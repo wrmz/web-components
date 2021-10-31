@@ -1,0 +1,9 @@
+node_modules
+test
+.out
+dist/
+.DS_STORE
+.idea
+docs/components
+coverage
+.nyc_output

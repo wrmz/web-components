@@ -1,0 +1,7 @@
+svg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--width, 24px);
+    height: var(--height, 24px);
+}
