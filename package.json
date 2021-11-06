@@ -34,6 +34,7 @@
         "jasmine": "^3.10.0",
         "nyc": "^15.1.0",
         "puppeteer": "^10.4.0",
+        "puppeteer-to-istanbul": "^1.4.0",
         "rollup": "^2.58.3",
         "rollup-plugin-terser": "^7.0.2",
         "stylelint": "^14.0.1",

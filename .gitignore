@@ -4,6 +4,7 @@ test
 dist/
 .DS_STORE
 .idea
+.env
 docs/components
 coverage
 .nyc_output

@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 import jasmine from 'jasmine';
 import axe from 'axe-core';
+import pti from 'puppeteer-to-istanbul';
 
 beforeAll(async () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -28,7 +29,7 @@ beforeAll(async () => {
     await page.goto('http://localhost:3000');
     await page.addScriptTag({'url': 'https://cdn.jsdelivr.net/npm/jasmine-core@3.6.0/lib/jasmine-core/jasmine.js'});
     await page.addScriptTag({'url': 'https://cdn.jsdelivr.net/npm/jasmine-core@3.6.0/lib/jasmine-core/jasmine-html.js'});
-    await page.addScriptTag({'url': 'https://cdn.jsdelivr.net/npm/jasmine-core@3.60./lib/jasmine-core/boot.js'});
+    await page.addScriptTag({'url': 'https://cdn.jsdelivr.net/npm/jasmine-core@3.6.0/lib/jasmine-core/boot.js'});
     global.axeHandle = await page.evaluateHandle(`${axe.source}`);
 });
 

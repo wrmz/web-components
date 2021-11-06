@@ -1,0 +1,13 @@
+:root {
+    --primary-mid: #274060;
+    --primary-light: #335c81;
+    --primary-dark: #1b2845;
+    --primary-ultralight: #65afff;
+    --secondary-mid: #489fb5;
+    --secondary-light: #82c0cc;
+    --secondary-dark: #16697a;
+    --info-ultralight: #65afff;
+    --info-mid: #274060;
+    --warning-ultralight: #ede7e3;
+    --warning-mid: #ffa62b;
+}

@@ -12,8 +12,23 @@
                 <div class="component">
                     <chevron-icon title="loading chevron icon"></chevron-icon>
                 </div>
+                <div class="component">
+                    <field-input>
+                        <label for="text-input" slot="label">Input Label</label>
+                        <input id="text-input" slot="input" placeholder="Placeholder text" required pattern="[A-z ]+" />
+                        <span slot="info">Additional helpful information for our users</span>
+                        <span slot="error">This input field should contain only letters and it is required!</em>
+                    </field-input>
+                </div>
+                <div class="component">
+                    <mortgage-calc
+                    >
+
+                    </mortgage-calc>
+                </div>
             </div>
         </div>
         <script src="./components/web-components.js"></script>
+        <script src="./main.js"></script>
     </body>
 </html>
