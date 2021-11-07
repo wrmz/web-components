@@ -1,0 +1,24 @@
+:root {
+    --primary-mid: #274060;
+    --primary-light: #335c81;
+    --primary-dark: #1b2845;
+    --primary-ultralight: #65afff;
+    --secondary-mid: #489fb5;
+    --secondary-light: #82c0cc;
+    --secondary-dark: #16697a;
+    --info-ultralight: #65afff;
+    --info-mid: #274060;
+    --warning-ultralight: #ede7e3;
+    --warning-mid: #ffa62b;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+    line-height: 1.6667;
+}
+
+#app {
+    padding: 50px;
+}
