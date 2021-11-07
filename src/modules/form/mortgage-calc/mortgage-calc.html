@@ -1,0 +1,34 @@
+<field-input>
+    <label for="price" slot="label">Price</label>
+    <input id="price" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="7" />
+    <!-- <span slot="info">The price of the home</span>
+    <span slot="error">Only numbers are permitted</span> -->
+</field-input>
+<field-input>
+    <label for="downpayment" slot="label">Downpayment</label>
+    <input id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="7" />
+    <!-- <span slot="info">How much you can put down</span>
+    <span slot="error">Only numbers are permitted</span> -->
+</field-input>
+<field-input>
+    <label for="interest" slot="label">Interest Rate</label>
+    <input id="interest" slot="input" placeholder="3.5" pattern="[0-9,]+" maxlength="4" />
+    <!-- <span slot="info">How much you can put down</span>
+    <span slot="error">Only numbers are permitted</span> -->
+</field-input>
+<field-input>
+    <label for="taxes" slot="label">Est. Monthly Property Taxes</label>
+    <input id="taxes" slot="input" placeholder="1.4" pattern="[0-9,]+" maxlength="4" />
+    <!-- <span slot="info">How much you can put down</span>
+    <span slot="error">Only numbers are permitted</span> -->
+</field-input>
+<radio-group>
+    <field-radio>
+        <input id="term-15" slot="input" type="radio" value="15" />
+        <label for="term-15" slot="label">15 Year</label>
+    </field-radio>
+    <field-radio>
+        <input id="term-30" slot="input" type="radio" value="30" />
+        <label for="term-30" slot="label">30 Year</label>
+    </field-radio>
+</radio-group>

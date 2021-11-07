@@ -4,7 +4,7 @@ import { ChevronIcon } from '../../icon/chevron-icon/chevron-icon';
 /**
  * @injectHTML
  */
-export class Info extends HTMLElement {
+export class InfoMessage extends HTMLElement {
     constructor() {
         super();
         registerComponents(ChevronIcon);
@@ -16,6 +16,6 @@ export class Info extends HTMLElement {
     }
 }
 
-if (!window.customElements.get('info')) {
-    window.customElements.define('info', Info);
+if (!window.customElements.get('info-message')) {
+    window.customElements.define('info-message', InfoMessage);
 }

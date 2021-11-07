@@ -1,0 +1,14 @@
+<fieldset>
+    <legend>
+        <slot name="label"></slot>
+    </legend>
+    <div class="radio-group">
+        <slot></slot>
+    </div>
+    <info role="status">
+        <slot name="info"></slot>
+    </info>
+    <info role="alert">
+        <slot name="error"></slot>
+    </info>
+</fieldset>
