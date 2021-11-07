@@ -1,12 +1,13 @@
 export class FormElement extends HTMLElement {
-    constructor() {
-        super();
-        this.handleInvalid = this.handleInvalid.bind(this);
-        this.handleInput = this.handleInput.bind(this);
-    }
-
     static get observedAttributes() {
         return ['invalid'];
+    }
+
+    constructor() {
+        super();
+        this.input = null;
+        this.handleInvalid = this.handleInvalid.bind(this);
+        this.handleInput = this.handleInput.bind(this);
     }
 
     get valid() { return !this.hasAttribute('invalid') && !this.hasAttribute('aria-invalid'); }
@@ -37,13 +38,16 @@ export class FormElement extends HTMLElement {
     }
 
     toggleInvalidAttribute(element) {
-        console.log('toggling invalid');
         const errorMsg = this.shadowRoot.querySelector('info[role="alert"]');
         element.validity.valid ? errorMsg.removeAttribute('invalid') : errorMsg.setAttribute('invalid', '');
     }
 
-    attributeChangedCallback() {
+    handleChanged() {
         const errorMsg = this.shadowRoot.querySelector('info[role="alert"]');
         this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
+    }
+
+    attributeChangedCallback(attr, oldVal, newVal) {
+        this.handleChanged();
     }
 }

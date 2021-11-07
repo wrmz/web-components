@@ -1,34 +1,45 @@
-<field-input>
-    <label for="price" slot="label">Price</label>
-    <input id="price" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="7" />
-    <!-- <span slot="info">The price of the home</span>
-    <span slot="error">Only numbers are permitted</span> -->
-</field-input>
-<field-input>
-    <label for="downpayment" slot="label">Downpayment</label>
-    <input id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="7" />
-    <!-- <span slot="info">How much you can put down</span>
-    <span slot="error">Only numbers are permitted</span> -->
-</field-input>
-<field-input>
-    <label for="interest" slot="label">Interest Rate</label>
-    <input id="interest" slot="input" placeholder="3.5" pattern="[0-9,]+" maxlength="4" />
-    <!-- <span slot="info">How much you can put down</span>
-    <span slot="error">Only numbers are permitted</span> -->
-</field-input>
-<field-input>
-    <label for="taxes" slot="label">Est. Monthly Property Taxes</label>
-    <input id="taxes" slot="input" placeholder="1.4" pattern="[0-9,]+" maxlength="4" />
-    <!-- <span slot="info">How much you can put down</span>
-    <span slot="error">Only numbers are permitted</span> -->
-</field-input>
-<radio-group>
-    <field-radio>
-        <input id="term-15" slot="input" type="radio" value="15" />
-        <label for="term-15" slot="label">15 Year</label>
-    </field-radio>
-    <field-radio>
-        <input id="term-30" slot="input" type="radio" value="30" />
-        <label for="term-30" slot="label">30 Year</label>
-    </field-radio>
-</radio-group>
+<div class="mortgage-calc__form">
+    <field-input name="price">
+        <label for="price" slot="label">Price</label>
+        <input id="price" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="7" />
+        <!-- <span slot="info">The price of the home</span>
+        <span slot="error">Only numbers are permitted</span> -->
+    </field-input>
+    <field-input name="downpayment">
+        <label for="downpayment" slot="label">Downpayment</label>
+        <input id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="7" />
+        <!-- <span slot="info">How much you can put down</span>
+        <span slot="error">Only numbers are permitted</span> -->
+    </field-input>
+    <field-input name="interest">
+        <label for="interest" slot="label">Interest Rate</label>
+        <input id="interest" slot="input" placeholder="3.5" pattern="[0-9,]+" maxlength="4" />
+        <!-- <span slot="info">How much you can put down</span>
+        <span slot="error">Only numbers are permitted</span> -->
+    </field-input>
+    <field-input name="taxes">
+        <label for="taxes" slot="label">Est. Monthly Property Taxes</label>
+        <input id="taxes" slot="input" placeholder="1.4" pattern="[0-9,]+" maxlength="4" />
+        <!-- <span slot="info">How much you can put down</span>
+        <span slot="error">Only numbers are permitted</span> -->
+    </field-input>
+    <radio-group name="term">
+        <span slot="label">Choose a Term</span>
+        <div class="mortgage-calc__radio">
+            <input id="term-15" type="radio" value="15" name="term" />
+            <label for="term-15">15 Year Mortgage</label>
+        </div>
+        <div class="mortgage-calc__radio">
+            <input id="term-30" type="radio" value="30" name="term" />
+            <label for="term-30">30 Year Mortgage</label>
+        </div>
+    </radio-group>
+</div>
+<div class="mortgage-calc__results">
+    <div class="mortgage-calc__chart">Chart</div>
+    <div class="mortgage-calc__data">
+        <div class="mortgage-calc__principal">Principal + Interest {{ principal }}</slot></div>
+        <div class="mortgage-calc__taxes">Taxes {{ taxes }}</div>
+        <div class="mortgage-calc__total">Amount Per Month: {{ perMonth }}</div>
+    </div>
+</div>

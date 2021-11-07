@@ -1,0 +1,53 @@
+:host {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 50px;
+
+    --box-shadow-color: var(--primary-light);
+    --box-shadow-width: 1px;
+    --box-shadow-color2: transparent;
+    --box-shadow-width2: 1px;
+}
+:host .mortgage-calc__form {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 20px;
+}
+radio-group {
+    grid-column: 1 / span 2;
+}
+:host .mortgage-calc__radio {
+    position: relative;
+    display: flex;
+}
+:host .mortgage-calc__radio input {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    margin: 22px 15px;
+    padding: 0;
+    background-clip: content-box;
+    appearance: none;
+    outline: none;
+    box-shadow: inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color), inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2);
+}
+:host .mortgage-calc__radio input:checked {
+    background-color: var(--primary-mid);
+
+    --box-shadow-color: var(--primary-mid);
+    --box-shadow-width: 2px;
+    --box-shadow-width2: 4px;
+    --box-shadow-color2: white;
+}
+:host .mortgage-calc__radio label {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 15px 20px 15px 40px;
+    border: 1px solid var(--primary-light);
+    border-radius: 5px;
+}

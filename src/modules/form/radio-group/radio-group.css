@@ -1,0 +1,18 @@
+:host {
+    display: grid;
+    appearance: none;
+}
+:host fieldset {
+    position: relative;
+    display: grid;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+:host .radio-group__options {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 20px;
+}
