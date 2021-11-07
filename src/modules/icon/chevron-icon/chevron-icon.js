@@ -6,7 +6,7 @@ export class ChevronIcon extends HTMLElement {
         super();
     }
 
-    static observedAttributes = ['title'];
+    static get observedAttributes() { return ['title'] };
 
     attributeChangedCallback(attrName, oldVal, newVal) {
         this.shadowRoot.querySelector('svg title').textContent = newVal;
