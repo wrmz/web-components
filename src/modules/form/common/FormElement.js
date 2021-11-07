@@ -1,13 +1,13 @@
 export class FormElement extends HTMLElement {
     static get observedAttributes() {
-        return ['invalid'];
+        return ['invalid', 'value'];
     }
 
     constructor() {
         super();
         this.input = null;
         this.handleInvalid = this.handleInvalid.bind(this);
-        this.handleInput = this.handleInput.bind(this);
+        this.handleFormInput = this.handleFormInput.bind(this);
     }
 
     get valid() { return !this.hasAttribute('invalid') && !this.hasAttribute('aria-invalid'); }
@@ -23,7 +23,7 @@ export class FormElement extends HTMLElement {
 
     registerElementForValidation(element) {
         element.addEventListener('invalid', this.handleInvalid, false);
-        element.addEventListener('input', this.handleInput, false);
+        element.addEventListener('input', this.handleFormInput, false);
     }
 
     handleInvalid(e) {
@@ -31,7 +31,7 @@ export class FormElement extends HTMLElement {
         this.toggleInvalidAttribute(e.target);
     }
 
-    handleInput(e) {
+    handleFormInput(e) {
         const element = e.target;
         this.valid = element.checkValidity();
         this.toggleInvalidAttribute(element);
