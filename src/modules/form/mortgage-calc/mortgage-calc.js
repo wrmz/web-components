@@ -6,7 +6,7 @@ import { RadioGroup } from '../radio-group/radio-group.js';
  * @injectHTML
  */
 export class MortgageCalc extends HTMLElement {
-    static observedAttributes = ['price', 'downpayment', 'interest', 'taxes', 'term'];
+    static get observedAttributes() { return ['price', 'downpayment', 'interest', 'taxes', 'term']; }
 
     constructor() {
         super();
