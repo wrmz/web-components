@@ -15,7 +15,7 @@
         ],
         "declaration-colon-space-after": "always",
         "indentation": [
-            "space",
+            4,
             {
                 "except": [
                     "value"
@@ -35,9 +35,12 @@
             }
         ],
         "declaration-block-no-redundant-longhand-properties": true,
-        "declaration-block-no-import": null,
+        "declaration-no-important": null,
         "max-nesting-depth": 5,
+        "max-line-length": 140,
         "no-duplicate-selectors": true,
-        "selector-type-no-unknown": null
+        "selector-type-no-unknown": null,
+        "selector-class-pattern": "^([a-z][a-z0-9]*(-[a-z0-9-_]+))",
+        "string-quotes": "single"
     }
 }

@@ -1,12 +1,11 @@
 import { FormElement } from '../common/FormElement';
-import { registerComponents } from '../../common/register-components';
 
 /**
  * @injectHTML
  */
 export class FieldInput extends FormElement {
 
-    static get readableFormat() { return new Intl.NumberFormat('en-US').format }
+    static get readableFormat() { return new Intl.NumberFormat('en-US').format; }
     static get currencyFormat() {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -15,9 +14,10 @@ export class FieldInput extends FormElement {
             maximumFractionDigits: 0,
         }).format;
     }
-    static get sanitizedFormat(v) {
-        return v.trim().replace(/[^0-9\.]/g, '');
+    static sanitizedFormat(v) {
+        return v.trim().replace(/[^0-9.]/g, '');
     }
+
     constructor() {
         super();
         this.handleSlotChange = this.handleSlotChange.bind(this);

@@ -37,7 +37,7 @@ export class MortgageCalc extends HTMLElement {
     set term(v) { this.elements.term.value = v; }
 
     get mortgagePrincipal() {
-        return
+        return 'no';
     }
 
     attributeChangedCallback(attr, oldVal, newVal) {

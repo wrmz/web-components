@@ -5,6 +5,7 @@
     height: max-content;
     box-sizing: border-box;
 }
+
 ::slotted(input),
 ::slotted(textarea) {
     width: 100%;

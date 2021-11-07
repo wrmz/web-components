@@ -5,10 +5,10 @@
     <div class="radio-group__options">
         <slot></slot>
     </div>
-    <info role="status">
-        <slot name="info"></slot>
-    </info>
-    <info role="alert">
+    <info-message role="status">
+        <slot name="info-message"></slot>
+    </info-message>
+    <info-message role="alert">
         <slot name="error"></slot>
-    </info>
+    </info-message>
 </fieldset>

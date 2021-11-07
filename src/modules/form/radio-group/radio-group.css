@@ -2,6 +2,7 @@
     display: grid;
     appearance: none;
 }
+
 :host fieldset {
     position: relative;
     display: grid;
