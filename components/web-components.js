@@ -83,13 +83,18 @@ var webComponents = (function (exports) {
         }
 
         toggleInvalidAttribute(element) {
-            const errorMsg = this.shadowRoot.querySelector('info[role="alert"]');
-            element.validity.valid ? errorMsg.removeAttribute('invalid') : errorMsg.setAttribute('invalid', '');
+            const errorMsg = this.shadowRoot.querySelector('info-message[role="alert"]');
+            if (errorMsg) {
+                element.validity.valid ? errorMsg.removeAttribute('invalid') : errorMsg.setAttribute('invalid', '');
+            }
+
         }
 
         handleChanged() {
-            const errorMsg = this.shadowRoot.querySelector('info[role="alert"]');
-            this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
+            const errorMsg = this.shadowRoot.querySelector('info-message[role="alert"]');
+            if (errorMsg) {
+                this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
+            }
         }
 
         attributeChangedCallback() {
