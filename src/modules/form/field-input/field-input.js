@@ -6,14 +6,16 @@ import { registerComponents } from '../../common/register-components';
  */
 export class FieldInput extends FormElement {
 
-    static readableFormat = new Intl.NumberFormat('en-US').format;
-    static currencyFormat = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format;
-    static sanitizedFormat = function (v) {
+    static get readableFormat() { return new Intl.NumberFormat('en-US').format }
+    static get currencyFormat() {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format;
+    }
+    static get sanitizedFormat(v) {
         return v.trim().replace(/[^0-9\.]/g, '');
     }
     constructor() {

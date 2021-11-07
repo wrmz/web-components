@@ -62,7 +62,7 @@ export class MortgageCalc extends HTMLElement {
         // }
         // this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
     }
-};
+}
 
 if (!window.customElements.get('mortgage-calc')) {
     window.customElements.define('mortgage-calc', MortgageCalc);

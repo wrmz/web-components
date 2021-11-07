@@ -47,7 +47,7 @@ export class FormElement extends HTMLElement {
         this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
     }
 
-    attributeChangedCallback(attr, oldVal, newVal) {
+    attributeChangedCallback() {
         this.handleChanged();
     }
 }
