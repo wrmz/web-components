@@ -41,6 +41,17 @@ export class MortgageCalcInput extends FieldInput {
         }
 
     }
+
+    attributeChangedCallback(attr, oldVal, newVal) {
+        this.handleChanged();
+        if (attr === 'value') {
+            if (this.type === 'currency') {
+                this._value = this.currency;
+            } else if (this.type === 'percentage') {
+                this._value = this.numeric;
+            }
+        }
+    }
 }
 
 if (!window.customElements.get('mortgage-calc-input')) {

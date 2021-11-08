@@ -22,7 +22,7 @@ export class FieldInput extends FormElement {
         this.input = [...e.target.assignedElements()].find(el => el.tagName === 'INPUT');
         if (this.input) {
             this.registerElementForValidation(this.input);
-            this.input.value = this.getAttribute('value') || '';
+            this.input.value = this._value || this.getAttribute('value') || '';
             this.input.addEventListener('input', this.handleInput, false);
             this.input.addEventListener('keyup', this.handleKeyup, false);
         }

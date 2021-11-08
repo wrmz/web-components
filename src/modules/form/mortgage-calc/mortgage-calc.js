@@ -43,22 +43,16 @@ export class MortgageCalc extends HTMLElement {
     }
 
     get price() { return this.elements.price.numeric; }
-    set price(v) {
-        console.log(this.elements);
-        this.elements.price.value = v;
-     }
+    set price(v) { this.elements.price.value = v; }
 
-    // get price() { return this.elements.price.floated; }
-    // set price(v) { this.elements.price.value = v; }
+    get downpayment() { return this.elements.downpayment.numeric; }
+    set downpayment(v) { this.elements.downpayment.value = v; }
 
-    // get downpayment() { return this.elements.downpayment.floated; }
-    // set downpayment(v) { this.elements.downpayment.value = v; }
+    get interest() { return this.elements.interest.floated; }
+    set interest(v) { this.elements.interest.value = v; }
 
-    // get interest() { return this.elements.interest.floated; }
-    // set interest(v) { this.elements.interest.value = v; }
-
-    // get taxes() { return this.elements.taxes.floated; }
-    // set taxes(v) { this.elements.taxes.value = v;}
+    get taxes() { return this.elements.taxes.floated; }
+    set taxes(v) { this.elements.taxes.value = v;}
 
     // get term() { return this.elements.term.floated; }
     // set term(v) { this.elements.term.value = v; }
@@ -152,9 +146,20 @@ export class MortgageCalc extends HTMLElement {
     //     this.output.perMonth.textContent = FieldInput.currencyFormat(this.monthlyPayment);
     // }
     attributeChangedCallback(attr, oldVal, newVal) {
-        if (attr === 'price') {
-            console.log('new price', newVal);
-            this.price = newVal;
+        switch (attr) {
+            case 'price':
+                this.price = newVal;
+                break;
+            case 'downpayment':
+                this.downpayment = newVal;
+                break;
+            case 'interest':
+                this.interest = newVal;
+                break;
+            case 'taxes':
+                this.taxes = newVal;
+                break;
+            default: break;
         }
     }
 

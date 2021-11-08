@@ -5,6 +5,7 @@ export class FormElement extends HTMLElement {
 
     constructor() {
         super();
+        this._input = null;
         this.input = null;
         this.handleFormElementInvalid = this.handleFormElementInvalid.bind(this);
         this.handleFormElementInput = this.handleFormElementInput.bind(this);
