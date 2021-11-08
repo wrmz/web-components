@@ -29,8 +29,6 @@ export class MortgageCalc extends HTMLElement {
             interest: this.shadowRoot.querySelector('mortgage-calc-input[name="interest"]'),
             taxes: this.shadowRoot.querySelector('mortgage-calc-input[name="taxes"]'),
             term: this.shadowRoot.querySelector('radio-group[name="term"]'),
-            // pmi: { floated: FieldInput.floatedFormat(this.getAttribute('pmi')) || 0.5 },
-            // insurance: { floated: FieldInput.floatedFormat(this.getAttribute('insurance')) || 0.35 }
         };
 
         this.output = {
@@ -39,7 +37,15 @@ export class MortgageCalc extends HTMLElement {
             perMonth: this.shadowRoot.querySelector('#outputPerMonth'),
         };
 
-        // this.addEventListener('input', this.handleInput, false);
+        this.addEventListener('input', this.handleInput, false);
+    }
+    get currencyFormat() {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format;
     }
 
     get price() { return this.elements.price.numeric; }
@@ -57,94 +63,93 @@ export class MortgageCalc extends HTMLElement {
     get term() { return this.elements.term.numeric; }
     set term(v) { this.elements.term.value = v; }
 
-    // get pmi() { return this.elements.pmi.floated; }
-    // set pmi(v) { this.elements.pmi.value = v; }
+    get pmi() { return this.getAttribute('pmi') || ''; }
 
-    // get insurance() { console.log(this.elements.insurance.floated); return this.elements.insurance.floated; }
-    // set insurance(v) { this.elements.insurance.value = v; }
+    get insurance() { return this.getAttribute('insurance') || ''; }
 
-    // /**
-    //  * The mortgage principal is the initial loan amount.
-    //  * It's the price minus the downpayment you make.
-    //  * If a home is $500,000 and you put down $100,000,
-    //  * you'll need to borrow $400,000 from the bank.
-    //  */
-    // get mortgagePrincipal() {
-    //     return this.price - this.downpayment;
-    // }
+    /**
+     * The mortgage principal is the initial loan amount.
+     * It's the price minus the downpayment you make.
+     * If a home is $500,000 and you put down $100,000,
+     * you'll need to borrow $400,000 from the bank.
+     */
+    get mortgagePrincipal() {
+        return this.price - this.downpayment;
+    }
 
-    // /**
-    //  * The interest rate percentage is divided by 12 (months in a year)
-    //  * to find the monthly interest rate.
-    //  * If the annual interest rate is 4%, the monthly interest rate is 0.33%
-    //  * or 0.0033.
-    //  */
-    // get monthlyInterestRate() {
-    //     return (this.interest / 100) / 12;
-    // }
+    /**
+     * The interest rate percentage is divided by 12 (months in a year)
+     * to find the monthly interest rate.
+     * If the annual interest rate is 4%, the monthly interest rate is 0.33%
+     * or 0.0033.
+     */
+    get monthlyInterestRate() {
+        return (this.interest / 100) / 12;
+    }
 
-    // /**
-    //  * For a fixed-rate mortgage, the term is often 30 or 15 years.
-    //  * The number of payments is the number of years multiplied by
-    //  * 12 (months in a year). 30 years would be 360 monthly payments.
-    //  */
-    // get numberOfPayments() {
-    //     console.log('term:', this.term);
-    //     return this.term * 12;
-    // }
+    /**
+     * For a fixed-rate mortgage, the term is often 30 or 15 years.
+     * The number of payments is the number of years multiplied by
+     * 12 (months in a year). 30 years would be 360 monthly payments.
+     */
+    get numberOfPayments() {
+        console.log('term:', this.term);
+        return this.term * 12;
+    }
 
-    // /**
-    //  * The monthly mortgage principal divided by the total number
-    //  * of payments
-    //  */
-    // get monthlyMortgagePrincipal() {
-    //     // console.log(this.numberOfPayments);
-    //     return this.mortgagePrincipal / this.numberOfPayments;
-    // }
+    /**
+     * The monthly mortgage principal divided by the total number
+     * of payments
+     */
+    get monthlyMortgagePrincipal() {
+        // console.log(this.numberOfPayments);
+        return this.mortgagePrincipal / this.numberOfPayments;
+    }
 
-    // /**
-    //  * Private mortgage insurance (PMI) is required if you put
-    //  * down less than 20% of the purchase price with a conventional mortgage.
-    //  * It's typically between 0.2% and 2% of the mortgage principal.
-    //  */
-    // get pmiCost() {
-    //     const lessThanTwentyPercent = (this.downpayment / this.price) < 0.2;
-    //     return lessThanTwentyPercent
-    //         ? ((this.pmi / 100) * this.mortgagePrincipal) / 12
-    //         : 0;
-    // }
+    /**
+     * Private mortgage insurance (PMI) is required if you put
+     * down less than 20% of the purchase price with a conventional mortgage.
+     * It's typically between 0.2% and 2% of the mortgage principal.
+     */
+    get pmiCost() {
+        const lessThanTwentyPercent = (this.downpayment / this.price) < 0.2;
+        return lessThanTwentyPercent
+            ? ((this.pmi / 100) * this.mortgagePrincipal) / 12
+            : 0;
+    }
 
-    // /**
-    //  * Property tax is a percentage of the price
-    //  * split into 12 month payments
-    //  */
-    // get taxesCost() {
-    //     return ((this.taxes / 100) * this.price) / 12;
-    // }
+    /**
+     * Property tax is a percentage of the price
+     * split into 12 month payments
+     */
+    get taxesCost() {
+        return ((this.taxes / 100) * this.price) / 12;
+    }
 
-    // /**
-    //  * Home insurance is a percentage of the price
-    //  * split into 12 month payments
-    //  */
-    // get insuranceCost() {
-    //     const insuranceCost = ((this.insurance / 100) * this.price) / 12
-    //     console.log('insurance cost', insuranceCost);
-    //     return insuranceCost;
-    // }
+    /**
+     * Home insurance is a percentage of the price
+     * split into 12 month payments
+     */
+    get insuranceCost() {
+        const insuranceCost = ((this.insurance / 100) * this.price) / 12
+        console.log('insurance cost', insuranceCost);
+        return insuranceCost;
+    }
 
-    // get monthlyPayment() {
-    //     const monthlyPayment = this.monthlyMortgagePrincipal + this.taxesCost + this.insuranceCost + this.pmiCost
-    //     // console.log(
-    //     //     'monthlyMortgagePrincipal:', this.monthlyMortgagePrincipal,
-    //     // );
-    //     return monthlyPayment;
-    // }
+    get monthlyPayment() {
+        const monthlyPayment = this.monthlyMortgagePrincipal + this.taxesCost + this.insuranceCost + this.pmiCost
+        // console.log(
+        //     'monthlyMortgagePrincipal:', this.monthlyMortgagePrincipal,
+        // );
+        return monthlyPayment;
+    }
 
-    // handleInput(e) {
-    //     this.output.principal.textContent = FieldInput.currencyFormat(this.monthlyMortgagePrincipal + this.interest);
-    //     this.output.taxes.textContent = FieldInput.currencyFormat(this.taxesCost);
-    //     this.output.perMonth.textContent = FieldInput.currencyFormat(this.monthlyPayment);
-    // }
+    handleInput(e) {
+        this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal + this.interest);
+        this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
+        this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
+    }
+
     attributeChangedCallback(attr, oldVal, newVal) {
         if (attr === 'price') {
             this.price = newVal;
@@ -157,6 +162,10 @@ export class MortgageCalc extends HTMLElement {
         } else if (attr === 'term') {
             this.term = newVal;
         }
+
+        this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal);
+        this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
+        this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
     }
 
     // attributeChangedCallback(attr, oldVal, newVal) {
