@@ -36,7 +36,7 @@ class FieldInput extends FormElement {
 
     disconnectedCallback() {
         this.input.removeEventListener('input', this.handleInput);
-        this.input.removeEventListener('iput', this.handleKeyup);
+        this.input.removeEventListener('keyup', this.handleKeyup);
         this.shadowInput.removeEventListener('slotchange', this.handleSlotChange);
     }
 

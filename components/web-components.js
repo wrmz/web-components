@@ -50,8 +50,8 @@ var webComponents = (function (exports) {
 
         constructor() {
             super();
-            this._input = null;
             this.input = null;
+            this.radios = null;
             this.handleFormElementInvalid = this.handleFormElementInvalid.bind(this);
             this.handleFormElementInput = this.handleFormElementInput.bind(this);
         }
@@ -139,7 +139,7 @@ var webComponents = (function (exports) {
 
         disconnectedCallback() {
             this.input.removeEventListener('input', this.handleInput);
-            this.input.removeEventListener('iput', this.handleKeyup);
+            this.input.removeEventListener('keyup', this.handleKeyup);
             this.shadowInput.removeEventListener('slotchange', this.handleSlotChange);
         }
 
@@ -191,22 +191,7 @@ var webComponents = (function (exports) {
      * @injectHTML
      */
     class RadioGroup extends FormElement {
-        static get readableFormat() { return new Intl.NumberFormat('en-US').format; }
-        static get currencyFormat() {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-            }).format;
-        }
-        static sanitizedFormat(v) {
-            return (v + '').trim().replace(/[^(0-9)*.(0-9)]/g, '');
-        }
-        static floatedFormat(v) {
-            const float = parseFloat(RadioGroup.sanitizedFormat(v));
-            return isNaN(float) ? 0 : float;
-        }
+        static sanitize(v) { return (v + '').trim().replace(/[^0-9.]*/g, ''); }
 
         constructor() {
             super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;appearance:none}:host fieldset{position:relative;display:grid;margin:0;padding:0;border:0}:host .radio-group__options{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:20px}</style><fieldset class="radio-group"><legend class="radio-group__legend"><slot name="label"></slot></legend><div class="radio-group__options"><slot></slot></div><info-message role="status"><slot name="info-message"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></fieldset>`;
@@ -217,13 +202,15 @@ var webComponents = (function (exports) {
             this.shadowRadios.addEventListener('slotchange', this.handleSlotChange, false);
         }
 
-        get value() { return RadioGroup.sanitizedFormat(this.getAttribute('value') || ''); }
+        get value() { return this.getAttribute('value') || ''; }
         set value(v) { this.setAttribute('value', v); }
 
-        get floated() { return RadioGroup.floatedFormat(this.value); }
+        get numeric() {
+            const sanitized = RadioGroup.sanitize(this.value);
+            return isNaN(sanitized) ? 0 : sanitized;
+        }
 
         get selectedRadio() {
-
             return this.radios && this.value
                 ? this.radios.find(el => el.checked)
                 : null;
@@ -251,6 +238,13 @@ var webComponents = (function (exports) {
 
         handleInput(e) {
             this.value = e.target.value;
+        }
+
+        attributeChangedCallback(attr, oldVal, newVal) {
+            this.handleChanged();
+            if (attr === 'value') {
+                this._value = newVal;
+            }
         }
 
         detachedCallback() {
@@ -301,7 +295,6 @@ var webComponents = (function (exports) {
             } else if (this.type === 'percentage') {
                 e.target.value = this.numeric;
             }
-
         }
 
         attributeChangedCallback(attr) {
@@ -337,7 +330,7 @@ var webComponents = (function (exports) {
         }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><mortgage-calc-input name="price" type="currency"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="downpayment" type="currency"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="interest" type="percentage"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="taxes" type="percentage"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9"></mortgage-calc-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15 Year Mortgage</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30 Year Mortgage</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart">Chart</div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div><div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div><div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div></div></div>`;
+            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><mortgage-calc-input name="price" type="currency"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="downpayment" type="currency"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="interest" type="percentage"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="taxes" type="percentage"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15 Year Mortgage</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30 Year Mortgage</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart">Chart</div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div><div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div><div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div></div></div>`;
 
             registerComponents(MortgageCalcInput, RadioGroup);
 
@@ -366,14 +359,14 @@ var webComponents = (function (exports) {
         get downpayment() { return this.elements.downpayment.numeric; }
         set downpayment(v) { this.elements.downpayment.value = v; }
 
-        get interest() { return this.elements.interest.floated; }
+        get interest() { return this.elements.interest.numeric; }
         set interest(v) { this.elements.interest.value = v; }
 
-        get taxes() { return this.elements.taxes.floated; }
+        get taxes() { return this.elements.taxes.numeric; }
         set taxes(v) { this.elements.taxes.value = v;}
 
-        // get term() { return this.elements.term.floated; }
-        // set term(v) { this.elements.term.value = v; }
+        get term() { return this.elements.term.numeric; }
+        set term(v) { this.elements.term.value = v; }
 
         // get pmi() { return this.elements.pmi.floated; }
         // set pmi(v) { this.elements.pmi.value = v; }
@@ -472,6 +465,8 @@ var webComponents = (function (exports) {
                 this.interest = newVal;
             } else if (attr === 'taxes') {
                 this.taxes = newVal;
+            } else if (attr === 'term') {
+                this.term = newVal;
             }
         }
 
