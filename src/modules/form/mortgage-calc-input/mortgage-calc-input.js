@@ -39,7 +39,6 @@ export class MortgageCalcInput extends FieldInput {
         } else if (this.type === 'percentage') {
             e.target.value = this.numeric;
         }
-
     }
 
     attributeChangedCallback(attr) {

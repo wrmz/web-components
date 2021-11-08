@@ -6,22 +6,7 @@ import { InfoMessage } from '../info-message/info-message.js';
  * @injectHTML
  */
 export class RadioGroup extends FormElement {
-    static get readableFormat() { return new Intl.NumberFormat('en-US').format; }
-    static get currencyFormat() {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format;
-    }
-    static sanitizedFormat(v) {
-        return (v + '').trim().replace(/[^(0-9)*.(0-9)]/g, '');
-    }
-    static floatedFormat(v) {
-        const float = parseFloat(RadioGroup.sanitizedFormat(v));
-        return isNaN(float) ? 0 : float;
-    }
+    static sanitize(v) { return (v + '').trim().replace(/[^0-9.]*/g, ''); }
 
     constructor() {
         super();
@@ -32,13 +17,15 @@ export class RadioGroup extends FormElement {
         this.shadowRadios.addEventListener('slotchange', this.handleSlotChange, false);
     }
 
-    get value() { return RadioGroup.sanitizedFormat(this.getAttribute('value') || ''); }
+    get value() { return this.getAttribute('value') || ''; }
     set value(v) { this.setAttribute('value', v); }
 
-    get floated() { return RadioGroup.floatedFormat(this.value); }
+    get numeric() {
+        const sanitized = RadioGroup.sanitize(this.value);
+        return isNaN(sanitized) ? 0 : sanitized;
+    }
 
     get selectedRadio() {
-
         return this.radios && this.value
             ? this.radios.find(el => el.checked)
             : null;
@@ -66,6 +53,13 @@ export class RadioGroup extends FormElement {
 
     handleInput(e) {
         this.value = e.target.value;
+    }
+
+    attributeChangedCallback(attr, oldVal, newVal) {
+        this.handleChanged();
+        if (attr === 'value') {
+            this._value = newVal;
+        }
     }
 
     detachedCallback() {

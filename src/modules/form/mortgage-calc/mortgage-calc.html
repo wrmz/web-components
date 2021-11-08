@@ -1,19 +1,19 @@
 <div class="mortgage-calc__form">
     <mortgage-calc-input name="price" type="currency">
         <label for="price" slot="label">Price</label>
-        <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9]+" maxlength="9" />
+        <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9" />
     </mortgage-calc-input>
     <mortgage-calc-input name="downpayment" type="currency">
         <label for="downpayment" slot="label">Downpayment</label>
-        <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="9" />
+        <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9" />
     </mortgage-calc-input>
     <mortgage-calc-input name="interest" type="percentage">
         <label for="interest" slot="label">Interest Rate</label>
-        <input type="text" id="interest" slot="input" placeholder="3.5" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9" />
+        <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9.]+" maxlength="9" />
     </mortgage-calc-input>
     <mortgage-calc-input name="taxes" type="percentage">
         <label for="taxes" slot="label">Est. Monthly Property Taxes</label>
-        <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9" />
+        <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9.]+" maxlength="9" />
     </mortgage-calc-input>
     <radio-group name="term">
         <span slot="label">Choose a Term</span>

@@ -48,14 +48,14 @@ export class MortgageCalc extends HTMLElement {
     get downpayment() { return this.elements.downpayment.numeric; }
     set downpayment(v) { this.elements.downpayment.value = v; }
 
-    get interest() { return this.elements.interest.floated; }
+    get interest() { return this.elements.interest.numeric; }
     set interest(v) { this.elements.interest.value = v; }
 
-    get taxes() { return this.elements.taxes.floated; }
+    get taxes() { return this.elements.taxes.numeric; }
     set taxes(v) { this.elements.taxes.value = v;}
 
-    // get term() { return this.elements.term.floated; }
-    // set term(v) { this.elements.term.value = v; }
+    get term() { return this.elements.term.numeric; }
+    set term(v) { this.elements.term.value = v; }
 
     // get pmi() { return this.elements.pmi.floated; }
     // set pmi(v) { this.elements.pmi.value = v; }
@@ -154,6 +154,8 @@ export class MortgageCalc extends HTMLElement {
             this.interest = newVal;
         } else if (attr === 'taxes') {
             this.taxes = newVal;
+        } else if (attr === 'term') {
+            this.term = newVal;
         }
     }
 
