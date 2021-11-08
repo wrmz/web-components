@@ -6,7 +6,22 @@ import { InfoMessage } from '../info-message/info-message.js';
  * @injectHTML
  */
 class RadioGroup extends FormElement {
-    // static observedAttributes = ['value'];
+    static get readableFormat() { return new Intl.NumberFormat('en-US').format; }
+    static get currencyFormat() {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format;
+    }
+    static sanitizedFormat(v) {
+        return (v + '').trim().replace(/[^(0-9)*.(0-9)]/g, '');
+    }
+    static floatedFormat(v) {
+        const float = parseFloat(RadioGroup.sanitizedFormat(v));
+        return isNaN(float) ? 0 : float;
+    }
 
     constructor() {
         super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;appearance:none}:host fieldset{position:relative;display:grid;margin:0;padding:0;border:0}:host .radio-group__options{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:20px}</style><fieldset class="radio-group"><legend class="radio-group__legend"><slot name="label"></slot></legend><div class="radio-group__options"><slot></slot></div><info-message role="status"><slot name="info-message"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></fieldset>`;
@@ -17,8 +32,10 @@ class RadioGroup extends FormElement {
         this.shadowRadios.addEventListener('slotchange', this.handleSlotChange, false);
     }
 
-    get value() { return this.getAttribute('value'); }
+    get value() { return RadioGroup.sanitizedFormat(this.getAttribute('value') || ''); }
     set value(v) { this.setAttribute('value', v); }
+
+    get floated() { return RadioGroup.floatedFormat(this.value); }
 
     get selectedRadio() {
 

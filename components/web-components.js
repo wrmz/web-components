@@ -50,9 +50,10 @@ var webComponents = (function (exports) {
 
         constructor() {
             super();
+            this._input = null;
             this.input = null;
-            this.handleInvalid = this.handleInvalid.bind(this);
-            this.handleFormInput = this.handleFormInput.bind(this);
+            this.handleFormElementInvalid = this.handleFormElementInvalid.bind(this);
+            this.handleFormElementInput = this.handleFormElementInput.bind(this);
         }
 
         get valid() { return !this.hasAttribute('invalid') && !this.hasAttribute('aria-invalid'); }
@@ -67,16 +68,16 @@ var webComponents = (function (exports) {
         }
 
         registerElementForValidation(element) {
-            element.addEventListener('invalid', this.handleInvalid, false);
-            element.addEventListener('input', this.handleFormInput, false);
+            element.addEventListener('invalid', this.handleFormElementInvalid, false);
+            element.addEventListener('input', this.handleFormElementInput, false);
         }
 
-        handleInvalid(e) {
+        handleFormElementInvalid(e) {
             this.valid = false;
             this.toggleInvalidAttribute(e.target);
         }
 
-        handleFormInput(e) {
+        handleFormElementInput(e) {
             const element = e.target;
             this.valid = element.checkValidity();
             this.toggleInvalidAttribute(element);
@@ -107,55 +108,79 @@ var webComponents = (function (exports) {
      */
     class FieldInput extends FormElement {
 
-        static get readableFormat() { return new Intl.NumberFormat('en-US').format; }
-        static get currencyFormat() {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-            }).format;
-        }
-        static sanitizedFormat(v) {
-            return v.trim().replace(/[^0-9.]/g, '');
-        }
-
         constructor() {
             super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-gap:3px;width:100%;height:max-content;box-sizing:border-box}::slotted(input),::slotted(textarea){width:100%;font-size:14px;line-height:20px;padding:13px 15px;margin:0;border:1px solid var(--primary-light);border-radius:5px;color:#555;outline:0;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis}:host([invalid]) ::slotted(input),:host([invalid]) ::slotted(textarea){border:2px solid var(--warning-mid);padding:12px 14px}::slotted(input::placeholder),::slotted(textarea::placeholder){color:#767676}::slotted(input:focus),::slotted(textarea:focus){border:2px solid #555;padding:12px 14px}</style><div class="field"><slot name="label"></slot><slot name="input"></slot><info-message role="status"><slot name="info"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></div>`;
+            this.input = null;
+            this.handleInput = this.handleInput.bind(this);
+            this.handleKeyup = this.handleKeyup.bind(this);
             this.handleSlotChange = this.handleSlotChange.bind(this);
-            this.input = undefined;
             this.shadowInput = this.shadowRoot.querySelector('slot[name="input"]');
             this.shadowInput.addEventListener('slotchange', this.handleSlotChange, false);
         }
 
-        get value() { return FieldInput.sanitizedFormat(this.getAttribute('value') || ''); }
-        set value(v) {
-            const sanitized = FieldInput.sanitizedFormat(v);
-            const readable = FieldInput.readableFormat(sanitized);
-
-            this.setAttribute('value', readable);
-        }
-
+        get value() { return this.getAttribute('value') || ''; }
+        set value(v) { this.setAttribute('value', v); }
 
         handleSlotChange(e) {
             this.input = [...e.target.assignedElements()].find(el => el.tagName === 'INPUT');
-
             if (this.input) {
-                this.input.value = this.value ? FieldInput.readableFormat(this.value) : '';
                 this.registerElementForValidation(this.input);
-                this.addEventListener('input', this.handleInput, false);
+                this.input.value = this._value || this.getAttribute('value') || '';
+                this.input.addEventListener('input', this.handleInput, false);
+                this.input.addEventListener('keyup', this.handleKeyup, false);
             }
         }
 
         handleInput(e) {
             this.value = e.target.value;
-            e.target.value = FieldInput.readableFormat(this.value);
         }
 
+        handleKeyup() { }
+
         disconnectedCallback() {
-            this.removeEventListener('input', this.handleInput);
+            this.input.removeEventListener('input', this.handleInput);
+            this.input.removeEventListener('iput', this.handleKeyup);
             this.shadowInput.removeEventListener('slotchange', this.handleSlotChange);
         }
+
+        // attributeChangedCallback(attr, oldVal, newVal) {
+        //     if (attr === 'value' && this.input) {
+        //         this.input.value = this.value;
+        //     }
+        // }
+
+        // get value() { return this.getAttribute('value') || ''; }
+        // set value(v) {
+        //     // const sanitized = FieldInput.sanitizedFormat(v);
+        //     // const readable = FieldInput.readableFormat(sanitized);
+
+        //     this.setAttribute('value', v);
+        // }
+        // get sanitized() { return FieldInput.sanitizedFormat(this.value); }
+        // get floated() { return FieldInput.floatedFormat(this.value); }
+        // get currency() { return FieldInput.currencyFormat(this.value); }
+
+
+        // handleSlotChange(e) {
+        //     this.input = [...e.target.assignedElements()].find(el => el.tagName === 'INPUT');
+
+        //     if (this.input) {
+        //         this.input.value = this.value ? FieldInput.readableFormat(this.value) : '';
+        //         this.registerElementForValidation(this.input);
+        //         this.addEventListener('input', this.handleInput, false);
+        //     }
+        // }
+
+        // handleInput(e) {
+        //     this.value = e.target.value;
+
+        //     e.target.value = FieldInput.readableFormat(this.value);
+        // }
+
+        // disconnectedCallback() {
+        //     this.removeEventListener('input', this.handleInput);
+        //     this.shadowInput.removeEventListener('slotchange', this.handleSlotChange);
+        // }
     }
 
     if (!window.customElements.get('field-input')) {
@@ -166,7 +191,22 @@ var webComponents = (function (exports) {
      * @injectHTML
      */
     class RadioGroup extends FormElement {
-        // static observedAttributes = ['value'];
+        static get readableFormat() { return new Intl.NumberFormat('en-US').format; }
+        static get currencyFormat() {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format;
+        }
+        static sanitizedFormat(v) {
+            return (v + '').trim().replace(/[^(0-9)*.(0-9)]/g, '');
+        }
+        static floatedFormat(v) {
+            const float = parseFloat(RadioGroup.sanitizedFormat(v));
+            return isNaN(float) ? 0 : float;
+        }
 
         constructor() {
             super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;appearance:none}:host fieldset{position:relative;display:grid;margin:0;padding:0;border:0}:host .radio-group__options{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:20px}</style><fieldset class="radio-group"><legend class="radio-group__legend"><slot name="label"></slot></legend><div class="radio-group__options"><slot></slot></div><info-message role="status"><slot name="info-message"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></fieldset>`;
@@ -177,8 +217,10 @@ var webComponents = (function (exports) {
             this.shadowRadios.addEventListener('slotchange', this.handleSlotChange, false);
         }
 
-        get value() { return this.getAttribute('value'); }
+        get value() { return RadioGroup.sanitizedFormat(this.getAttribute('value') || ''); }
         set value(v) { this.setAttribute('value', v); }
+
+        get floated() { return RadioGroup.floatedFormat(this.value); }
 
         get selectedRadio() {
 
@@ -220,70 +262,253 @@ var webComponents = (function (exports) {
         window.customElements.define('radio-group', RadioGroup);
     }
 
+    class MortgageCalcInput extends FieldInput {
+        static sanitize(v) { return (v + '').trim().replace(/[^0-9.]*/g, ''); }
+
+        get type() { return this.getAttribute('type') || 'currency'; }
+        get stylizedFormat() {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: this.type === 'percentage' ? 1 : 0,
+                maximumFractionDigits: 2
+            }).format;
+        }
+        get currencyFormat() {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format;
+        }
+        get numeric() {
+            const sanitized = MortgageCalcInput.sanitize(this.value);
+            return isNaN(sanitized) ? 0 : sanitized;
+        }
+        get stylized() {
+            const sanitized = this.numeric;
+            return this.stylizedFormat(sanitized);
+        }
+        get currency() {
+            const sanitized = this.numeric;
+            return this.currencyFormat(sanitized);
+        }
+
+        handleKeyup(e) {
+            const val = e.target.value;
+            this.value = val === '.' ? val.replace('.', '0.') : val;
+            if (this.type === 'currency') {
+                e.target.value = this.currency;
+            } else if (this.type === 'percentage') {
+                e.target.value = this.numeric;
+            }
+
+        }
+
+        attributeChangedCallback(attr) {
+            this.handleChanged();
+            if (attr === 'value') {
+                if (this.type === 'currency') {
+                    this._value = this.currency;
+                } else if (this.type === 'percentage') {
+                    this._value = this.numeric;
+                }
+            }
+        }
+    }
+
+    if (!window.customElements.get('mortgage-calc-input')) {
+        window.customElements.define('mortgage-calc-input', MortgageCalcInput);
+    }
+
     /**
      * @injectHTML
      */
     class MortgageCalc extends HTMLElement {
-        static get observedAttributes() { return ['price', 'downpayment', 'interest', 'taxes', 'term']; }
+        static get observedAttributes() {
+            return [
+                'price',
+                'downpayment',
+                'interest',
+                'taxes',
+                'term',
+                'pmi',
+                'monthly-payment'
+            ];
+        }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><field-input name="price"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="8"><!-- <span slot="info">The price of the home</span>
-        <span slot="error">Only numbers are permitted</span> --></field-input><field-input name="downpayment"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="8"><!-- <span slot="info">How much you can put down</span>
-        <span slot="error">Only numbers are permitted</span> --></field-input><field-input name="interest"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9,]+" maxlength="4"><!-- <span slot="info">How much you can put down</span>
-        <span slot="error">Only numbers are permitted</span> --></field-input><field-input name="taxes"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9,]+" maxlength="4"><!-- <span slot="info">How much you can put down</span>
-        <span slot="error">Only numbers are permitted</span> --></field-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15 Year Mortgage</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30 Year Mortgage</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart">Chart</div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest {{ principal }}</div><div class="mortgage-calc__taxes">Taxes {{ taxes }}</div><div class="mortgage-calc__total">Amount Per Month: {{ perMonth }}</div></div></div>`;
-            registerComponents(FieldInput, RadioGroup);
+            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><mortgage-calc-input name="price" type="currency"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="downpayment" type="currency"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="interest" type="percentage"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="taxes" type="percentage"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9"></mortgage-calc-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15 Year Mortgage</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30 Year Mortgage</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart">Chart</div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div><div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div><div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div></div></div>`;
+
+            registerComponents(MortgageCalcInput, RadioGroup);
 
             this.elements = {
-                price: this.shadowRoot.querySelector('field-input[name="price"]'),
-                downpayment: this.shadowRoot.querySelector('field-input[name="downpayment"]'),
-                interest: this.shadowRoot.querySelector('field-input[name="interest"]'),
-                taxes: this.shadowRoot.querySelector('field-input[name="taxes"]'),
-                term: this.shadowRoot.querySelector('radio-group[name="term"]')
+                price: this.shadowRoot.querySelector('mortgage-calc-input[name="price"]'),
+                downpayment: this.shadowRoot.querySelector('mortgage-calc-input[name="downpayment"]'),
+                interest: this.shadowRoot.querySelector('mortgage-calc-input[name="interest"]'),
+                taxes: this.shadowRoot.querySelector('mortgage-calc-input[name="taxes"]'),
+                term: this.shadowRoot.querySelector('radio-group[name="term"]'),
+                // pmi: { floated: FieldInput.floatedFormat(this.getAttribute('pmi')) || 0.5 },
+                // insurance: { floated: FieldInput.floatedFormat(this.getAttribute('insurance')) || 0.35 }
             };
+
+            this.output = {
+                principal: this.shadowRoot.querySelector('#outputPrincipal'), // will include interest
+                taxes: this.shadowRoot.querySelector('#outputTaxes'),
+                perMonth: this.shadowRoot.querySelector('#outputPerMonth'),
+            };
+
+            // this.addEventListener('input', this.handleInput, false);
         }
 
-        get price() { return this.elements.price.value; }
+        get price() { return this.elements.price.numeric; }
         set price(v) { this.elements.price.value = v; }
 
-        get downpayment() { return this.elements.downpayment.value; }
+        get downpayment() { return this.elements.downpayment.numeric; }
         set downpayment(v) { this.elements.downpayment.value = v; }
 
-        get interest() { return this.elements.interest.value; }
+        get interest() { return this.elements.interest.floated; }
         set interest(v) { this.elements.interest.value = v; }
 
-        get taxes() { return this.elements.taxes.value; }
+        get taxes() { return this.elements.taxes.floated; }
         set taxes(v) { this.elements.taxes.value = v;}
 
-        get term() { return this.elements.term.value; }
-        set term(v) { this.elements.term.value = v; }
+        // get term() { return this.elements.term.floated; }
+        // set term(v) { this.elements.term.value = v; }
 
-        get mortgagePrincipal() {
-            return 'no';
-        }
+        // get pmi() { return this.elements.pmi.floated; }
+        // set pmi(v) { this.elements.pmi.value = v; }
 
+        // get insurance() { console.log(this.elements.insurance.floated); return this.elements.insurance.floated; }
+        // set insurance(v) { this.elements.insurance.value = v; }
+
+        // /**
+        //  * The mortgage principal is the initial loan amount.
+        //  * It's the price minus the downpayment you make.
+        //  * If a home is $500,000 and you put down $100,000,
+        //  * you'll need to borrow $400,000 from the bank.
+        //  */
+        // get mortgagePrincipal() {
+        //     return this.price - this.downpayment;
+        // }
+
+        // /**
+        //  * The interest rate percentage is divided by 12 (months in a year)
+        //  * to find the monthly interest rate.
+        //  * If the annual interest rate is 4%, the monthly interest rate is 0.33%
+        //  * or 0.0033.
+        //  */
+        // get monthlyInterestRate() {
+        //     return (this.interest / 100) / 12;
+        // }
+
+        // /**
+        //  * For a fixed-rate mortgage, the term is often 30 or 15 years.
+        //  * The number of payments is the number of years multiplied by
+        //  * 12 (months in a year). 30 years would be 360 monthly payments.
+        //  */
+        // get numberOfPayments() {
+        //     console.log('term:', this.term);
+        //     return this.term * 12;
+        // }
+
+        // /**
+        //  * The monthly mortgage principal divided by the total number
+        //  * of payments
+        //  */
+        // get monthlyMortgagePrincipal() {
+        //     // console.log(this.numberOfPayments);
+        //     return this.mortgagePrincipal / this.numberOfPayments;
+        // }
+
+        // /**
+        //  * Private mortgage insurance (PMI) is required if you put
+        //  * down less than 20% of the purchase price with a conventional mortgage.
+        //  * It's typically between 0.2% and 2% of the mortgage principal.
+        //  */
+        // get pmiCost() {
+        //     const lessThanTwentyPercent = (this.downpayment / this.price) < 0.2;
+        //     return lessThanTwentyPercent
+        //         ? ((this.pmi / 100) * this.mortgagePrincipal) / 12
+        //         : 0;
+        // }
+
+        // /**
+        //  * Property tax is a percentage of the price
+        //  * split into 12 month payments
+        //  */
+        // get taxesCost() {
+        //     return ((this.taxes / 100) * this.price) / 12;
+        // }
+
+        // /**
+        //  * Home insurance is a percentage of the price
+        //  * split into 12 month payments
+        //  */
+        // get insuranceCost() {
+        //     const insuranceCost = ((this.insurance / 100) * this.price) / 12
+        //     console.log('insurance cost', insuranceCost);
+        //     return insuranceCost;
+        // }
+
+        // get monthlyPayment() {
+        //     const monthlyPayment = this.monthlyMortgagePrincipal + this.taxesCost + this.insuranceCost + this.pmiCost
+        //     // console.log(
+        //     //     'monthlyMortgagePrincipal:', this.monthlyMortgagePrincipal,
+        //     // );
+        //     return monthlyPayment;
+        // }
+
+        // handleInput(e) {
+        //     this.output.principal.textContent = FieldInput.currencyFormat(this.monthlyMortgagePrincipal + this.interest);
+        //     this.output.taxes.textContent = FieldInput.currencyFormat(this.taxesCost);
+        //     this.output.perMonth.textContent = FieldInput.currencyFormat(this.monthlyPayment);
+        // }
         attributeChangedCallback(attr, oldVal, newVal) {
             if (attr === 'price') {
                 this.price = newVal;
-            }
-            if (attr === 'downpayment') {
+            } else if (attr === 'downpayment') {
                 this.downpayment = newVal;
-            }
-            if (attr === 'interest') {
+            } else if (attr === 'interest') {
                 this.interest = newVal;
-            }
-            if (attr === 'taxes') {
+            } else if (attr === 'taxes') {
                 this.taxes = newVal;
             }
-            if (attr === 'term') {
-                this.term = newVal;
-            }
-            // const errorMsg = this.shadowRoot.querySelector('info[role="alert"]');
-            // if (attr === 'value' && oldVal !== newVal) {
-            //     console.log('setting value:', attr, oldVal, newVal);
-            // }
-            // this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
         }
+
+        // attributeChangedCallback(attr, oldVal, newVal) {
+        //     if (attr === 'price') {
+        //         console.log('new price');
+        //         this.price = newVal;
+        //     }
+        //     if (attr === 'downpayment') {
+        //         this.downpayment = newVal;
+        //     }
+        //     if (attr === 'interest') {
+        //         this.interest = newVal;
+        //     }
+        //     if (attr === 'taxes') {
+        //         this.taxes = newVal;
+        //     }
+        //     if (attr === 'term') {
+        //         this.term = newVal;
+        //     }
+
+        //     this.output.principal.textContent = FieldInput.currencyFormat(this.monthlyMortgagePrincipal);
+        //     this.output.taxes.textContent = FieldInput.currencyFormat(this.taxesCost);
+        //     this.output.perMonth.textContent = FieldInput.currencyFormat(this.monthlyPayment);
+        //     // console.log(this.output.principal);
+
+
+        //     // const errorMsg = this.shadowRoot.querySelector('info[role="alert"]');
+        //     // if (attr === 'value' && oldVal !== newVal) {
+        //     //     console.log('setting value:', attr, oldVal, newVal);
+        //     // }
+        //     // this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
+        // }
+
+        // disconnectedCallback() {
+        //     this.removeEventListener('input', this.handleInput);
+        // }
     }
 
     if (!window.customElements.get('mortgage-calc')) {
@@ -294,6 +519,7 @@ var webComponents = (function (exports) {
     exports.FieldInput = FieldInput;
     exports.InfoMessage = InfoMessage;
     exports.MortgageCalc = MortgageCalc;
+    exports.MortgageCalcInput = MortgageCalcInput;
     exports.RadioGroup = RadioGroup;
     exports.registerComponents = registerComponents;
 
