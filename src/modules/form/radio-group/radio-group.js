@@ -6,7 +6,22 @@ import { InfoMessage } from '../info-message/info-message.js';
  * @injectHTML
  */
 export class RadioGroup extends FormElement {
-    // static observedAttributes = ['value'];
+    static get readableFormat() { return new Intl.NumberFormat('en-US').format; }
+    static get currencyFormat() {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format;
+    }
+    static sanitizedFormat(v) {
+        return (v + '').trim().replace(/[^(0-9)*.(0-9)]/g, '');
+    }
+    static floatedFormat(v) {
+        const float = parseFloat(RadioGroup.sanitizedFormat(v));
+        return isNaN(float) ? 0 : float;
+    }
 
     constructor() {
         super();
@@ -17,8 +32,10 @@ export class RadioGroup extends FormElement {
         this.shadowRadios.addEventListener('slotchange', this.handleSlotChange, false);
     }
 
-    get value() { return this.getAttribute('value'); }
+    get value() { return RadioGroup.sanitizedFormat(this.getAttribute('value') || ''); }
     set value(v) { this.setAttribute('value', v); }
+
+    get floated() { return RadioGroup.floatedFormat(this.value); }
 
     get selectedRadio() {
 

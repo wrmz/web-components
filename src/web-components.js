@@ -7,6 +7,7 @@ export { FieldInput } from './modules/form/field-input/field-input.js';
 export { RadioGroup } from './modules/form/radio-group/radio-group.js';
 
 // Complex Components
+export { MortgageCalcInput } from './modules/form/mortgage-calc-input/mortgage-calc-input.js';
 export { MortgageCalc } from './modules/form/mortgage-calc/mortgage-calc.js';
 
 export { registerComponents } from './modules/common/register-components.js';

@@ -1,28 +1,20 @@
 <div class="mortgage-calc__form">
-    <field-input name="price">
+    <mortgage-calc-input name="price" type="currency">
         <label for="price" slot="label">Price</label>
-        <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="8" />
-        <!-- <span slot="info">The price of the home</span>
-        <span slot="error">Only numbers are permitted</span> -->
-    </field-input>
-    <field-input name="downpayment">
+        <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9]+" maxlength="9" />
+    </mortgage-calc-input>
+    <mortgage-calc-input name="downpayment" type="currency">
         <label for="downpayment" slot="label">Downpayment</label>
-        <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="8" />
-        <!-- <span slot="info">How much you can put down</span>
-        <span slot="error">Only numbers are permitted</span> -->
-    </field-input>
-    <field-input name="interest">
+        <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9,]+" maxlength="9" />
+    </mortgage-calc-input>
+    <mortgage-calc-input name="interest" type="percentage">
         <label for="interest" slot="label">Interest Rate</label>
-        <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9,]+" maxlength="4" />
-        <!-- <span slot="info">How much you can put down</span>
-        <span slot="error">Only numbers are permitted</span> -->
-    </field-input>
-    <field-input name="taxes">
+        <input type="text" id="interest" slot="input" placeholder="3.5" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9" />
+    </mortgage-calc-input>
+    <mortgage-calc-input name="taxes" type="percentage">
         <label for="taxes" slot="label">Est. Monthly Property Taxes</label>
-        <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9,]+" maxlength="4" />
-        <!-- <span slot="info">How much you can put down</span>
-        <span slot="error">Only numbers are permitted</span> -->
-    </field-input>
+        <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="^[0-9]+(\.[0-9]*)?$" maxlength="9" />
+    </mortgage-calc-input>
     <radio-group name="term">
         <span slot="label">Choose a Term</span>
         <div class="mortgage-calc__radio">
@@ -38,8 +30,8 @@
 <div class="mortgage-calc__results">
     <div class="mortgage-calc__chart">Chart</div>
     <div class="mortgage-calc__data">
-        <div class="mortgage-calc__principal">Principal + Interest {{ principal }}</div>
-        <div class="mortgage-calc__taxes">Taxes {{ taxes }}</div>
-        <div class="mortgage-calc__total">Amount Per Month: {{ perMonth }}</div>
+        <div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div>
+        <div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div>
+        <div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div>
     </div>
 </div>
