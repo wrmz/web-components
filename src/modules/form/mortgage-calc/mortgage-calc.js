@@ -146,20 +146,14 @@ export class MortgageCalc extends HTMLElement {
     //     this.output.perMonth.textContent = FieldInput.currencyFormat(this.monthlyPayment);
     // }
     attributeChangedCallback(attr, oldVal, newVal) {
-        switch (attr) {
-            case 'price':
-                this.price = newVal;
-                break;
-            case 'downpayment':
-                this.downpayment = newVal;
-                break;
-            case 'interest':
-                this.interest = newVal;
-                break;
-            case 'taxes':
-                this.taxes = newVal;
-                break;
-            default: break;
+        if (attr === 'price') {
+            this.price = newVal;
+        } else if (attr === 'downpayment') {
+            this.downpayment = newVal;
+        } else if (attr === 'interest') {
+            this.interest = newVal;
+        } else if (attr === 'taxes') {
+            this.taxes = newVal;
         }
     }
 

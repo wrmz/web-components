@@ -42,7 +42,7 @@ export class MortgageCalcInput extends FieldInput {
 
     }
 
-    attributeChangedCallback(attr, oldVal, newVal) {
+    attributeChangedCallback(attr) {
         this.handleChanged();
         if (attr === 'value') {
             if (this.type === 'currency') {

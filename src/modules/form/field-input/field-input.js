@@ -32,9 +32,7 @@ export class FieldInput extends FormElement {
         this.value = e.target.value;
     }
 
-    handleKeyup(e) {
-
-    }
+    handleKeyup() { }
 
     disconnectedCallback() {
         this.input.removeEventListener('input', this.handleInput);
