@@ -92,31 +92,34 @@ export class MortgageCalc extends HTMLElement {
     get numberOfPayments() { return this.term * 12; }
 
 
-
+    /**
+     * Monthly principal and interest is calculated against the loan principal
+     * and considers the monthly interest rate and total months in the loan term chosen
+     * @returns {Number}
+     */
     get monthlyPrincipalAndInterest() {
         return (this.mortgagePrincipal / ((1 - Math.pow(1 + this.monthlyInterestRate, -this.numberOfPayments)) / this.monthlyInterestRate));
     }
 
 
-
     /**
      * The monthly mortgage principal divided by the total number
      * of payments
+     * @returns {Number}
      */
     get monthlyMortgagePrincipal() {
         const monthlyMortgagePrincipal = this.monthlyPrincipalAndInterest - this.monthlyInterestCost;
         return monthlyMortgagePrincipal;
     }
 
+    /**
+     * The interest cost is the mortgage principal multiplied by the monthly interest rate
+     * @returns {Number}
+     */
     get monthlyInterestCost() {
         const interestCost = this.mortgagePrincipal * this.monthlyInterestRate;
-
         return interestCost;
     }
-
-
-
-
 
     /**
      * Private mortgage insurance (PMI) is required if you put
@@ -142,29 +145,39 @@ export class MortgageCalc extends HTMLElement {
     /**
      * Home insurance is a percentage of the price
      * split into 12 month payments
+     * @returns {Number}
      */
     get insuranceCost() {
         const insuranceCost = ((this.insurance / 100) * this.price) / 12;
         return insuranceCost;
     }
 
+    /**
+     * Monthly payment adds all the monthly costs up into a single sum
+     * @returns {Number}
+     */
     get monthlyPayment() {
         const monthlyPayment = this.monthlyPrincipalAndInterest + this.taxesCost + this.insuranceCost + this.pmiCost;
         return monthlyPayment;
     }
 
-    handleInput(e) {
-        console.log(
-            'monthlyPrincipal:', this.monthlyMortgagePrincipal,
-            '\nmonthlyInterest:', this.monthlyInterestCost,
-            '\nmonthlyInterestRate:', this.monthlyInterestRate
-        )
+    /**
+     * Handles input events for the mortgage calc form
+     */
+    handleInput() {
         this.output.principal.textContent = this.currencyFormat(this.monthlyPrincipalAndInterest);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
     }
 
+    /**
+     * Handles changes to the component attributes
+     * @param {String} attr - The attribute that changed
+     * @param {*} oldVal - The old value
+     * @param {*} newVal - The new value
+     */
     attributeChangedCallback(attr, oldVal, newVal) {
+        // Update attributes
         if (attr === 'price') {
             this.price = newVal;
         } else if (attr === 'downpayment') {
@@ -177,12 +190,14 @@ export class MortgageCalc extends HTMLElement {
             this.term = newVal;
         }
 
+        // Update the outputs
         this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal + this.monthlyInterestCost);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
     }
 }
 
+// Define the component
 if (!window.customElements.get('mortgage-calc')) {
     window.customElements.define('mortgage-calc', MortgageCalc);
 }
