@@ -73,9 +73,7 @@ export class MortgageCalc extends HTMLElement {
      * If a home is $500,000 and you put down $100,000,
      * you'll need to borrow $400,000 from the bank.
      */
-    get mortgagePrincipal() {
-        return this.price - this.downpayment;
-    }
+    get mortgagePrincipal() { return this.price - this.downpayment; }
 
     /**
      * The interest rate percentage is divided by 12 (months in a year)
@@ -83,28 +81,42 @@ export class MortgageCalc extends HTMLElement {
      * If the annual interest rate is 4%, the monthly interest rate is 0.33%
      * or 0.0033.
      */
-    get monthlyInterestRate() {
-        return (this.interest / 100) / 12;
-    }
+    get monthlyInterestRate() { return this.interest / 100 / 12; }
+
 
     /**
      * For a fixed-rate mortgage, the term is often 30 or 15 years.
      * The number of payments is the number of years multiplied by
      * 12 (months in a year). 30 years would be 360 monthly payments.
      */
-    get numberOfPayments() {
-        console.log('term:', this.term);
-        return this.term * 12;
+    get numberOfPayments() { return this.term * 12; }
+
+
+
+    get monthlyPrincipalAndInterest() {
+        return (this.mortgagePrincipal / ((1 - Math.pow(1 + this.monthlyInterestRate, -this.numberOfPayments)) / this.monthlyInterestRate));
     }
+
+
 
     /**
      * The monthly mortgage principal divided by the total number
      * of payments
      */
     get monthlyMortgagePrincipal() {
-        // console.log(this.numberOfPayments);
-        return this.mortgagePrincipal / this.numberOfPayments;
+        const monthlyMortgagePrincipal = this.monthlyPrincipalAndInterest - this.monthlyInterestCost;
+        return monthlyMortgagePrincipal;
     }
+
+    get monthlyInterestCost() {
+        const interestCost = this.mortgagePrincipal * this.monthlyInterestRate;
+
+        return interestCost;
+    }
+
+
+
+
 
     /**
      * Private mortgage insurance (PMI) is required if you put
@@ -113,6 +125,7 @@ export class MortgageCalc extends HTMLElement {
      */
     get pmiCost() {
         const lessThanTwentyPercent = (this.downpayment / this.price) < 0.2;
+        console.log('is less than 20%:', lessThanTwentyPercent, this.downpayment, this.price);
         return lessThanTwentyPercent
             ? ((this.pmi / 100) * this.mortgagePrincipal) / 12
             : 0;
@@ -131,21 +144,22 @@ export class MortgageCalc extends HTMLElement {
      * split into 12 month payments
      */
     get insuranceCost() {
-        const insuranceCost = ((this.insurance / 100) * this.price) / 12
-        console.log('insurance cost', insuranceCost);
+        const insuranceCost = ((this.insurance / 100) * this.price) / 12;
         return insuranceCost;
     }
 
     get monthlyPayment() {
-        const monthlyPayment = this.monthlyMortgagePrincipal + this.taxesCost + this.insuranceCost + this.pmiCost
-        // console.log(
-        //     'monthlyMortgagePrincipal:', this.monthlyMortgagePrincipal,
-        // );
+        const monthlyPayment = this.monthlyPrincipalAndInterest + this.taxesCost + this.insuranceCost + this.pmiCost;
         return monthlyPayment;
     }
 
     handleInput(e) {
-        this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal + this.interest);
+        console.log(
+            'monthlyPrincipal:', this.monthlyMortgagePrincipal,
+            '\nmonthlyInterest:', this.monthlyInterestCost,
+            '\nmonthlyInterestRate:', this.monthlyInterestRate
+        )
+        this.output.principal.textContent = this.currencyFormat(this.monthlyPrincipalAndInterest);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
     }
@@ -163,45 +177,10 @@ export class MortgageCalc extends HTMLElement {
             this.term = newVal;
         }
 
-        this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal);
+        this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal + this.monthlyInterestCost);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
     }
-
-    // attributeChangedCallback(attr, oldVal, newVal) {
-    //     if (attr === 'price') {
-    //         console.log('new price');
-    //         this.price = newVal;
-    //     }
-    //     if (attr === 'downpayment') {
-    //         this.downpayment = newVal;
-    //     }
-    //     if (attr === 'interest') {
-    //         this.interest = newVal;
-    //     }
-    //     if (attr === 'taxes') {
-    //         this.taxes = newVal;
-    //     }
-    //     if (attr === 'term') {
-    //         this.term = newVal;
-    //     }
-
-    //     this.output.principal.textContent = FieldInput.currencyFormat(this.monthlyMortgagePrincipal);
-    //     this.output.taxes.textContent = FieldInput.currencyFormat(this.taxesCost);
-    //     this.output.perMonth.textContent = FieldInput.currencyFormat(this.monthlyPayment);
-    //     // console.log(this.output.principal);
-
-
-    //     // const errorMsg = this.shadowRoot.querySelector('info[role="alert"]');
-    //     // if (attr === 'value' && oldVal !== newVal) {
-    //     //     console.log('setting value:', attr, oldVal, newVal);
-    //     // }
-    //     // this.hasAttribute('invalid') ? errorMsg.setAttribute('invalid', '') : errorMsg.removeAttribute('invalid');
-    // }
-
-    // disconnectedCallback() {
-    //     this.removeEventListener('input', this.handleInput);
-    // }
 }
 
 if (!window.customElements.get('mortgage-calc')) {
