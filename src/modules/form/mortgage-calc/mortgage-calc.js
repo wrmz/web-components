@@ -1,6 +1,7 @@
 import { registerComponents } from '../../common/register-components.js';
 import { MortgageCalcInput } from '../mortgage-calc-input/mortgage-calc-input.js';
 import { RadioGroup } from '../radio-group/radio-group.js';
+import { ChartDonut } from '../../chart/donut/chart-donut.js';
 
 /**
  * @injectHTML
@@ -21,7 +22,7 @@ export class MortgageCalc extends HTMLElement {
     constructor() {
         super();
 
-        registerComponents(MortgageCalcInput, RadioGroup);
+        registerComponents(MortgageCalcInput, RadioGroup, ChartDonut);
 
         this.elements = {
             price: this.shadowRoot.querySelector('mortgage-calc-input[name="price"]'),
@@ -128,7 +129,6 @@ export class MortgageCalc extends HTMLElement {
      */
     get pmiCost() {
         const lessThanTwentyPercent = (this.downpayment / this.price) < 0.2;
-        console.log('is less than 20%:', lessThanTwentyPercent, this.downpayment, this.price);
         return lessThanTwentyPercent
             ? ((this.pmi / 100) * this.mortgagePrincipal) / 12
             : 0;
