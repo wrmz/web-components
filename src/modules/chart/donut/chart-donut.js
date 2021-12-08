@@ -1,4 +1,4 @@
-import { registerComponents  } from '../../common/register-components';
+// import { registerComponents  } from '../../common/register-components';
 
 /**
  * @injectHTML
