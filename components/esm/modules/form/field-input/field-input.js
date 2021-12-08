@@ -39,45 +39,6 @@ class FieldInput extends FormElement {
         this.input.removeEventListener('keyup', this.handleKeyup);
         this.shadowInput.removeEventListener('slotchange', this.handleSlotChange);
     }
-
-    // attributeChangedCallback(attr, oldVal, newVal) {
-    //     if (attr === 'value' && this.input) {
-    //         this.input.value = this.value;
-    //     }
-    // }
-
-    // get value() { return this.getAttribute('value') || ''; }
-    // set value(v) {
-    //     // const sanitized = FieldInput.sanitizedFormat(v);
-    //     // const readable = FieldInput.readableFormat(sanitized);
-
-    //     this.setAttribute('value', v);
-    // }
-    // get sanitized() { return FieldInput.sanitizedFormat(this.value); }
-    // get floated() { return FieldInput.floatedFormat(this.value); }
-    // get currency() { return FieldInput.currencyFormat(this.value); }
-
-
-    // handleSlotChange(e) {
-    //     this.input = [...e.target.assignedElements()].find(el => el.tagName === 'INPUT');
-
-    //     if (this.input) {
-    //         this.input.value = this.value ? FieldInput.readableFormat(this.value) : '';
-    //         this.registerElementForValidation(this.input);
-    //         this.addEventListener('input', this.handleInput, false);
-    //     }
-    // }
-
-    // handleInput(e) {
-    //     this.value = e.target.value;
-
-    //     e.target.value = FieldInput.readableFormat(this.value);
-    // }
-
-    // disconnectedCallback() {
-    //     this.removeEventListener('input', this.handleInput);
-    //     this.shadowInput.removeEventListener('slotchange', this.handleSlotChange);
-    // }
 }
 
 if (!window.customElements.get('field-input')) {
