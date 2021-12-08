@@ -40,6 +40,7 @@
         "max-line-length": 140,
         "no-duplicate-selectors": true,
         "selector-type-no-unknown": null,
+        "selector-class-pattern": "*+",
         "string-quotes": "single"
     }
 }
