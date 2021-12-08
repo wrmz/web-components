@@ -33,7 +33,7 @@ export class ChartDonut extends HTMLElement {
         let colors = this.getAttribute('colors');
 
         // Replace single quotes with double-quotes
-        colors = colors.replace(/'/g, '\"');
+        colors = colors.replace(/'/g, '"');
 
         return colors ? JSON.parse(colors) : [];
     }
@@ -41,7 +41,7 @@ export class ChartDonut extends HTMLElement {
     get values() {
         let values = this.getAttribute('values');
 
-        values = values.replace(/'/g, '\"');
+        values = values.replace(/'/g, '"');
 
         return values ? JSON.parse(values) : [];
     }
