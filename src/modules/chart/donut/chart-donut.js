@@ -81,9 +81,9 @@ export class ChartDonut extends HTMLElement {
         circle.setAttribute('fill', 'transparent');
         circle.setAttribute('stroke', this.colors[i]);
         circle.setAttribute('stroke-width', 30);
-        circle.setAttribute('stroke-dasharray', this.adjustedCircumference)
+        circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
-        circle.setAttribute('transform', this.calculateTransform(i))
+        circle.setAttribute('transform', this.calculateTransform(i));
 
 
 
@@ -110,7 +110,7 @@ export class ChartDonut extends HTMLElement {
     }
 
     attributeChangedCallback(attr, oldVal, newVal) {
-
+        console.log(attr, oldVal, newVal);
     }
 }
 
