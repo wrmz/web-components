@@ -107,9 +107,9 @@ export class ChartDonut extends HTMLElement {
 
     }
 
-    updateSegment(segment) {
+    // updateSegment(segment) {
 
-    }
+    // }
 
     calculateStrokeDashOffset(val) {
         const strokeDiff = this.dataPercentage(val) * this.circumference;
@@ -124,11 +124,16 @@ export class ChartDonut extends HTMLElement {
         return this.total ? val / this.total : 0;
     }
 
-    attributeChangedCallback(attr, oldVal, newVal) {
+    /**
+     * @todo - Rather than destroying segments, we should update the segments that already exist
+     * @param {string} attr - The attribute which changed
+     * @param {string} oldVal - The old value
+     * @param {string} newVal - The new value
+     */
+    attributeChangedCallback() {
         if (this.colors && this.values && this.total) {
             this.destroySegments();
             this.generateSegments();
-            console.log(this.data)
         }
     }
 
