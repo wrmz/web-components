@@ -253,12 +253,8 @@ var webComponents = (function (exports) {
         }
 
         get colors() {
-            let colors = this.getAttribute('colors');
-
-            // Replace single quotes with double-quotes
-            colors = colors.replace(/'/g, '"');
-
-            return colors ? JSON.parse(colors) : [];
+            const colors = (this.getAttribute('colors') || '').replace(/'/g, '"');
+            return colors ? JSON.parse(colors) : ['red', 'green', 'blue'];
         }
 
         set values(v) {
@@ -266,12 +262,7 @@ var webComponents = (function (exports) {
         }
 
         get values() {
-            let values = this.getAttribute('values') || '';
-
-            values = values.replace(/'/g, '"');
-
-            // console.log(values);
-
+            const values = (this.getAttribute('values') || '').replace(/'/g, '"');
             return values ? JSON.parse(values) : [];
         }
 
