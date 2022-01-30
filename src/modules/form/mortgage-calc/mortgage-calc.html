@@ -15,6 +15,10 @@
         <label for="taxes" slot="label">Est. Monthly Property Taxes</label>
         <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9.]+" maxlength="9" />
     </mortgage-calc-input>
+    <mortgage-calc-input name="hoa" type="currency">
+        <label for="hoa" slot="label">Monthly HOA Fees</label>
+        <input type="text" id="hoa" slot="input" placeholder="200" pattern="[0-9.]+" maxlength="9" />
+    </mortgage-calc-input>
     <radio-group name="term">
         <span slot="label">Choose a Term</span>
         <div class="mortgage-calc__radio">
@@ -29,7 +33,7 @@
 </div>
 <div class="mortgage-calc__results">
     <div class="mortgage-calc__chart">
-        <chart-donut colors="['blue', 'red', 'green']" values="[400,45,207]"></chart-donut>
+        <!-- <chart-donut colors="['blue', 'red', 'green']" values="[400,45,207]"></chart-donut> -->
     </div>
     <div class="mortgage-calc__data">
         <div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div>

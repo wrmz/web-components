@@ -24,9 +24,13 @@ export class ChartDonut extends HTMLElement {
         this.angleOffset = -90;
         this.chartData = [];
         this.segmentElems = [];
+
         this.svg = this.shadowRoot.querySelector('svg');
         this.generateSegment = this.generateSegment.bind(this);
-        this.generateSegments();
+    }
+
+    set colors(v) {
+        this.setAttribute('colors', JSON.stringify(v));
     }
 
     get colors() {
@@ -38,16 +42,24 @@ export class ChartDonut extends HTMLElement {
         return colors ? JSON.parse(colors) : [];
     }
 
+    set values(v) {
+        this.setAttribute('values', JSON.stringify(v));
+    }
+
     get values() {
-        let values = this.getAttribute('values');
+        let values = this.getAttribute('values') || '';
 
         values = values.replace(/'/g, '"');
+
+        // console.log(values);
 
         return values ? JSON.parse(values) : [];
     }
 
     get total() {
-        return this.values.reduce((previous, current) => previous + current);
+        return this.values.length
+            ? this.values.reduce((previous, current) => previous + current)
+            : 0;
     }
 
     get circumference() {
@@ -61,19 +73,23 @@ export class ChartDonut extends HTMLElement {
     generateSegments() {
 
         this.values.forEach(this.generateSegment);
-
-        console.log('total:', this.total);
+        console.log(this.segmentElems);
     }
 
     generateSegment(val, i) {
+        // console.log(val, i);
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         const data = {
             degrees: this.angleOffset,
         };
+
+        console.log('degrees:', this.angleOffset);
+
+        // console.log('calculated offset:', this.values[i], this.dataPercentage(this.values[i]) * 360)
         this.angleOffset += this.dataPercentage(this.values[i]) * 360;
         this.chartData.push(data);
 
-        console.log(this.values[i], this.dataPercentage(this.values[i]),  this.angleOffset);
+        // console.log(this.values[i], this.dataPercentage(this.values[i]),  this.angleOffset);
 
         circle.setAttribute('cx', this.cx);
         circle.setAttribute('cy', this.cy);
@@ -86,13 +102,12 @@ export class ChartDonut extends HTMLElement {
         circle.setAttribute('transform', this.calculateTransform(i));
 
 
-
-
-
-
-
         this.segmentElems.push(circle);
         this.svg.appendChild(circle);
+
+    }
+
+    updateSegment(segment) {
 
     }
 
@@ -106,11 +121,24 @@ export class ChartDonut extends HTMLElement {
     }
 
     dataPercentage(val) {
-        return val / this.total;
+        return this.total ? val / this.total : 0;
     }
 
     attributeChangedCallback(attr, oldVal, newVal) {
-        console.log(attr, oldVal, newVal);
+        if (this.colors && this.values && this.total) {
+            this.destroySegments();
+            this.generateSegments();
+            console.log(this.data)
+        }
+    }
+
+    destroySegments() {
+        while (this.svg.firstChild) {
+            this.svg.removeChild(this.svg.firstChild);
+            this.segmentElems.shift();
+            this.chartData.shift();
+        }
+        this.angleOffset = -90;
     }
 }
 

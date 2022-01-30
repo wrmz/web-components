@@ -15,6 +15,7 @@ export class MortgageCalc extends HTMLElement {
             'taxes',
             'term',
             'pmi',
+            'hoa',
             'monthly-payment'
         ];
     }
@@ -24,12 +25,18 @@ export class MortgageCalc extends HTMLElement {
 
         registerComponents(MortgageCalcInput, RadioGroup, ChartDonut);
 
+        this.chartElement = undefined;
+        this.generateChart();
+
+
+
         this.elements = {
             price: this.shadowRoot.querySelector('mortgage-calc-input[name="price"]'),
             downpayment: this.shadowRoot.querySelector('mortgage-calc-input[name="downpayment"]'),
             interest: this.shadowRoot.querySelector('mortgage-calc-input[name="interest"]'),
             taxes: this.shadowRoot.querySelector('mortgage-calc-input[name="taxes"]'),
             term: this.shadowRoot.querySelector('radio-group[name="term"]'),
+            hoa: this.shadowRoot.querySelector('mortgage-calc-input[name="hoa"]'),
         };
 
         this.output = {
@@ -37,6 +44,8 @@ export class MortgageCalc extends HTMLElement {
             taxes: this.shadowRoot.querySelector('#outputTaxes'),
             perMonth: this.shadowRoot.querySelector('#outputPerMonth'),
         };
+
+
 
         this.addEventListener('input', this.handleInput, false);
     }
@@ -49,19 +58,22 @@ export class MortgageCalc extends HTMLElement {
         }).format;
     }
 
-    get price() { return this.elements.price.numeric; }
+    get price() { return this.elements ? this.elements.price.numeric : 0; }
     set price(v) { this.elements.price.value = v; }
 
-    get downpayment() { return this.elements.downpayment.numeric; }
+    get downpayment() { return this.elements ? this.elements.downpayment.numeric : 0; }
     set downpayment(v) { this.elements.downpayment.value = v; }
 
-    get interest() { return this.elements.interest.numeric; }
+    get interest() { return this.elements ? this.elements.interest.numeric : 0; }
     set interest(v) { this.elements.interest.value = v; }
 
-    get taxes() { return this.elements.taxes.numeric; }
+    get taxes() { return this.elements ? this.elements.taxes.numeric : 0; }
     set taxes(v) { this.elements.taxes.value = v;}
 
-    get term() { return this.elements.term.numeric; }
+    get hoa() { return this.elements.hoa.numeric; }
+    set hoa(v) { this.elements.hoa.value = v; }
+
+    get term() { return this.elements ? this.elements.term.numeric : 0; }
     set term(v) { this.elements.term.value = v; }
 
     get pmi() { return this.getAttribute('pmi') || ''; }
@@ -99,7 +111,10 @@ export class MortgageCalc extends HTMLElement {
      * @returns {Number}
      */
     get monthlyPrincipalAndInterest() {
-        return (this.mortgagePrincipal / ((1 - Math.pow(1 + this.monthlyInterestRate, -this.numberOfPayments)) / this.monthlyInterestRate));
+        const isCalculable = this.mortgagePrincipal && this.monthlyInterestRate;
+        return isCalculable
+            ? (this.mortgagePrincipal / ((1 - Math.pow(1 + this.monthlyInterestRate, -this.numberOfPayments)) / this.monthlyInterestRate))
+            : 0;
     }
 
 
@@ -161,6 +176,15 @@ export class MortgageCalc extends HTMLElement {
         return monthlyPayment;
     }
 
+    generateChart() {
+        const chartContainer = this.shadowRoot.querySelector('.mortgage-calc__chart');
+        this.chartElement = document.createElement('chart-donut');
+        this.chartElement.colors = ['blue', 'red', 'green'];
+        this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+
+        chartContainer.append(this.chartElement);
+    }
+
     /**
      * Handles input events for the mortgage calc form
      */
@@ -168,6 +192,10 @@ export class MortgageCalc extends HTMLElement {
         this.output.principal.textContent = this.currencyFormat(this.monthlyPrincipalAndInterest);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
+        if (this.chartElement) {
+            // console.log('input:', this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment);
+            this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+        }
     }
 
     /**
@@ -194,6 +222,9 @@ export class MortgageCalc extends HTMLElement {
         this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal + this.monthlyInterestCost);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
+        if (this.chartElement) {
+            this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+        }
     }
 }
 
