@@ -243,9 +243,13 @@ var webComponents = (function (exports) {
             this.angleOffset = -90;
             this.chartData = [];
             this.segmentElems = [];
+
             this.svg = this.shadowRoot.querySelector('svg');
             this.generateSegment = this.generateSegment.bind(this);
-            this.generateSegments();
+        }
+
+        set colors(v) {
+            this.setAttribute('colors', JSON.stringify(v));
         }
 
         get colors() {
@@ -257,16 +261,24 @@ var webComponents = (function (exports) {
             return colors ? JSON.parse(colors) : [];
         }
 
+        set values(v) {
+            this.setAttribute('values', JSON.stringify(v));
+        }
+
         get values() {
-            let values = this.getAttribute('values');
+            let values = this.getAttribute('values') || '';
 
             values = values.replace(/'/g, '"');
+
+            // console.log(values);
 
             return values ? JSON.parse(values) : [];
         }
 
         get total() {
-            return this.values.reduce((previous, current) => previous + current);
+            return this.values.length
+                ? this.values.reduce((previous, current) => previous + current)
+                : 0;
         }
 
         get circumference() {
@@ -280,19 +292,23 @@ var webComponents = (function (exports) {
         generateSegments() {
 
             this.values.forEach(this.generateSegment);
-
-            console.log('total:', this.total);
+            console.log(this.segmentElems);
         }
 
         generateSegment(val, i) {
+            // console.log(val, i);
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             const data = {
                 degrees: this.angleOffset,
             };
+
+            console.log('degrees:', this.angleOffset);
+
+            // console.log('calculated offset:', this.values[i], this.dataPercentage(this.values[i]) * 360)
             this.angleOffset += this.dataPercentage(this.values[i]) * 360;
             this.chartData.push(data);
 
-            console.log(this.values[i], this.dataPercentage(this.values[i]),  this.angleOffset);
+            // console.log(this.values[i], this.dataPercentage(this.values[i]),  this.angleOffset);
 
             circle.setAttribute('cx', this.cx);
             circle.setAttribute('cy', this.cy);
@@ -305,15 +321,14 @@ var webComponents = (function (exports) {
             circle.setAttribute('transform', this.calculateTransform(i));
 
 
-
-
-
-
-
             this.segmentElems.push(circle);
             this.svg.appendChild(circle);
 
         }
+
+        // updateSegment(segment) {
+
+        // }
 
         calculateStrokeDashOffset(val) {
             const strokeDiff = this.dataPercentage(val) * this.circumference;
@@ -325,11 +340,29 @@ var webComponents = (function (exports) {
         }
 
         dataPercentage(val) {
-            return val / this.total;
+            return this.total ? val / this.total : 0;
         }
 
-        attributeChangedCallback(attr, oldVal, newVal) {
-            console.log(attr, oldVal, newVal);
+        /**
+         * @todo - Rather than destroying segments, we should update the segments that already exist
+         * @param {string} attr - The attribute which changed
+         * @param {string} oldVal - The old value
+         * @param {string} newVal - The new value
+         */
+        attributeChangedCallback() {
+            if (this.colors && this.values && this.total) {
+                this.destroySegments();
+                this.generateSegments();
+            }
+        }
+
+        destroySegments() {
+            while (this.svg.firstChild) {
+                this.svg.removeChild(this.svg.firstChild);
+                this.segmentElems.shift();
+                this.chartData.shift();
+            }
+            this.angleOffset = -90;
         }
     }
 
@@ -406,14 +439,20 @@ var webComponents = (function (exports) {
                 'taxes',
                 'term',
                 'pmi',
+                'hoa',
                 'monthly-payment'
             ];
         }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><mortgage-calc-input name="price" type="currency"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="downpayment" type="currency"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="interest" type="percentage"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="taxes" type="percentage"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15-Year Fixed</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30-Year Fixed</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart"><chart-donut colors="['blue', 'red', 'green']" values="[400,45,207]"></chart-donut></div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div><div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div><div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div></div></div>`;
+            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><mortgage-calc-input name="price" type="currency"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="downpayment" type="currency"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="interest" type="percentage"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="taxes" type="percentage"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="hoa" type="currency"><label for="hoa" slot="label">Monthly HOA Fees</label> <input type="text" id="hoa" slot="input" placeholder="200" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15-Year Fixed</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30-Year Fixed</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart"><!-- Chart is injected here --></div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div><div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div><div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div></div></div>`;
 
             registerComponents(MortgageCalcInput, RadioGroup, ChartDonut);
+
+            this.chartElement = undefined;
+            this.generateChart();
+
+
 
             this.elements = {
                 price: this.shadowRoot.querySelector('mortgage-calc-input[name="price"]'),
@@ -421,6 +460,7 @@ var webComponents = (function (exports) {
                 interest: this.shadowRoot.querySelector('mortgage-calc-input[name="interest"]'),
                 taxes: this.shadowRoot.querySelector('mortgage-calc-input[name="taxes"]'),
                 term: this.shadowRoot.querySelector('radio-group[name="term"]'),
+                hoa: this.shadowRoot.querySelector('mortgage-calc-input[name="hoa"]'),
             };
 
             this.output = {
@@ -428,6 +468,8 @@ var webComponents = (function (exports) {
                 taxes: this.shadowRoot.querySelector('#outputTaxes'),
                 perMonth: this.shadowRoot.querySelector('#outputPerMonth'),
             };
+
+
 
             this.addEventListener('input', this.handleInput, false);
         }
@@ -440,19 +482,22 @@ var webComponents = (function (exports) {
             }).format;
         }
 
-        get price() { return this.elements.price.numeric; }
+        get price() { return this.elements ? this.elements.price.numeric : 0; }
         set price(v) { this.elements.price.value = v; }
 
-        get downpayment() { return this.elements.downpayment.numeric; }
+        get downpayment() { return this.elements ? this.elements.downpayment.numeric : 0; }
         set downpayment(v) { this.elements.downpayment.value = v; }
 
-        get interest() { return this.elements.interest.numeric; }
+        get interest() { return this.elements ? this.elements.interest.numeric : 0; }
         set interest(v) { this.elements.interest.value = v; }
 
-        get taxes() { return this.elements.taxes.numeric; }
+        get taxes() { return this.elements ? this.elements.taxes.numeric : 0; }
         set taxes(v) { this.elements.taxes.value = v;}
 
-        get term() { return this.elements.term.numeric; }
+        get hoa() { return this.elements.hoa.numeric; }
+        set hoa(v) { this.elements.hoa.value = v; }
+
+        get term() { return this.elements ? this.elements.term.numeric : 0; }
         set term(v) { this.elements.term.value = v; }
 
         get pmi() { return this.getAttribute('pmi') || ''; }
@@ -490,7 +535,10 @@ var webComponents = (function (exports) {
          * @returns {Number}
          */
         get monthlyPrincipalAndInterest() {
-            return (this.mortgagePrincipal / ((1 - Math.pow(1 + this.monthlyInterestRate, -this.numberOfPayments)) / this.monthlyInterestRate));
+            const isCalculable = this.mortgagePrincipal && this.monthlyInterestRate;
+            return isCalculable
+                ? (this.mortgagePrincipal / ((1 - Math.pow(1 + this.monthlyInterestRate, -this.numberOfPayments)) / this.monthlyInterestRate))
+                : 0;
         }
 
 
@@ -552,6 +600,15 @@ var webComponents = (function (exports) {
             return monthlyPayment;
         }
 
+        generateChart() {
+            const chartContainer = this.shadowRoot.querySelector('.mortgage-calc__chart');
+            this.chartElement = document.createElement('chart-donut');
+            this.chartElement.colors = ['blue', 'red', 'green'];
+            this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+
+            chartContainer.append(this.chartElement);
+        }
+
         /**
          * Handles input events for the mortgage calc form
          */
@@ -559,6 +616,10 @@ var webComponents = (function (exports) {
             this.output.principal.textContent = this.currencyFormat(this.monthlyPrincipalAndInterest);
             this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
             this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
+            if (this.chartElement) {
+                // console.log('input:', this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment);
+                this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+            }
         }
 
         /**
@@ -585,6 +646,9 @@ var webComponents = (function (exports) {
             this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal + this.monthlyInterestCost);
             this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
             this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
+            if (this.chartElement) {
+                this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+            }
         }
     }
 
