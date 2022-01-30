@@ -64,23 +64,16 @@ class ChartDonut extends HTMLElement {
     generateSegments() {
 
         this.values.forEach(this.generateSegment);
-        console.log(this.segmentElems);
     }
 
     generateSegment(val, i) {
-        // console.log(val, i);
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         const data = {
             degrees: this.angleOffset,
         };
 
-        console.log('degrees:', this.angleOffset);
-
-        // console.log('calculated offset:', this.values[i], this.dataPercentage(this.values[i]) * 360)
         this.angleOffset += this.dataPercentage(this.values[i]) * 360;
         this.chartData.push(data);
-
-        // console.log(this.values[i], this.dataPercentage(this.values[i]),  this.angleOffset);
 
         circle.setAttribute('cx', this.cx);
         circle.setAttribute('cy', this.cy);
@@ -92,15 +85,22 @@ class ChartDonut extends HTMLElement {
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
         circle.setAttribute('transform', this.calculateTransform(i));
 
-
         this.segmentElems.push(circle);
         this.svg.appendChild(circle);
 
     }
 
-    // updateSegment(segment) {
+    updateSegments() {
+        this.angleOffset = -90;
+        this.values.forEach(this.updateSegment);
+    }
 
-    // }
+    updateSegment(val, i) {
+        const circle = this.segmentElems[i];
+        circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
+        circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
+        circle.setAttribute('transform', this.calculateTransform(i));
+    }
 
     calculateStrokeDashOffset(val) {
         const strokeDiff = this.dataPercentage(val) * this.circumference;
@@ -116,15 +116,13 @@ class ChartDonut extends HTMLElement {
     }
 
     /**
-     * @todo - Rather than destroying segments, we should update the segments that already exist
      * @param {string} attr - The attribute which changed
      * @param {string} oldVal - The old value
      * @param {string} newVal - The new value
      */
     attributeChangedCallback() {
         if (this.colors && this.values && this.total) {
-            this.destroySegments();
-            this.generateSegments();
+            this.updateSegments();
         }
     }
 
