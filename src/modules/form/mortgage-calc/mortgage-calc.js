@@ -16,7 +16,8 @@ export class MortgageCalc extends HTMLElement {
             'term',
             'pmi',
             'hoa',
-            'monthly-payment'
+            'monthly-payment',
+            'colors',
         ];
     }
 
@@ -45,10 +46,15 @@ export class MortgageCalc extends HTMLElement {
             perMonth: this.shadowRoot.querySelector('#outputPerMonth'),
         };
 
-
-
         this.addEventListener('input', this.handleInput, false);
     }
+
+    get colors() {
+        let colors = this.getAttribute('colors') || '';
+        colors = colors.replace(/'/g, '"');
+        return colors ? JSON.parse(colors) : [];
+    }
+
     get currencyFormat() {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -179,7 +185,7 @@ export class MortgageCalc extends HTMLElement {
     generateChart() {
         const chartContainer = this.shadowRoot.querySelector('.mortgage-calc__chart');
         this.chartElement = document.createElement('chart-donut');
-        this.chartElement.colors = ['blue', 'red', 'green'];
+        this.chartElement.colors = this.colors;
         this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
 
         chartContainer.append(this.chartElement);
