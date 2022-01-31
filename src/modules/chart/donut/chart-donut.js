@@ -158,12 +158,12 @@ export class ChartDonut extends HTMLElement {
         return this.total ? val / this.total : 0;
     }
 
-     /**
+    /**
      * Destroys the segments of the circle by removing the elements,
      * removing them from the `segmentElems` array and removing their
      * data from the `segmentElems` array.
      */
-      destroySegments() {
+    destroySegments() {
         while (this.svg.firstChild) {
             this.svg.removeChild(this.svg.firstChild);
             this.segmentElems.shift();
