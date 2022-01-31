@@ -1,14 +1,13 @@
-.donut {
-    /* background: red; */
-}
 .donut circle {
     cursor: pointer;
     pointer-events: stroke;
     transition: filter 0.2s ease-out;
 }
+
 .donut circle:focus {
     outline: 0;
 }
+
 .donut circle:hover,
 .donut circle:focus {
     filter: brightness(80%);
