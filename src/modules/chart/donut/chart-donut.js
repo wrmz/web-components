@@ -61,11 +61,18 @@ export class ChartDonut extends HTMLElement {
         return this.circumference - this.gap;
     }
 
+    /**
+     * Loops through the values and generates a segment for each
+     */
     generateSegments() {
-
         this.values.forEach(this.generateSegment);
     }
 
+    /**
+     * Generates an individual segment
+     * @param {number} val - The amount this segmenet represents
+     * @param {number} i - Index of this value in `this.values`
+     */
     generateSegment(val, i) {
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         const data = {
@@ -126,6 +133,11 @@ export class ChartDonut extends HTMLElement {
         }
     }
 
+    /**
+     * Destroys the segments of the circle by removing the elements,
+     * removing them from the `segmentElems` array and removing their
+     * data from the `segmentElems` array.
+     */
     destroySegments() {
         while (this.svg.firstChild) {
             this.svg.removeChild(this.svg.firstChild);
