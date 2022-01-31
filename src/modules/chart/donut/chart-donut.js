@@ -84,6 +84,8 @@ export class ChartDonut extends HTMLElement {
         this.angleOffset += this.dataPercentage(this.values[i]) * 360;
         this.chartData.push(data);
 
+        circle.setAttribute('tabindex', '0');
+        circle.setAttribute('title', val);
         circle.setAttribute('cx', this.cx);
         circle.setAttribute('cy', this.cy);
         circle.setAttribute('r', this.radius);
