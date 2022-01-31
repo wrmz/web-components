@@ -31,6 +31,15 @@ export class ChartDonut extends HTMLElement {
         this.updateSegment = this.updateSegment.bind(this);
     }
 
+    get currencyFormat() {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format;
+    }
+
     set colors(v) {
         this.setAttribute('colors', JSON.stringify(v));
     }
@@ -77,6 +86,7 @@ export class ChartDonut extends HTMLElement {
      */
     generateSegment(val, i) {
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
         const data = {
             degrees: this.angleOffset,
         };
@@ -85,7 +95,6 @@ export class ChartDonut extends HTMLElement {
         this.chartData.push(data);
 
         circle.setAttribute('tabindex', '0');
-        circle.setAttribute('title', val);
         circle.setAttribute('cx', this.cx);
         circle.setAttribute('cy', this.cy);
         circle.setAttribute('r', this.radius);
@@ -95,6 +104,8 @@ export class ChartDonut extends HTMLElement {
         circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
         circle.setAttribute('transform', this.calculateTransform(i));
+        circle.appendChild(title);
+        title.textContent = this.currencyFormat(val);
 
         this.segmentElems.push(circle);
         this.svg.appendChild(circle);
@@ -108,6 +119,8 @@ export class ChartDonut extends HTMLElement {
 
     updateSegment(val, i) {
         const circle = this.segmentElems[i];
+        const title = circle.querySelector('title');
+        console.log(title);
         const data = {
             degrees: this.angleOffset,
         };
@@ -115,7 +128,7 @@ export class ChartDonut extends HTMLElement {
         this.angleOffset += this.dataPercentage(this.values[i]) * 360;
         this.chartData.push(data);
 
-        circle.setAttribute('title', val);
+        title.textContent = this.currencyFormat(val);
         circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
         circle.setAttribute('transform', this.calculateTransform(i));
