@@ -29,8 +29,6 @@ class MortgageCalc extends HTMLElement {
         this.chartElement = undefined;
         this.generateChart();
 
-
-
         this.elements = {
             price: this.shadowRoot.querySelector('mortgage-calc-input[name="price"]'),
             downpayment: this.shadowRoot.querySelector('mortgage-calc-input[name="downpayment"]'),
@@ -186,6 +184,7 @@ class MortgageCalc extends HTMLElement {
         const chartContainer = this.shadowRoot.querySelector('.mortgage-calc__chart');
         this.chartElement = document.createElement('chart-donut');
         this.chartElement.colors = this.colors;
+        this.chartElement.labels = ['Principal + Interest', 'Taxes', 'Amount Per Month'];
         this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
 
         chartContainer.append(this.chartElement);

@@ -227,6 +227,7 @@ var webComponents = (function (exports) {
             return [
                 'colors',
                 'values',
+                'labels',
             ];
         }
 
@@ -235,7 +236,7 @@ var webComponents = (function (exports) {
         }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>.test{background:red}</style><div class="chart chart--donut"><svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" width="160" height="160" viewBox="0 0 160 160" class="donut"></svg></div>`;
+            super();this.attachShadow({mode:'open'}).innerHTML=`<style>.donut circle{cursor:pointer;pointer-events:stroke;transition:filter .2s ease-out}.donut circle:focus{outline:0}.donut circle:focus,.donut circle:hover{filter:brightness(80%)}</style><div class="chart chart--donut"><svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" width="160" height="160" viewBox="0 0 160 160" class="donut"></svg></div>`;
             this.gap = 2;
             this.cx = 80;
             this.cy = 80;
@@ -243,9 +244,20 @@ var webComponents = (function (exports) {
             this.angleOffset = -90;
             this.chartData = [];
             this.segmentElems = [];
+            this.isLoaded = false;
 
             this.svg = this.shadowRoot.querySelector('svg');
             this.generateSegment = this.generateSegment.bind(this);
+            this.updateSegment = this.updateSegment.bind(this);
+        }
+
+        get currencyFormat() {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format;
         }
 
         set colors(v) {
@@ -255,6 +267,15 @@ var webComponents = (function (exports) {
         get colors() {
             const colors = (this.getAttribute('colors') || '').replace(/'/g, '"');
             return colors ? JSON.parse(colors) : ['red', 'green', 'blue'];
+        }
+
+        set labels(v) {
+            this.setAttribute('labels', JSON.stringify(v));
+        }
+
+        get labels() {
+            const labels = (this.getAttribute('labels') || '').replace(/'/g, '"');
+            return labels ? JSON.parse(labels) : [];
         }
 
         set values(v) {
@@ -294,6 +315,7 @@ var webComponents = (function (exports) {
          */
         generateSegment(val, i) {
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
             const data = {
                 degrees: this.angleOffset,
             };
@@ -301,6 +323,7 @@ var webComponents = (function (exports) {
             this.angleOffset += this.dataPercentage(this.values[i]) * 360;
             this.chartData.push(data);
 
+            circle.setAttribute('tabindex', '0');
             circle.setAttribute('cx', this.cx);
             circle.setAttribute('cy', this.cy);
             circle.setAttribute('r', this.radius);
@@ -310,19 +333,31 @@ var webComponents = (function (exports) {
             circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
             circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
             circle.setAttribute('transform', this.calculateTransform(i));
+            circle.appendChild(title);
+            title.textContent = `${this.labels[i]}: ${this.currencyFormat(val)}`;
 
             this.segmentElems.push(circle);
             this.svg.appendChild(circle);
-
         }
 
         updateSegments() {
             this.angleOffset = -90;
+            this.chartData = [];
             this.values.forEach(this.updateSegment);
         }
 
         updateSegment(val, i) {
             const circle = this.segmentElems[i];
+            const title = circle.querySelector('title');
+            console.log(title);
+            const data = {
+                degrees: this.angleOffset,
+            };
+
+            this.angleOffset += this.dataPercentage(this.values[i]) * 360;
+            this.chartData.push(data);
+
+            title.textContent = `${this.labels[i]}: ${this.currencyFormat(val)}`;
             circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
             circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
             circle.setAttribute('transform', this.calculateTransform(i));
@@ -333,23 +368,23 @@ var webComponents = (function (exports) {
             return this.circumference - strokeDiff;
         }
 
+        /**
+         * Calculates the transform rotation the circle should be
+         * attributed with
+         * @param {Number} i - The index of chart data to use
+         * @returns {String} - The rotation of the circle
+         */
         calculateTransform(i) {
             return `rotate(${this.chartData[i].degrees}, ${this.cx}, ${this.cy})`;
         }
 
+        /**
+         * Gets the percentage a given value represents of the total
+         * @param {Number} val - The divisor
+         * @returns {Number} - The percentage
+         */
         dataPercentage(val) {
             return this.total ? val / this.total : 0;
-        }
-
-        /**
-         * @param {string} attr - The attribute which changed
-         * @param {string} oldVal - The old value
-         * @param {string} newVal - The new value
-         */
-        attributeChangedCallback() {
-            if (this.colors && this.values && this.total) {
-                this.updateSegments();
-            }
         }
 
         /**
@@ -364,6 +399,22 @@ var webComponents = (function (exports) {
                 this.chartData.shift();
             }
             this.angleOffset = -90;
+        }
+
+        connectedCallback() {
+            this.generateSegments();
+            this.isLoaded = true;
+        }
+
+        /**
+         * @param {string} attr - The attribute which changed
+         * @param {string} oldVal - The old value
+         * @param {string} newVal - The new value
+         */
+        attributeChangedCallback() {
+            if (this.isLoaded && this.colors && this.values && this.total) {
+                this.updateSegments();
+            }
         }
     }
 
@@ -453,8 +504,6 @@ var webComponents = (function (exports) {
 
             this.chartElement = undefined;
             this.generateChart();
-
-
 
             this.elements = {
                 price: this.shadowRoot.querySelector('mortgage-calc-input[name="price"]'),
@@ -611,6 +660,7 @@ var webComponents = (function (exports) {
             const chartContainer = this.shadowRoot.querySelector('.mortgage-calc__chart');
             this.chartElement = document.createElement('chart-donut');
             this.chartElement.colors = this.colors;
+            this.chartElement.labels = ['Principal + Interest', 'Taxes', 'Amount Per Month'];
             this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
 
             chartContainer.append(this.chartElement);
