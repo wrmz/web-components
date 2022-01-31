@@ -8,6 +8,7 @@ export class ChartDonut extends HTMLElement {
         return [
             'colors',
             'values',
+            'labels',
         ];
     }
 
@@ -47,6 +48,15 @@ export class ChartDonut extends HTMLElement {
     get colors() {
         const colors = (this.getAttribute('colors') || '').replace(/'/g, '"');
         return colors ? JSON.parse(colors) : ['red', 'green', 'blue'];
+    }
+
+    set labels(v) {
+        this.setAttribute('labels', JSON.stringify(v));
+    }
+
+    get labels() {
+        const labels = (this.getAttribute('labels') || '').replace(/'/g, '"');
+        return labels ? JSON.parse(labels) : [];
     }
 
     set values(v) {
@@ -105,7 +115,7 @@ export class ChartDonut extends HTMLElement {
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
         circle.setAttribute('transform', this.calculateTransform(i));
         circle.appendChild(title);
-        title.textContent = this.currencyFormat(val);
+        title.textContent = `${this.labels[i]}: ${this.currencyFormat(val)}`;
 
         this.segmentElems.push(circle);
         this.svg.appendChild(circle);
@@ -128,7 +138,7 @@ export class ChartDonut extends HTMLElement {
         this.angleOffset += this.dataPercentage(this.values[i]) * 360;
         this.chartData.push(data);
 
-        title.textContent = this.currencyFormat(val);
+        title.textContent = `${this.labels[i]}: ${this.currencyFormat(val)}`;
         circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
         circle.setAttribute('transform', this.calculateTransform(i));
