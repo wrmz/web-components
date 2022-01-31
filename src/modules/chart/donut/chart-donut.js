@@ -24,9 +24,11 @@ export class ChartDonut extends HTMLElement {
         this.angleOffset = -90;
         this.chartData = [];
         this.segmentElems = [];
+        this.isLoaded = false;
 
         this.svg = this.shadowRoot.querySelector('svg');
         this.generateSegment = this.generateSegment.bind(this);
+        this.updateSegment = this.updateSegment.bind(this);
     }
 
     set colors(v) {
@@ -94,16 +96,23 @@ export class ChartDonut extends HTMLElement {
 
         this.segmentElems.push(circle);
         this.svg.appendChild(circle);
-
     }
 
     updateSegments() {
         this.angleOffset = -90;
+        this.chartData = [];
         this.values.forEach(this.updateSegment);
     }
 
     updateSegment(val, i) {
         const circle = this.segmentElems[i];
+        const data = {
+            degrees: this.angleOffset,
+        };
+
+        this.angleOffset += this.dataPercentage(this.values[i]) * 360;
+        this.chartData.push(data);
+
         circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
         circle.setAttribute('transform', this.calculateTransform(i));
@@ -114,12 +123,42 @@ export class ChartDonut extends HTMLElement {
         return this.circumference - strokeDiff;
     }
 
+    /**
+     * Calculates the transform rotation the circle should be
+     * attributed with
+     * @param {Number} i - The index of chart data to use
+     * @returns {String} - The rotation of the circle
+     */
     calculateTransform(i) {
         return `rotate(${this.chartData[i].degrees}, ${this.cx}, ${this.cy})`;
     }
 
+    /**
+     * Gets the percentage a given value represents of the total
+     * @param {Number} val - The divisor
+     * @returns {Number} - The percentage
+     */
     dataPercentage(val) {
         return this.total ? val / this.total : 0;
+    }
+
+     /**
+     * Destroys the segments of the circle by removing the elements,
+     * removing them from the `segmentElems` array and removing their
+     * data from the `segmentElems` array.
+     */
+      destroySegments() {
+        while (this.svg.firstChild) {
+            this.svg.removeChild(this.svg.firstChild);
+            this.segmentElems.shift();
+            this.chartData.shift();
+        }
+        this.angleOffset = -90;
+    }
+
+    connectedCallback() {
+        this.generateSegments();
+        this.isLoaded = true;
     }
 
     /**
@@ -128,23 +167,9 @@ export class ChartDonut extends HTMLElement {
      * @param {string} newVal - The new value
      */
     attributeChangedCallback() {
-        if (this.colors && this.values && this.total) {
+        if (this.isLoaded && this.colors && this.values && this.total) {
             this.updateSegments();
         }
-    }
-
-    /**
-     * Destroys the segments of the circle by removing the elements,
-     * removing them from the `segmentElems` array and removing their
-     * data from the `segmentElems` array.
-     */
-    destroySegments() {
-        while (this.svg.firstChild) {
-            this.svg.removeChild(this.svg.firstChild);
-            this.segmentElems.shift();
-            this.chartData.shift();
-        }
-        this.angleOffset = -90;
     }
 }
 
