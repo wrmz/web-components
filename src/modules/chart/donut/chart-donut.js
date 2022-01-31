@@ -115,6 +115,7 @@ export class ChartDonut extends HTMLElement {
         this.angleOffset += this.dataPercentage(this.values[i]) * 360;
         this.chartData.push(data);
 
+        circle.setAttribute('title', val);
         circle.setAttribute('stroke-dasharray', this.adjustedCircumference);
         circle.setAttribute('stroke-dashoffset', this.calculateStrokeDashOffset(this.values[i]));
         circle.setAttribute('transform', this.calculateTransform(i));
