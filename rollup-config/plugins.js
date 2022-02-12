@@ -1,5 +1,4 @@
 import injectInnerHTML from './injectInnerHTML.js';
-import livereload from 'rollup-plugin-livereload';
 import { watcher, noOpWatcher } from './watcher.js';
 import { terser } from 'rollup-plugin-terser';
 
@@ -11,6 +10,5 @@ export const plugins = [
     dev ? noOpWatcher() : terser({
         module: true,
         keep_classnames: true,
-    }),
-    dev ? livereload() : noOpWatcher(),
+    })
 ];

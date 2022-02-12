@@ -21,7 +21,7 @@
         "prod": "yarn run production",
         "production": "cross-env NODE_ENV=production yarn run build",
         "build": "rollup -c",
-        "pretest": "cross-env NODE_ENV=development yarn run build",
+        "pretest": "cross-env NODE_ENV=local yarn run build",
         "test": "concurrently -k -s first \"nyc --reporter=lcov --reporter=text-summary jasmine\" \"node server.js docs\"",
         "prepublishOnly": "yarn run lint && yarn test && yarn run build",
         "lint": "eslint src/**/*.js && stylelint src/**/*.css && html-validate src/**/*.html"
@@ -39,7 +39,6 @@
         "puppeteer": "^10.4.0",
         "puppeteer-to-istanbul": "^1.4.0",
         "rollup": "^2.58.3",
-        "rollup-plugin-livereload": "^2.0.5",
         "rollup-plugin-terser": "^7.0.2",
         "stylelint": "^14.0.1",
         "stylelint-config-standard": "^23.0.0"
