@@ -17,7 +17,7 @@
     "module": "dist/esm/web-components.js",
     "scripts": {
         "start": "concurrently -k \"node server.js docs\" \"cross-env NODE_ENV=local rollup -c -w\"",
-        "build": "rollup -c",
+        "build": "cross-env NODE_ENV=production rollup -c",
         "pretest": "cross-env NODE_ENV=local yarn run build",
         "test": "concurrently -k -s first \"nyc --reporter=lcov --reporter=text-summary jasmine\" \"node server.js docs\"",
         "prepublishOnly": "yarn run lint && yarn test && yarn run build",
