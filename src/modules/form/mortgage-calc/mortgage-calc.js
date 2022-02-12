@@ -172,7 +172,6 @@ export class MortgageCalc extends HTMLElement {
 
     get feesCost() {
         const feesCost = this.hoa;
-        console.log(typeof this.hoa);
         return feesCost;
     }
 
@@ -191,9 +190,8 @@ export class MortgageCalc extends HTMLElement {
         this.chartElement.colors = this.colors;
         this.chartElement.labels = ['Principal + Interest', 'Taxes', 'Fees'];
         this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.feesCost];
-        console.log(this.chartElement.values);
 
-        // chartContainer.append(this.chartElement);
+        chartContainer.append(this.chartElement);
     }
 
     /**

@@ -130,7 +130,6 @@ export class ChartDonut extends HTMLElement {
     updateSegment(val, i) {
         const circle = this.segmentElems[i];
         const title = circle.querySelector('title');
-        console.log(title);
         const data = {
             degrees: this.angleOffset,
         };
@@ -165,7 +164,7 @@ export class ChartDonut extends HTMLElement {
      * @returns {Number} - The percentage
      */
     dataPercentage(val) {
-        return this.total ? val / this.total : 0;
+        return (this.total && val) ? val / this.total : 0;
     }
 
     /**
