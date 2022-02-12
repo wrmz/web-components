@@ -16,9 +16,12 @@
     "type": "module",
     "module": "dist/esm/web-components.js",
     "scripts": {
-        "start": "concurrently -k \"node server.js docs\" \"cross-env NODE_ENV=local rollup -c -w\"",
+        "dev": "yarn run development",
+        "development": "concurrently -k \"node server.js docs\" \"cross-env NODE_ENV=local rollup -c -w\"",
+        "prod": "yarn run production",
+        "production": "cross-env NODE_ENV=production yarn run build",
         "build": "rollup -c",
-        "pretest": "cross-env NODE_ENV=local yarn run build",
+        "pretest": "cross-env NODE_ENV=development yarn run build",
         "test": "concurrently -k -s first \"nyc --reporter=lcov --reporter=text-summary jasmine\" \"node server.js docs\"",
         "prepublishOnly": "yarn run lint && yarn test && yarn run build",
         "lint": "eslint src/**/*.js && stylelint src/**/*.css && html-validate src/**/*.html"
