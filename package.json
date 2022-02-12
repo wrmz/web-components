@@ -2,6 +2,7 @@
     "name": "@wrmz/web-components",
     "version": "1.0.0",
     "description": "A set of web components for Graphic Language, Inc.",
+    "private": true,
     "license": "UNLICENSED",
     "sideEffects": false,
     "repository": {
@@ -36,7 +37,7 @@
         "html-validate": "^6.1.0",
         "jasmine": "^3.10.0",
         "nyc": "^15.1.0",
-        "puppeteer": "^10.4.0",
+        "puppeteer": "^13.3.1",
         "puppeteer-to-istanbul": "^1.4.0",
         "rollup": "^2.58.3",
         "rollup-plugin-terser": "^7.0.2",
