@@ -27,7 +27,6 @@ export class MortgageCalc extends HTMLElement {
         registerComponents(MortgageCalcInput, RadioGroup, ChartDonut);
 
         this.chartElement = undefined;
-        this.generateChart();
 
         this.elements = {
             price: this.shadowRoot.querySelector('mortgage-calc-input[name="price"]'),
@@ -74,7 +73,7 @@ export class MortgageCalc extends HTMLElement {
     get taxes() { return this.elements ? this.elements.taxes.numeric : 0; }
     set taxes(v) { this.elements.taxes.value = v;}
 
-    get hoa() { return this.elements.hoa.numeric; }
+    get hoa() { return this.elements ? this.elements.hoa.numeric : 0; }
     set hoa(v) { this.elements.hoa.value = v; }
 
     get term() { return this.elements ? this.elements.term.numeric : 0; }
@@ -171,12 +170,18 @@ export class MortgageCalc extends HTMLElement {
         return insuranceCost;
     }
 
+    get feesCost() {
+        const feesCost = this.hoa;
+        console.log(typeof this.hoa);
+        return feesCost;
+    }
+
     /**
      * Monthly payment adds all the monthly costs up into a single sum
      * @returns {Number}
      */
     get monthlyPayment() {
-        const monthlyPayment = this.monthlyPrincipalAndInterest + this.taxesCost + this.insuranceCost + this.pmiCost;
+        const monthlyPayment = this.monthlyPrincipalAndInterest + this.taxesCost + this.insuranceCost + this.pmiCost + this.feesCost;
         return monthlyPayment;
     }
 
@@ -184,10 +189,11 @@ export class MortgageCalc extends HTMLElement {
         const chartContainer = this.shadowRoot.querySelector('.mortgage-calc__chart');
         this.chartElement = document.createElement('chart-donut');
         this.chartElement.colors = this.colors;
-        this.chartElement.labels = ['Principal + Interest', 'Taxes', 'Amount Per Month'];
-        this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+        this.chartElement.labels = ['Principal + Interest', 'Taxes', 'Fees'];
+        this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.feesCost];
+        console.log(this.chartElement.values);
 
-        chartContainer.append(this.chartElement);
+        // chartContainer.append(this.chartElement);
     }
 
     /**
@@ -198,9 +204,12 @@ export class MortgageCalc extends HTMLElement {
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
         if (this.chartElement) {
-            // console.log('input:', this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment);
-            this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+            this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.feesCost];
         }
+    }
+
+    connectedCallback() {
+        this.generateChart();
     }
 
     /**
@@ -221,6 +230,8 @@ export class MortgageCalc extends HTMLElement {
             this.taxes = newVal;
         } else if (attr === 'term') {
             this.term = newVal;
+        } else if (attr === 'hoa') {
+            this.hoa = newVal;
         }
 
         // Update the outputs
@@ -228,7 +239,7 @@ export class MortgageCalc extends HTMLElement {
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
         if (this.chartElement) {
-            this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.monthlyPayment];
+            this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.feesCost];
         }
     }
 }
