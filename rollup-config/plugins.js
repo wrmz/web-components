@@ -12,5 +12,5 @@ export const plugins = [
         module: true,
         keep_classnames: true,
     }),
-    livereload()
+    dev ? livereload() : noOpWatcher(),
 ];
