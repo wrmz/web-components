@@ -4,7 +4,11 @@ import path from 'path';
 export function watcher() {
     return {
         buildStart() {
-            let include = ['/src/modules/**/*.html', 'src/modules/**/*.css'];
+            let include = [
+                'dist/**',
+                'src/modules/**/*.html',
+                'src/modules/**/*.css'
+            ];
             for (const item of include) {
                 glob.sync(path.resolve(item)).forEach(filename => this.addWatchFile(filename));
             }

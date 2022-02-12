@@ -19,7 +19,7 @@ export default [
             dir: dev ? 'docs/components/esm' : 'dist/esm',
             preserveModules: true
         }],
-        plugins: plugins
+        plugins: plugins,
     },
     ...modules
 ];
