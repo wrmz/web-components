@@ -2,7 +2,7 @@
     "name": "@wrmz/web-components",
     "version": "1.0.0",
     "description": "A set of web components for Graphic Language, Inc.",
-    "license": "UNCLICENSED",
+    "license": "UNLICENSED",
     "sideEffects": false,
     "repository": {
         "type": "git",
