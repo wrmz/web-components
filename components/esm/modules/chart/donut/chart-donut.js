@@ -17,7 +17,7 @@ class ChartDonut extends HTMLElement {
     }
 
     constructor() {
-        super();this.attachShadow({mode:'open'}).innerHTML=`<style>.donut circle{cursor:pointer;pointer-events:stroke;transition:filter .2s ease-out,transform .2s ease-out}.donut circle:focus{outline:0}.donut circle:focus,.donut circle:hover{filter:brightness(80%)}</style><div class="chart chart--donut"><svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" width="160" height="160" viewBox="0 0 160 160" class="donut"></svg></div>`;
+        super();this.attachShadow({mode:'open'}).innerHTML=`<style>.donut circle{cursor:pointer;pointer-events:stroke;transition:filter .2s linear,transform .2s linear}.donut circle:focus{outline:0}.donut circle:focus,.donut circle:hover{filter:brightness(80%)}</style><div class="chart chart--donut"><svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" width="160" height="160" viewBox="0 0 160 160" class="donut"></svg></div>`;
         this.gap = 2;
         this.cx = 80;
         this.cy = 80;

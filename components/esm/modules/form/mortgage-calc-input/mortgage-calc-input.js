@@ -4,6 +4,7 @@ class MortgageCalcInput extends FieldInput {
     static sanitize(v) { return (v + '').trim().replace(/[^0-9.]*/g, ''); }
 
     get type() { return this.getAttribute('type') || 'currency'; }
+    get name() { return this.getAttribute('name') || ''; }
     get stylizedFormat() {
         return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: this.type === 'percentage' ? 1 : 0,
@@ -20,7 +21,8 @@ class MortgageCalcInput extends FieldInput {
     }
     get numeric() {
         const sanitized = MortgageCalcInput.sanitize(this.value);
-        const numeric = isNaN(sanitized) ? 0 : sanitized;
+        const numeric = (!sanitized || isNaN(sanitized)) ? 0 : sanitized;
+        console.log(this.name, numeric);
         return Number.isInteger(numeric) ? parseInt(numeric, 10) : parseFloat(numeric);
     }
     get stylized() {
