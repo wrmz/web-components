@@ -22,7 +22,6 @@ export class MortgageCalcInput extends FieldInput {
     get numeric() {
         const sanitized = MortgageCalcInput.sanitize(this.value);
         const numeric = (!sanitized || isNaN(sanitized)) ? 0 : sanitized;
-        console.log(this.name, numeric);
         return Number.isInteger(numeric) ? parseInt(numeric, 10) : parseFloat(numeric);
     }
     get stylized() {
