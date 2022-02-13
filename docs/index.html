@@ -6,25 +6,63 @@
         <link rel="shortcut icon" sizes="16x16 24x24 32x32 48x48 64x64" href="favicon.ico" />
         <link rel="stylesheet" href="main.css" />
     </head>
-    <body>
+    <body class="line-numbers">
         <div id="app">
-            <h1>Graphic Language Web Components</h1>
+            <div class="component-nav">
+                <div class="component-nav__container">
+                    <h1 class="app__title">Graphic Language<br/>Web Components</h1>
+                    <div class="component-nav__group">
+                        <a href="#mortgage-calc" class="component-nav__link">Mortgage Calculator</a>
+                        <a href="#mortgage-calc-code" class="component-nav__link">&lt; / &gt;</a>
+                    </div>
+                </div>
+            </div>
             <div class="components">
-                <div class="component">
-                    <mortgage-calc
-                        price="2222222"
-                        downpayment="444444"
-                        interest="5"
-                        taxes="1.4"
-                        term="30"
-                        pmi="0.58"
-                        hoa="200"
-                        colors="['#4b4e6d', '#84dcc6', '#95a3b3']"
-                    ></mortgage-calc>
+
+                <div id="mortgage-calc" class="component">
+                    <h2 class="component__title">Mortgage Calculator</h2>
+                    <div class="component__content">
+                        <mortgage-calc
+                            price="2222222"
+                            downpayment="444444"
+                            interest="5"
+                            taxes="1.4"
+                            term="30"
+                            pmi="0.58"
+                            hoa="200"
+                            colors="['#4b4e6d', '#84dcc6', '#95a3b3']"
+                        ></mortgage-calc>
+                    </div>
+                    <div id="mortgage-calc-code" class="component__scripts">
+                        <div class="component__script-block">
+                            <pre><code class="language-html">&#x3C;mortgage-calc
+    price=&#x22;2222222&#x22;
+    downpayment=&#x22;444444&#x22;
+    interest=&#x22;5&#x22;
+    taxes=&#x22;1.4&#x22;
+    term=&#x22;30&#x22;
+    pmi=&#x22;0.58&#x22;
+    hoa=&#x22;200&#x22;
+    colors=&#x22;[&#x27;#4b4e6d&#x27;, &#x27;#84dcc6&#x27;, &#x27;#95a3b3&#x27;]&#x22;
+&#x3E;&#x3C;/mortgage-calc&#x3E;</code></pre>
+                        </div>
+                        <div class="component__script-block">
+                            <pre><code class="language-js">const mortgageCalc = document.createElement('mortgage-calc');
+
+mortgageCalc.setAttribute('price', '500000');
+mortgageCalc.setAttribute('interest', '3.5');
+mortgageCalc.setAttribute('taxes', '1.4');
+mortgageCalc.setAttribute('term', '15');
+mortgageCalc.setAttribute('pmi', '0.58');
+
+document.body.append(mortgageCalc);</code></pre>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <script src="components/web-components.js"></script>
-        <script src="main.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.26.0/prism.min.js" integrity="sha512-pSVqGtpGygQlhN8ZTHXx1kqkjQr30eM+S6OoSzhHGTjh6DKdfy7WZlo1DNO9bhtM0Imf6xNLznZ7iVC2YUMwJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script type="module" src="components/web-components.js"></script>
+        <script type="module" src="main.js"></script>
     </body>
 </html>
