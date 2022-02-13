@@ -81,7 +81,23 @@ body {
     border: 0;
 }
 .components {
-    padding: 50px;
+    padding: 50px 0 0;
+}
+.footer {
+    padding: 30px 50px 25px;
+    font-size: 14px;
+    font-weight: 300;
+    color: #a89984;
+    background: #282828;
+}
+.footer a {
+    text-decoration: none;
+    color: #ebdbb2;
+    transition: color .2s ease-out;
+}
+.footer a:hover,
+.footer a:focus {
+    color: #b8bb26;
 }
 .app__title {
     margin: 0 0 0.5em;
@@ -93,7 +109,7 @@ body {
     font-size: 14px;
 }
 .component {
-    margin-bottom: 30px;
+    margin: 0 50px 50px;
     overflow: hidden;
     border-radius: 4px;
 }
