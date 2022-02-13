@@ -1,7 +1,7 @@
 .donut circle {
     cursor: pointer;
     pointer-events: stroke;
-    transition: filter 0.2s ease-out, transform 0.2s ease-out;
+    transition: filter 0.2s linear, transform 0.2s linear;
 }
 
 .donut circle:focus {
