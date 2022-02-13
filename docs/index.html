@@ -12,13 +12,45 @@
                 <div class="component-nav__container">
                     <h1 class="app__title">Graphic Language<br/>Web Components</h1>
                     <div class="component-nav__group">
+                        <a href="#mortgage-calc-input" class="component-nav__link">Mortgage Calculator Input</a>
+                        <a href="#mortgage-calc-input-code" class="component-nav__link">&lt; / &gt;</a>
+                    </div>
+                    <div class="component-nav__group">
                         <a href="#mortgage-calc" class="component-nav__link">Mortgage Calculator</a>
                         <a href="#mortgage-calc-code" class="component-nav__link">&lt; / &gt;</a>
                     </div>
                 </div>
             </div>
             <div class="components">
+                <div id="mortgage-calc-input" class="component">
+                    <h2 class="component__title">Mortgage Calculator Input</h2>
+                    <div class="component__content">
+                        <mortgage-calc-input name="price" type="currency">
+                            <label for="price" slot="label">Price</label>
+                            <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9" />
+                        </mortgage-calc-input>
+                    </div>
+                    <div id="mortgage-calc-input-code" class="component__scripts">
+                        <div class="component__script-block">
+                            <pre><code class="language-html">&#x3C;mortgage-calc-input name=&#x22;price&#x22; type=&#x22;currency&#x22;&#x3E;
+    &#x3C;label for=&#x22;price&#x22; slot=&#x22;label&#x22;&#x3E;Price&#x3C;/label&#x3E;
+    &#x3C;input
+        type=&#x22;text&#x22;
+        id=&#x22;price&#x22;
+        slot=&#x22;input&#x22;
+        placeholder=&#x22;123,456&#x22;
+        pattern=&#x22;[0-9$,]+&#x22;
+        maxlength=&#x22;9&#x22;
+    /&#x3E;
+&#x3C;/mortgage-calc-input&#x3E;</code></pre>
+                        </div>
+                        <div class="component__script-block">
+                            <pre><code class="language-js">const mortgageCalcInput = document.createElement('mortgage-calc-input');
 
+mortgageCalc.append(mortgageCalcInput);</code></pre>
+                        </div>
+                    </div>
+                </div>
                 <div id="mortgage-calc" class="component">
                     <h2 class="component__title">Mortgage Calculator</h2>
                     <div class="component__content">
