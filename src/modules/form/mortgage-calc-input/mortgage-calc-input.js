@@ -25,7 +25,7 @@ export class MortgageCalcInput extends FieldInput {
         return Number.isInteger(numeric) ? parseInt(numeric, 10) : parseFloat(numeric);
     }
     get stylized() {
-        const stylized = this.stylizedFormat(this.numeric);;
+        const stylized = this.stylizedFormat(this.numeric);
         return this.type === 'percentage' ? stylized + '%' : stylized;
     }
     get currency() {
