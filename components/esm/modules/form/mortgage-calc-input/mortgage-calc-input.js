@@ -8,7 +8,7 @@ class MortgageCalcInput extends FieldInput {
     get stylizedFormat() {
         return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: this.type === 'percentage' ? 1 : 0,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 3
         }).format;
     }
     get currencyFormat() {
@@ -25,8 +25,8 @@ class MortgageCalcInput extends FieldInput {
         return Number.isInteger(numeric) ? parseInt(numeric, 10) : parseFloat(numeric);
     }
     get stylized() {
-        const sanitized = this.numeric;
-        return this.stylizedFormat(sanitized);
+        const stylized = this.stylizedFormat(this.numeric);
+        return this.type === 'percentage' ? stylized + '%' : stylized;
     }
     get currency() {
         const sanitized = this.numeric;
@@ -39,7 +39,7 @@ class MortgageCalcInput extends FieldInput {
         if (this.type === 'currency') {
             e.target.value = this.currency;
         } else if (this.type === 'percentage') {
-            e.target.value = this.numeric;
+            e.target.value = this.stylized;
         }
     }
 
@@ -49,7 +49,7 @@ class MortgageCalcInput extends FieldInput {
             if (this.type === 'currency') {
                 this._value = this.currency;
             } else if (this.type === 'percentage') {
-                this._value = this.numeric;
+                this._value = this.stylized;
             }
         }
     }
