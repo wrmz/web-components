@@ -40,6 +40,7 @@ export class MortgageCalc extends HTMLElement {
         this.output = {
             principal: this.shadowRoot.querySelector('#outputPrincipal'), // will include interest
             taxes: this.shadowRoot.querySelector('#outputTaxes'),
+            fees: this.shadowRoot.querySelector('#outputFees'),
             perMonth: this.shadowRoot.querySelector('#outputPerMonth'),
         };
 
@@ -200,6 +201,7 @@ export class MortgageCalc extends HTMLElement {
     handleInput() {
         this.output.principal.textContent = this.currencyFormat(this.monthlyPrincipalAndInterest);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
+        this.output.fees.textContent = this.currencyFormat(this.feesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
         if (this.chartElement) {
             this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.feesCost];
@@ -235,6 +237,7 @@ export class MortgageCalc extends HTMLElement {
         // Update the outputs
         this.output.principal.textContent = this.currencyFormat(this.monthlyMortgagePrincipal + this.monthlyInterestCost);
         this.output.taxes.textContent = this.currencyFormat(this.taxesCost);
+        this.output.fees.textContent = this.currencyFormat(this.feesCost);
         this.output.perMonth.textContent = this.currencyFormat(this.monthlyPayment);
         if (this.chartElement) {
             this.chartElement.values = [this.monthlyPrincipalAndInterest, this.taxesCost, this.feesCost];

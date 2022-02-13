@@ -12,6 +12,10 @@
                 <div class="component-nav__container">
                     <h1 class="app__title">Graphic Language<br/>Web Components</h1>
                     <div class="component-nav__group">
+                        <a href="#mortgage-calc-donut-chart" class="component-nav__link">Donut Chart</a>
+                        <a href="#mortgage-calc-donut-chart-code" class="component-nav__link">&lt; / &gt;</a>
+                    </div>
+                    <div class="component-nav__group">
                         <a href="#mortgage-calc-input" class="component-nav__link">Mortgage Calculator Input</a>
                         <a href="#mortgage-calc-input-code" class="component-nav__link">&lt; / &gt;</a>
                     </div>
@@ -22,6 +26,35 @@
                 </div>
             </div>
             <div class="components">
+
+                <div id="mortgage-calc-donut-chart" class="component">
+                    <h2 class="component__title">Donut Chart</h2>
+                    <div class="component__content">
+                        <chart-donut
+                            colors="['red', 'green', 'blue']"
+                            labels="['Red', 'Green', 'Blue']"
+                            values="[25, 45, 30]"
+                        ></chart-donut>
+                    </div>
+                    <div id="mortgage-calc-donut-chart-code" class="component__scripts">
+                        <div class="component__script-block">
+                            <pre><code class="language-html">&#x3C;chart-donut
+    colors=&#x22;[&#x27;red&#x27;, &#x27;green&#x27;, &#x27;blue&#x27;]&#x22;
+    labels=&#x22;[&#x27;Red&#x27;, &#x27;Green&#x27;, &#x27;Blue&#x27;]&#x22;
+    values=&#x22;[25, 45, 30]&#x22;
+&#x3E;&#x3C;/chart-donut&#x3E;</code></pre>
+                        </div>
+                        <div class="component__script-block">
+                            <pre><code class="language-js">const chartElement = document.createElement('chart-donut');
+chartElement.colors = ['red', 'green', 'blue'];
+chartElement.labels = ['Red', 'Green', 'Blue'];
+chartElement.values = [25, 45, 30];
+
+document.body.append(this.chartElement);</code></pre>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="mortgage-calc-input" class="component">
                     <h2 class="component__title">Mortgage Calculator Input</h2>
                     <div class="component__content">
@@ -51,6 +84,8 @@ mortgageCalc.append(mortgageCalcInput);</code></pre>
                         </div>
                     </div>
                 </div>
+
+
                 <div id="mortgage-calc" class="component">
                     <h2 class="component__title">Mortgage Calculator</h2>
                     <div class="component__content">
