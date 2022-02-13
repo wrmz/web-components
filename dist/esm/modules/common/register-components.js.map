@@ -1,0 +1,1 @@
+{"version":3,"file":"register-components.js","sources":["../../../../src/modules/common/register-components.js"],"sourcesContent":["export function registerComponents (...args) {\n    args ? '' : console.error('Please register your components');\n}\n"],"names":["registerComponents","args","console","error"],"mappings":"AAAO,SAASA,KAAuBC,IACnCA,GAAYC,QAAQC,MAAM"}
