@@ -1,3 +1,5 @@
+window.google = null;
+
 /**
  * @injectHTML
  */
