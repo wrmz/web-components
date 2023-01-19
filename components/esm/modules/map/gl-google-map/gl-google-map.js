@@ -11,14 +11,12 @@ class GlGoogleMap extends HTMLElement {
 
     constructor() {
         super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{position:relative;display:block;width:100%;min-height:300px}:host .map{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class="map"></div>`;
-        this.errors = [];
-        this.utilTimeout = undefined;
         this.key = '';
-        this.id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
-        this.apiLoadedCBName = `gl_cb_${this.id}`;
+        this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
+        this.apiLoadedCBName = `gl_cb_${this._id}`;
         this.map = undefined;
         this.elem = this.shadowRoot.querySelector('.map');
-        this.elem.setAttribute('id', `map_${this.id}`);
+        this.elem.setAttribute('id', `map_${this._id}`);
     }
 
     handleApiLoaded() {
@@ -33,7 +31,7 @@ class GlGoogleMap extends HTMLElement {
         console.log('loading api');
         const endpoint = 'https://maps.googleapis.com/maps/api/js';
         const script = document.createElement('script');
-        script.id = `map_script_${this.id}`;
+        script.id = `map_script_${this._id}`;
         script.type = 'text/javascript';
         script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
         script.defer = true;
