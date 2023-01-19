@@ -421,7 +421,7 @@ var webComponents = (function (exports) {
         window.customElements.define('chart-donut', ChartDonut);
     }
 
-    let google = window.google;
+    /*global google*/
     /**
      * @injectHTML
      */
