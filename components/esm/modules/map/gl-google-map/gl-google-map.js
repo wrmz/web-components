@@ -20,6 +20,7 @@ class GlGoogleMap extends HTMLElement {
         this.map = undefined;
         this.elem = this.shadowRoot.querySelector('.map');
         this.elem.setAttribute('id', `map_${this.id}`);
+        this.handleApiLoaded = this.handleApiLoaded.bind(this);
     }
 
     handleApiLoaded() {
@@ -37,7 +38,7 @@ class GlGoogleMap extends HTMLElement {
         script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
         script.defer = true;
         script.async = true;
-        window[this.apiLoadedCBName] = this.handleApiLoaded.bind(this);
+        window[this.apiLoadedCBName] = this.handleApiLoaded;
         document.head.appendChild(script);
     }
 
