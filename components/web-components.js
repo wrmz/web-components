@@ -452,15 +452,17 @@ var webComponents = (function (exports) {
         }
 
         loadGoogleMapsApi() {
-            const endpoint = 'https://maps.googleapis.com/maps/api/js';
-            const script = document.createElement('script');
-            script.id = `map_script_${this.id}`;
-            script.type = 'text/javascript';
-            script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
-            script.defer = true;
-            script.async = true;
-            window[this.apiLoadedCBName] = this.handleApiLoaded.bind(this);
-            document.head.appendChild(script);
+            if (!google.maps) {
+                const endpoint = 'https://maps.googleapis.com/maps/api/js';
+                const script = document.createElement('script');
+                script.id = `map_script_${this.id}`;
+                script.type = 'text/javascript';
+                script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
+                script.defer = true;
+                script.async = true;
+                window[this.apiLoadedCBName] = this.handleApiLoaded.bind(this);
+                document.head.appendChild(script);
+            }
         }
 
         /**
