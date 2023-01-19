@@ -1,4 +1,4 @@
-window.google = null;
+let google = null;
 
 /**
  * @injectHTML
