@@ -1,4 +1,4 @@
-let google = window.google;
+/*global google*/
 /**
  * @injectHTML
  */
