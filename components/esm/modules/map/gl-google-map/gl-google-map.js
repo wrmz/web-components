@@ -30,6 +30,7 @@ class GlGoogleMap extends HTMLElement {
     }
 
     loadGoogleMapsApi() {
+        console.log('loading api');
         const endpoint = 'https://maps.googleapis.com/maps/api/js';
         const script = document.createElement('script');
         script.id = `map_script_${this.id}`;
@@ -45,7 +46,7 @@ class GlGoogleMap extends HTMLElement {
      * Fires when the component is connected to the DOM
      */
     connectedCallback() {
-
+        console.log('connected');
     }
 
     /**
