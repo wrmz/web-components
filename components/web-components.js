@@ -445,6 +445,7 @@ var webComponents = (function (exports) {
         }
 
         handleApiLoaded() {
+            console.log('map loaded');
             this.map = new google.maps.Map(this.elem, {
                 center: { lat: -34.397, lng: 150.644 },
                 zoom: 8
