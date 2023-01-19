@@ -8,35 +8,34 @@ export class GlGoogleMap extends HTMLElement {
         ];
     }
 
-    #key = '';
-    #id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : (Math.random() * 1000);
-    #apiLoadedCBName = `gl_cb_${this.#id}`;
-
     constructor() {
         super();
         this.errors = [];
         this.utilTimeout = undefined;
+        this.key = '';
+        this.id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : (Math.random() * 1000);
+        this.handleApiLoaded = `gl_cb_${this.id}`;
         this.map = undefined;
         this.elem = this.shadowRoot.querySelector('.map');
-        this.elem.setAttribute('id', `map_${this.#id}`);
+        this.elem.setAttribute('id', `map_${this.id}`);
     }
 
-    #handleApiLoaded() {
+    handleApiLoaded() {
         this.map = new google.maps.Map(this.elem, {
             center: { lat: -34.397, lng: 150.644 },
             zoom: 8
         });
     }
 
-    #loadGoogleMapsApi() {
+    loadGoogleMapsApi() {
         const endpoint = 'https://maps.googleapis.com/maps/api/js';
         const script = document.createElement('script');
-        script.id = `map_script_${this.#id}`;
+        script.id = `map_script_${this.id}`;
         script.type = 'text/javascript';
-        script.src = `${endpoint}?key=${this.#key}&callback=${this.#apiLoadedCBName}&v=weekly`;
+        script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
         script.defer = true;
         script.async = true;
-        window[this.#apiLoadedCBName] = this.#handleApiLoaded.bind(this);
+        window[this.apiLoadedCBName] = this.handleApiLoaded.bind(this);
         document.head.appendChild(script);
     }
 
@@ -55,9 +54,9 @@ export class GlGoogleMap extends HTMLElement {
      */
     attributeChangedCallback(name, oldValue, newValue) {
         if (name === 'key' && newValue) {
-            this.#key = newValue;
+            this.key = newValue;
             this.removeAttribute('key');
-            this.#loadGoogleMapsApi();
+            this.loadGoogleMapsApi();
         }
     }
 }
