@@ -2,7 +2,11 @@
  * @injectHTML
  */
 export class GlGoogleMap extends HTMLElement {
-    static observedAttributes = ['key'];
+    static get observedAttributes() {
+        return [
+            'key',
+        ];
+    }
 
     #key = '';
     #id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : (Math.random() * 1000);
