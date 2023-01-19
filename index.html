@@ -24,6 +24,10 @@
                         <a href="#mortgage-calc" class="component-nav__link">Mortgage Calculator</a>
                         <a href="#mortgage-calc-code" class="component-nav__link">&lt; / &gt;</a>
                     </div>
+                    <div class="component-nav__group">
+                        <a href="#google-map" class="component-nav__link">Google Map</a>
+                        <a href="#google-map-code" class="component-nav__link">&lt; / &gt;</a>
+                    </div>
                 </div>
             </div>
             <div class="components">
@@ -124,6 +128,29 @@ mortgageCalc.setAttribute('term', '15');
 mortgageCalc.setAttribute('pmi', '0.58');
 
 document.body.append(mortgageCalc);</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div id="google-map" class="component">
+                    <h2 class="component__title">Google Map</h2>
+                    <div class="component__content">
+                        <gl-google-map
+                            key="AIzaSyAmbaZso7PDRM7VM9wFWd6qSnnm6hzRgg4"
+                        ></gl-google-map>
+                    </div>
+                    <div id="google-map-code" class="component__scripts">
+                        <div class="component__script-block">
+                            <pre><code class="language-html">&lt;gl-google-map
+    key="[YOUR API KEY HERE]"
+&gt;[LOADING COMPONENT HERE]&lt;/gl-google-map&gt;</code></pre>
+                        </div>
+                        <div class="component__script-block">
+                            <pre><code class="language-js">const glMap = document.createElement('gl-google-map');
+
+glMap.setAttribute('key', 'YOUR GOOGLE MAPS API KEY HERE');
+
+document.body.append(glMap);
+                            </code></pre>
                         </div>
                     </div>
                 </div>
