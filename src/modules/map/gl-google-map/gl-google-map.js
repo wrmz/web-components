@@ -14,7 +14,7 @@ export class GlGoogleMap extends HTMLElement {
         this.errors = [];
         this.utilTimeout = undefined;
         this.key = '';
-        this.id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : (Math.random() * 1000);
+        this.id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
         this.apiLoadedCBName = `gl_cb_${this.id}`;
         this.map = undefined;
         this.elem = this.shadowRoot.querySelector('.map');
