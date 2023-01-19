@@ -1,14 +1,4 @@
-let google = null;
-
-if (!Function.prototype.bind) {
-    Function.prototype.bind = function(any) {
-        let func = this;
-        return function () {
-            func.apply(any);
-        };
-    };
-}
-
+let google = window.google;
 /**
  * @injectHTML
  */
@@ -25,11 +15,10 @@ export class GlGoogleMap extends HTMLElement {
         this.utilTimeout = undefined;
         this.key = '';
         this.id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : (Math.random() * 1000);
-        this.handleApiLoaded = `gl_cb_${this.id}`;
+        this.apiLoadedCBName = `gl_cb_${this.id}`;
         this.map = undefined;
         this.elem = this.shadowRoot.querySelector('.map');
         this.elem.setAttribute('id', `map_${this.id}`);
-        this.handleApiLoaded = this.handleApiLoaded.bind(this);
     }
 
     handleApiLoaded() {
@@ -47,7 +36,7 @@ export class GlGoogleMap extends HTMLElement {
         script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
         script.defer = true;
         script.async = true;
-        window[this.apiLoadedCBName] = this.handleApiLoaded;
+        window[this.apiLoadedCBName] = this.handleApiLoaded.bind(this);
         document.head.appendChild(script);
     }
 
