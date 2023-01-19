@@ -1,5 +1,14 @@
 let google = null;
 
+if (!Function.prototype.bind) {
+    Function.prototype.bind = function(any) {
+        let func = this;
+        return function () {
+            func.apply(any);
+        };
+    }
+}
+
 /**
  * @injectHTML
  */
