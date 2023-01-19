@@ -421,8 +421,7 @@ var webComponents = (function (exports) {
         window.customElements.define('chart-donut', ChartDonut);
     }
 
-    let google = null;
-
+    let google = window.google;
     /**
      * @injectHTML
      */
@@ -439,11 +438,10 @@ var webComponents = (function (exports) {
             this.utilTimeout = undefined;
             this.key = '';
             this.id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : (Math.random() * 1000);
-            this.handleApiLoaded = `gl_cb_${this.id}`;
+            this.apiLoadedCBName = `gl_cb_${this.id}`;
             this.map = undefined;
             this.elem = this.shadowRoot.querySelector('.map');
             this.elem.setAttribute('id', `map_${this.id}`);
-            this.handleApiLoaded = this.handleApiLoaded.bind(this);
         }
 
         handleApiLoaded() {
@@ -461,7 +459,7 @@ var webComponents = (function (exports) {
             script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
             script.defer = true;
             script.async = true;
-            window[this.apiLoadedCBName] = this.handleApiLoaded;
+            window[this.apiLoadedCBName] = this.handleApiLoaded.bind(this);
             document.head.appendChild(script);
         }
 
