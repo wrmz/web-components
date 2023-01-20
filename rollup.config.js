@@ -12,7 +12,7 @@ export default [
             sourcemap: true,
             format: 'iife',
             dir: dev ? 'docs/components' : 'dist',
-            name: 'webComponents'
+            name: 'webComponents',
         }, {
             sourcemap: true,
             format: 'esm',

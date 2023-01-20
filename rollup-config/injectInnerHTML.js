@@ -22,7 +22,10 @@ export default function injectInnerHTML() {
                 if (minifiedCss.warnings && minifiedCss.warnings.length > 0) {
                     console.warn(minifiedCss.warnings);
                 }
-                code = code.replace('super();', `super();this.attachShadow({mode:'open'}).innerHTML=\`<style>${minifiedCss.styles}</style>${minifiedHTML}\`;`);
+
+                const styles = `<style>${minifiedCss.styles}</style>`;
+
+                code = code.replace('super();', `super();this.attachShadow({mode:'open'});const template = document.createElement('template');template.innerHTML = \`<style>${minifiedCss.styles}</style>${minifiedHTML}\`;this.shadowRoot.appendChild(template.content.cloneNode(true));`);
             }
 
             return {
