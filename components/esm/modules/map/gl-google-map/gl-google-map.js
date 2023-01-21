@@ -78,7 +78,7 @@ class GlGoogleMap extends HTMLElement {
         });
 
         mapMarker.addListener('dragend', (event) => {
-            const dragendEvent = new Event('dragend', {
+            const dragendEvent = new CustomEvent('dragend', {
                 detail: {
                     map: this.map,
                     marker: mapMarker,
