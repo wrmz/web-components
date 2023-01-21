@@ -1,5 +1,3 @@
-// import { registerComponents  } from '../../common/register-components';
-
 /**
  * @injectHTML
  */
@@ -28,6 +26,7 @@ export class ChartDonut extends HTMLElement {
         this.isLoaded = false;
 
         this.svg = this.shadowRoot.querySelector('svg');
+
         this.generateSegment = this.generateSegment.bind(this);
         this.updateSegment = this.updateSegment.bind(this);
     }
@@ -182,6 +181,7 @@ export class ChartDonut extends HTMLElement {
     }
 
     connectedCallback() {
+
         this.generateSegments();
         this.isLoaded = true;
     }

@@ -1,1 +1,1 @@
-
+!function(t){class GlGoogleMarker extends HTMLElement{static get observedAttributes(){return["latitude","longitude"]}constructor(){super()}get latitude(){const t=parseFloat(this.hasAttribute("latitude")?this.getAttribute("latitude"):"0");return isNaN(t)?0:t}get longitude(){const t=parseFloat(this.hasAttribute("longitude")?this.getAttribute("longitude"):"0");return isNaN(t)?0:t}}window.customElements.get("gl-google-marker")||window.customElements.define("gl-google-marker",GlGoogleMarker),t.GlGoogleMarker=GlGoogleMarker,Object.defineProperty(t,"__esModule",{value:!0})}({});

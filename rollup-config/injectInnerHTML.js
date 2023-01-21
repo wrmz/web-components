@@ -25,7 +25,7 @@ export default function injectInnerHTML() {
 
                 const styles = `<style>${minifiedCss.styles}</style>`;
 
-                code = code.replace('super();', `super();this.attachShadow({mode:'open'});const template = document.createElement('template');template.innerHTML = \`<style>${minifiedCss.styles}</style>${minifiedHTML}\`;this.shadowRoot.appendChild(template.content.cloneNode(true));`);
+                code = code.replace('super();', `super();const el = document.createElement('template');el.innerHTML = \`<style>${minifiedCss.styles}</style>${minifiedHTML}\`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));`);
             }
 
             return {

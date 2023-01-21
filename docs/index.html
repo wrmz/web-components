@@ -149,12 +149,31 @@ document.body.append(mortgageCalc);</code></pre>
                         <div class="component__script-block">
                             <pre><code class="language-html">&lt;gl-google-map
     key="[YOUR API KEY HERE]"
-&gt;[LOADING COMPONENT HERE]&lt;/gl-google-map&gt;</code></pre>
+    latitude="-34.397"
+    longitude="150.644"
+&gt;
+    [LOADING COMPONENT HERE]
+    &lt;gl-google-marker
+        latitude="-34.397"
+        longitude="150.644"
+    &gt;&lt;/gl-google-marker&gt;
+&lt;/gl-google-map&gt;</code></pre>
                         </div>
                         <div class="component__script-block">
                             <pre><code class="language-js">const glMap = document.createElement('gl-google-map');
+const markers = [{
+    latitude: -34.397,
+    longitude: 150.644
+}];
 
 glMap.setAttribute('key', 'YOUR GOOGLE MAPS API KEY HERE');
+
+markers.foreach((marker) => {
+    const glMarker = document.createElement('gl-google-marker');
+    glMarker.setAttribute('latitude', marker.latitude);
+    glMarker.setAttribute('longitude', marker.longitude);
+    glMap.appendChild(glMarker);
+});
 
 document.body.append(glMap);
                             </code></pre>

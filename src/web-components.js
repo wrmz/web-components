@@ -10,6 +10,7 @@ export { RadioGroup } from './modules/form/radio-group/radio-group.js';
 export { ChartDonut } from './modules/chart/donut/chart-donut.js';
 
 // Maps
+export { GlGoogleMarker } from './modules/map/gl-google-marker/gl-google-marker.js'
 export { GlGoogleMap } from './modules/map/gl-google-map/gl-google-map.js';
 
 // Complex Components
