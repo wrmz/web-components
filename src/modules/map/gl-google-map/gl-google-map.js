@@ -10,11 +10,11 @@ export class GlGoogleMap extends HTMLElement {
         return [
             'key',
             'latitude',
-            'longitude',
+            'longitude'
         ];
     }
 
-    constructor(args) {
+    constructor() {
         super();
 
         registerComponents(GlGoogleMarker);
