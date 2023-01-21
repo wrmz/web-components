@@ -1,4 +1,4 @@
-/*global google,setTimeout*/
+/*global google*/
 import { registerComponents } from '../../common/register-components.js';
 import { GlGoogleMarker } from '../gl-google-marker/gl-google-marker.js';
 
