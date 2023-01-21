@@ -6,7 +6,7 @@ import { ChevronIcon } from '../../icon/chevron-icon/chevron-icon.js';
  */
 class InfoMessage extends HTMLElement {
     constructor() {
-        super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:none;padding:2px;font-size:12px;line-height:16px;color:#555;align-items:center}:host([shown]){display:flex}:host([role=alert][shown]:not([invalid])){display:none}:host([role=alert][invalid][shown]){display:flex}</style><chevron-icon aria-hidden="true"></chevron-icon><slot></slot>`;
+        super();const el = document.createElement('template');el.innerHTML = `<style>:host{display:none;padding:2px;font-size:12px;line-height:16px;color:#555;align-items:center}:host([shown]){display:flex}:host([role=alert][shown]:not([invalid])){display:none}:host([role=alert][invalid][shown]){display:flex}</style><chevron-icon aria-hidden="true"></chevron-icon><slot></slot>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
         registerComponents(ChevronIcon);
         this.shadowRoot.querySelector('slot').addEventListener('slotchange', this.handleSlotChange, false);
     }

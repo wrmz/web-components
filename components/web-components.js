@@ -6,7 +6,7 @@ var webComponents = (function (exports) {
      */
     class ChevronIcon extends HTMLElement {
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>svg{display:flex;align-items:center;justify-content:center;width:var(--width,24px);height:var(--height,24px)}</style><svg width="17" height="9" viewBox="0 0 17 9" xmlns="http://www.w3.org/2000/svg" class="svg-chevron" fill="currentColor"><title>Chevron Icon</title><path d="M16.749.356l-.255-.255a.43.43 0 00-.61 0L8.878 7.113 1.866.1a.43.43 0 00-.61 0l-.255.255a.43.43 0 000 .61l7.568 7.57a.43.43 0 00.61 0l7.566-7.57a.428.428 0 00.004-.61z" fill-rule="nonzero"/></svg>`;
+            super();const el = document.createElement('template');el.innerHTML = `<style>svg{display:flex;align-items:center;justify-content:center;width:var(--width,24px);height:var(--height,24px)}</style><svg width="17" height="9" viewBox="0 0 17 9" xmlns="http://www.w3.org/2000/svg" class="svg-chevron" fill="currentColor"><title>Chevron Icon</title><path d="M16.749.356l-.255-.255a.43.43 0 00-.61 0L8.878 7.113 1.866.1a.43.43 0 00-.61 0l-.255.255a.43.43 0 000 .61l7.568 7.57a.43.43 0 00.61 0l7.566-7.57a.428.428 0 00.004-.61z" fill-rule="nonzero"/></svg>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
         }
 
         static get observedAttributes() { return ['title']; }
@@ -29,7 +29,7 @@ var webComponents = (function (exports) {
      */
     class InfoMessage extends HTMLElement {
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:none;padding:2px;font-size:12px;line-height:16px;color:#555;align-items:center}:host([shown]){display:flex}:host([role=alert][shown]:not([invalid])){display:none}:host([role=alert][invalid][shown]){display:flex}</style><chevron-icon aria-hidden="true"></chevron-icon><slot></slot>`;
+            super();const el = document.createElement('template');el.innerHTML = `<style>:host{display:none;padding:2px;font-size:12px;line-height:16px;color:#555;align-items:center}:host([shown]){display:flex}:host([role=alert][shown]:not([invalid])){display:none}:host([role=alert][invalid][shown]){display:flex}</style><chevron-icon aria-hidden="true"></chevron-icon><slot></slot>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
             registerComponents(ChevronIcon);
             this.shadowRoot.querySelector('slot').addEventListener('slotchange', this.handleSlotChange, false);
         }
@@ -109,7 +109,7 @@ var webComponents = (function (exports) {
     class FieldInput extends FormElement {
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-gap:3px;width:100%;height:max-content;box-sizing:border-box}::slotted(input),::slotted(textarea){width:100%;font-size:14px;line-height:20px;padding:13px 15px;margin:0;border:1px solid var(--primary-light);border-radius:5px;color:#555;outline:0;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis}:host([invalid]) ::slotted(input),:host([invalid]) ::slotted(textarea){border:2px solid var(--warning-mid);padding:12px 14px}::slotted(input::placeholder),::slotted(textarea::placeholder){color:#767676}::slotted(input:focus),::slotted(textarea:focus){border:2px solid #555;padding:12px 14px}</style><div class="field"><slot name="label"></slot><slot name="input"></slot><info-message role="status"><slot name="info"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></div>`;
+            super();const el = document.createElement('template');el.innerHTML = `<style>:host{display:grid;grid-gap:3px;width:100%;height:max-content;box-sizing:border-box}::slotted(input),::slotted(textarea){width:100%;font-size:14px;line-height:20px;padding:13px 15px;margin:0;border:1px solid var(--primary-light);border-radius:5px;color:#555;outline:0;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis}:host([invalid]) ::slotted(input),:host([invalid]) ::slotted(textarea){border:2px solid var(--warning-mid);padding:12px 14px}::slotted(input::placeholder),::slotted(textarea::placeholder){color:#767676}::slotted(input:focus),::slotted(textarea:focus){border:2px solid #555;padding:12px 14px}</style><div class="field"><slot name="label"></slot><slot name="input"></slot><info-message role="status"><slot name="info"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
             this.input = null;
             this.handleInput = this.handleInput.bind(this);
             this.handleKeyup = this.handleKeyup.bind(this);
@@ -155,7 +155,7 @@ var webComponents = (function (exports) {
         static sanitize(v) { return (v + '').trim().replace(/[^0-9.]*/g, ''); }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;appearance:none}:host fieldset{position:relative;display:grid;margin:0;padding:0;border:0}:host .radio-group__options{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:20px}</style><fieldset class="radio-group"><legend class="radio-group__legend"><slot name="label"></slot></legend><div class="radio-group__options"><slot></slot></div><info-message role="status"><slot name="info-message"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></fieldset>`;
+            super();const el = document.createElement('template');el.innerHTML = `<style>:host{display:grid;appearance:none}:host fieldset{position:relative;display:grid;margin:0;padding:0;border:0}:host .radio-group__options{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:20px}</style><fieldset class="radio-group"><legend class="radio-group__legend"><slot name="label"></slot></legend><div class="radio-group__options"><slot></slot></div><info-message role="status"><slot name="info-message"></slot></info-message><info-message role="alert"><slot name="error"></slot></info-message></fieldset>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
             registerComponents(InfoMessage);
             this.radios = null;
             this.handleSlotChange = this.handleSlotChange.bind(this);
@@ -217,8 +217,6 @@ var webComponents = (function (exports) {
         window.customElements.define('radio-group', RadioGroup);
     }
 
-    // import { registerComponents  } from '../../common/register-components';
-
     /**
      * @injectHTML
      */
@@ -236,7 +234,7 @@ var webComponents = (function (exports) {
         }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>.donut circle{cursor:pointer;pointer-events:stroke;transition:filter .2s linear,transform .2s linear}.donut circle:focus{outline:0}.donut circle:focus,.donut circle:hover{filter:brightness(80%)}</style><div class="chart chart--donut"><svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" width="160" height="160" viewBox="0 0 160 160" class="donut"></svg></div>`;
+            super();const el = document.createElement('template');el.innerHTML = `<style>.donut circle{cursor:pointer;pointer-events:stroke;transition:filter .2s linear,transform .2s linear}.donut circle:focus{outline:0}.donut circle:focus,.donut circle:hover{filter:brightness(80%)}</style><div class="chart chart--donut"><svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events" width="160" height="160" viewBox="0 0 160 160" class="donut"></svg></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
             this.gap = 2;
             this.cx = 80;
             this.cy = 80;
@@ -247,6 +245,7 @@ var webComponents = (function (exports) {
             this.isLoaded = false;
 
             this.svg = this.shadowRoot.querySelector('svg');
+
             this.generateSegment = this.generateSegment.bind(this);
             this.updateSegment = this.updateSegment.bind(this);
         }
@@ -401,6 +400,7 @@ var webComponents = (function (exports) {
         }
 
         connectedCallback() {
+
             this.generateSegments();
             this.isLoaded = true;
         }
@@ -421,7 +421,35 @@ var webComponents = (function (exports) {
         window.customElements.define('chart-donut', ChartDonut);
     }
 
+    class GlGoogleMarker extends HTMLElement {
+        static get observedAttributes() {
+            return [
+                'latitude',
+                'longitude',
+            ];
+        }
+
+        constructor() {
+            super();
+        }
+
+        get latitude() {
+            const latitude = parseFloat(this.hasAttribute('latitude') ? this.getAttribute('latitude') : '0');
+            return  isNaN(latitude) ? 0 : latitude;
+        }
+
+        get longitude() {
+            const longitude = parseFloat(this.hasAttribute('longitude') ? this.getAttribute('longitude') : '0');
+            return  isNaN(longitude) ? 0 : longitude;
+        }
+    }
+
+    if (!window.customElements.get('gl-google-marker')) {
+        window.customElements.define('gl-google-marker', GlGoogleMarker);
+    }
+
     /*global google*/
+
     /**
      * @injectHTML
      */
@@ -429,25 +457,84 @@ var webComponents = (function (exports) {
         static get observedAttributes() {
             return [
                 'key',
+                'latitude',
+                'longitude'
             ];
         }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{position:relative;display:block;width:100%;min-height:300px}:host .map{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class="map"></div>`;
+            super();const el = document.createElement('template');el.innerHTML = `<style>:host{position:relative;display:block;width:100%;min-height:300px}:host .map{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class="map"></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
+
+            registerComponents(GlGoogleMarker);
+
             this.key = '';
             this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
+            this._markerElems = this.querySelectorAll('gl-google-marker');
+            this._markers = [];
             this.apiLoadedCBName = `gl_cb_${this._id}`;
             this.map = undefined;
             this.elem = this.shadowRoot.querySelector('.map');
             this.elem.setAttribute('id', `map_${this._id}`);
+
+            this.generateMarker = this.generateMarker.bind(this);
+        }
+
+        get latitude() {
+            const latitude = parseFloat(this.hasAttribute('latitude') ? this.getAttribute('latitude') : '0');
+            return  isNaN(latitude) ? 0 : latitude;
+        }
+
+        get longitude() {
+            const longitude = parseFloat(this.hasAttribute('longitude') ? this.getAttribute('longitude') : '0');
+            return  isNaN(longitude) ? 0 : longitude;
+        }
+
+        get markerElems() {
+            return [...this._markerElems];
+        }
+
+        get markers() {
+            return this._markers;
+        }
+
+        set markers(markers) {
+            if (this.map && google && google.maps) {
+                this._markers = markers.map(this.generateMarker);
+            } else {
+                this._markers = [];
+            }
         }
 
         handleApiLoaded() {
-            console.log('map loaded');
             this.map = new google.maps.Map(this.elem, {
-                center: { lat: -34.397, lng: 150.644 },
+                center: { lat: this.latitude, lng: this.longitude },
                 zoom: 8
             });
+            this.markers = this.markerElems;
+        }
+
+        generateMarker(marker) {
+            const mapMarker = new google.maps.Marker({
+                map: this.map,
+                position: { lat: marker.latitude, lng: marker.longitude },
+                draggable: true,
+            });
+
+            mapMarker.addListener('dragend', (event) => {
+                const dragendEvent = new Event('dragend', {
+                    detail: {
+                        map: this.map,
+                        marker: mapMarker,
+                        position: {
+                            latitude: event.latLng.lat(),
+                            longitude: event.latLng.lng()
+                        }
+                    }
+                });
+                this.dispatchEvent(dragendEvent);
+            });
+
+            return mapMarker;
         }
 
         loadGoogleMapsApi() {
@@ -567,7 +654,7 @@ var webComponents = (function (exports) {
         }
 
         constructor() {
-            super();this.attachShadow({mode:'open'}).innerHTML=`<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><mortgage-calc-input name="price" type="currency"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="downpayment" type="currency"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="interest" type="percentage"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="taxes" type="percentage"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="hoa" type="currency"><label for="hoa" slot="label">Monthly HOA Fees</label> <input type="text" id="hoa" slot="input" placeholder="200" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15-Year Fixed</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30-Year Fixed</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart"><!-- Chart is injected here --></div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div><div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div><div class="mortgage-calc__taxes">Fees &amp; Dues: <span id="outputFees"></span></div><div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div></div></div>`;
+            super();const el = document.createElement('template');el.innerHTML = `<style>:host{display:grid;grid-template-columns:50% 50%;gap:50px;--box-shadow-color:var(--primary-light);--box-shadow-width:1px;--box-shadow-color2:transparent;--box-shadow-width2:1px}:host .mortgage-calc__form{display:grid;grid-template-columns:50% 50%;gap:20px}radio-group{grid-column:1/span 2}:host .mortgage-calc__radio{position:relative;display:flex}:host .mortgage-calc__radio input{cursor:pointer;position:absolute;top:0;left:0;min-width:15px;height:15px;border-radius:50%;margin:22px 15px;padding:0;background-clip:content-box;appearance:none;outline:0;box-shadow:inset 0 0 0 var(--box-shadow-width) var(--box-shadow-color),inset 0 0 0 var(--box-shadow-width2) var(--box-shadow-color2)}:host .mortgage-calc__radio input:checked{background-color:var(--primary-mid);--box-shadow-color:var(--primary-mid);--box-shadow-width:2px;--box-shadow-width2:4px;--box-shadow-color2:white}:host .mortgage-calc__radio label{cursor:pointer;display:block;width:100%;padding:15px 20px 15px 40px;border:1px solid var(--primary-light);border-radius:5px}</style><div class="mortgage-calc__form"><mortgage-calc-input name="price" type="currency"><label for="price" slot="label">Price</label> <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="downpayment" type="currency"><label for="downpayment" slot="label">Downpayment</label> <input type="text" id="downpayment" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="interest" type="percentage"><label for="interest" slot="label">Interest Rate</label> <input type="text" id="interest" slot="input" placeholder="3.5" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="taxes" type="percentage"><label for="taxes" slot="label">Est. Monthly Property Taxes</label> <input type="text" id="taxes" slot="input" placeholder="1.4" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><mortgage-calc-input name="hoa" type="currency"><label for="hoa" slot="label">Monthly HOA Fees</label> <input type="text" id="hoa" slot="input" placeholder="200" pattern="[0-9.]+" maxlength="9"></mortgage-calc-input><radio-group name="term"><span slot="label">Choose a Term</span><div class="mortgage-calc__radio"><input id="term-15" type="radio" value="15" name="term"> <label for="term-15">15-Year Fixed</label></div><div class="mortgage-calc__radio"><input id="term-30" type="radio" value="30" name="term"> <label for="term-30">30-Year Fixed</label></div></radio-group></div><div class="mortgage-calc__results"><div class="mortgage-calc__chart"><!-- Chart is injected here --></div><div class="mortgage-calc__data"><div class="mortgage-calc__principal">Principal + Interest <span id="outputPrincipal"></span></div><div class="mortgage-calc__taxes">Taxes <span id="outputTaxes"></span></div><div class="mortgage-calc__taxes">Fees &amp; Dues: <span id="outputFees"></span></div><div class="mortgage-calc__total">Amount Per Month: <span id="outputPerMonth"></span></div></div></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
 
             registerComponents(MortgageCalcInput, RadioGroup, ChartDonut);
 
@@ -799,6 +886,7 @@ var webComponents = (function (exports) {
     exports.ChevronIcon = ChevronIcon;
     exports.FieldInput = FieldInput;
     exports.GlGoogleMap = GlGoogleMap;
+    exports.GlGoogleMarker = GlGoogleMarker;
     exports.InfoMessage = InfoMessage;
     exports.MortgageCalc = MortgageCalc;
     exports.MortgageCalcInput = MortgageCalcInput;
