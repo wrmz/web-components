@@ -63,7 +63,11 @@ class GlGoogleMap extends HTMLElement {
             center: { lat: this.latitude, lng: this.longitude },
             zoom: 8
         });
-        this.markers = this.markerElems;
+        setTimeout(() => {
+            this.markers = this.markerElems;
+            console.log(this.markerElems);
+            console.log(this.markers);
+        }, 100);
     }
 
     generateMarker(marker) {
