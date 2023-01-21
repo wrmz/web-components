@@ -22,7 +22,7 @@ class GlGoogleMap extends HTMLElement {
 
         this.key = '';
         this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
-        this._markerElems = this.querySelectorAll('gl-google-marker');
+        this._markerElems = [...this.querySelectorAll('gl-google-marker')];
         this._markers = [];
         this.apiLoadedCBName = `gl_cb_${this._id}`;
         this.map = undefined;
@@ -112,6 +112,12 @@ class GlGoogleMap extends HTMLElement {
      */
     connectedCallback() {
         console.log('connected');
+        this._markerElems = this.querySelectorAll('gl-google-marker');
+    }
+
+    adoptedCallback() {
+        console.log('adopted');
+        this._markerElems = this.querySelectorAll('gl-google-marker');
     }
 
     /**
