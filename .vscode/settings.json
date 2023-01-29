@@ -1,4 +1,7 @@
 {
     "editor.quickSuggestions": null,
-    "javascript.validate.enable": false
+    "javascript.validate.enable": false,
+    "search.exclude": {
+        "**/dist": true
+    }
 }
