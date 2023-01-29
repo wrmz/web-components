@@ -196,19 +196,91 @@ document.body.append(mortgageCalc);</code></pre>
 &gt;
     [LOADING COMPONENT HERE]
     &lt;gl-google-marker
-        latitude="28.359729644303936"
-        longitude="-81.41682021939336"
+        latitude="28.359547901249183"
+        longitude="-81.41757660233556"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359806353941554"
+        longitude="-81.41734727346478"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359919058000852"
+        longitude="-81.41708173477231"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359998127792913"
+        longitude="-81.41679876172124"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.360135024607075"
+        longitude="-81.4163776549059"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359860640728538"
+        longitude="-81.41639240705548"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359619300343706"
+        longitude="-81.41647689663945"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359254633391174"
+        longitude="-81.41651981198369"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359336063984454"
+        longitude="-81.41678803288518"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.359340784596633"
+        longitude="-81.4170428427416"
+    &gt;&lt;/gl-google-marker&gt;
+    &lt;gl-google-marker
+        latitude="28.35935494643191"
+        longitude="-81.4172963114935"
     &gt;&lt;/gl-google-marker&gt;
 &lt;/gl-google-map&gt;</code></pre>
                         </div>
                         <div class="component__script-block">
                             <pre><code class="language-js">const glMap = document.createElement('gl-google-map');
 const markers = [{
-    latitude: -34.397,
-    longitude: 150.644
+    latitude: 28.359547901249183,
+    longitude: -81.41757660233556
+}, {
+    latitude: 28.359806353941554,
+    longitude: -81.41734727346478
+}, {
+    latitude: 28.359919058000852,
+    longitude: -81.41708173477231
+}, {
+    latitude: 28.359998127792913,
+    longitude: -81.41679876172124
+}, {
+    latitude: 28.360135024607075,
+    longitude: -81.4163776549059"
+}, {
+    latitude: 28.359860640728538,
+    longitude: -81.41639240705548
+}, {
+    latitude: 28.359619300343706,
+    longitude: -81.41647689663945
+}, {
+    latitude: 28.359254633391174,
+    longitude: -81.41651981198369
+}, {
+    latitude: 28.359336063984454,
+    longitude: -81.41678803288518
+}, {
+    latitude: 28.359340784596633,
+    longitude: -81.4170428427416
+}, {
+    latitude: 28.35935494643191,
+    longitude: -81.4172963114935
 }];
 
 glMap.setAttribute('key', 'YOUR GOOGLE MAPS API KEY HERE');
+glMap.setAttribute('latitude', 28.359729644303936);
+glMap.setAttribute('longitude', -81.41682021939336);
 
 markers.foreach((marker) => {
     const glMarker = document.createElement('gl-google-marker');
