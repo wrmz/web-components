@@ -11,8 +11,25 @@ class GlGoogleMap extends HTMLElement {
         return [
             'key',
             'latitude',
-            'longitude'
+            'longitude',
+            'overlay',
         ];
+    }
+
+    static getNormalizedCoord(coord, zoom) {
+        const y = coord.y;
+        let x = coord.x;
+        const tileRange = 1 << zoom;
+
+        if (y < 0 || y >= tileRange) {
+            return null;
+        }
+
+        if (x < 0 || x >= tileRange) {
+            x = ((x % tileRange) + tileRange) % tileRange;
+        }
+
+        return { x, y };
     }
 
     constructor() {
@@ -22,10 +39,12 @@ class GlGoogleMap extends HTMLElement {
 
         this.key = '';
         this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
+        this._overlayElems = [...this.querySelectorAll('gl-google-overlay')];
         this._markerElems = [...this.querySelectorAll('gl-google-marker')];
         this._markers = [];
         this.apiLoadedCBName = `gl_cb_${this._id}`;
         this.map = undefined;
+        this.overlayLayer = undefined;
         this.elem = this.shadowRoot.querySelector('.map');
         this.elem.setAttribute('id', `map_${this._id}`);
 
@@ -40,6 +59,10 @@ class GlGoogleMap extends HTMLElement {
     get longitude() {
         const longitude = parseFloat(this.hasAttribute('longitude') ? this.getAttribute('longitude') : '0');
         return  isNaN(longitude) ? 0 : longitude;
+    }
+
+    get overlay() {
+        return this.getAttribute('overlay');
     }
 
     get markerElems() {
@@ -63,11 +86,19 @@ class GlGoogleMap extends HTMLElement {
             center: { lat: this.latitude, lng: this.longitude },
             zoom: 8
         });
+        this.generateOverlay();
         setTimeout(() => {
             this.markers = this.markerElems;
             console.log(this.markerElems);
             console.log(this.markers);
         }, 100);
+    }
+
+    generateOverlay() {
+        this.overlayLayer = new google.maps.KmlLayer({
+            url: this.overlay,
+            map: this.map
+        });
     }
 
     generateMarker(marker) {
@@ -89,13 +120,13 @@ class GlGoogleMap extends HTMLElement {
                 }
             });
             this.dispatchEvent(dragendEvent);
+            console.log('lat:', event.latLng.lat(), 'lng:', event.latLng.lng());
         });
 
         return mapMarker;
     }
 
     loadGoogleMapsApi() {
-        console.log('loading api');
         const endpoint = 'https://maps.googleapis.com/maps/api/js';
         const script = document.createElement('script');
         script.id = `map_script_${this._id}`;
@@ -111,12 +142,10 @@ class GlGoogleMap extends HTMLElement {
      * Fires when the component is connected to the DOM
      */
     connectedCallback() {
-        console.log('connected');
         this._markerElems = this.querySelectorAll('gl-google-marker');
     }
 
     adoptedCallback() {
-        console.log('adopted');
         this._markerElems = this.querySelectorAll('gl-google-marker');
     }
 
