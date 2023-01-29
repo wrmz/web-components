@@ -17,9 +17,9 @@
     "type": "module",
     "module": "dist/esm/web-components.js",
     "scripts": {
-        "dev": "yarn run development",
+        "dev": "npm run development",
         "development": "concurrently -k \"node server.js docs\" \"cross-env NODE_ENV=local rollup -c -w\"",
-        "prod": "yarn run production",
+        "prod": "npm run production",
         "production": "cross-env NODE_ENV=production yarn run build",
         "build": "rollup -c",
         "pretest": "cross-env NODE_ENV=local yarn run build",
