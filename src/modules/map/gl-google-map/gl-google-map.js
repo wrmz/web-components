@@ -110,7 +110,7 @@ export class GlGoogleMap extends HTMLElement {
             animation: google.maps.Animation.DROP,
             draggable: true,
         });
-        mapMarker.addListener('mouseover', (event) => {
+        mapMarker.addListener('mouseover', () => {
             mapMarker.setIcon({
                 path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
                 fillColor: 'red',
@@ -119,7 +119,7 @@ export class GlGoogleMap extends HTMLElement {
                 anchor: new google.maps.Point(10, 22)
             });
         });
-        mapMarker.addListener('mouseout', (event) => {
+        mapMarker.addListener('mouseout', () => {
             mapMarker.setIcon({
                 path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
                 fillColor: 'red',
@@ -140,7 +140,6 @@ export class GlGoogleMap extends HTMLElement {
                 }
             });
             this.dispatchEvent(dragendEvent);
-            console.log(event.latLng.lat(), event.latLng.lng());
         });
 
         return mapMarker;
