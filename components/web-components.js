@@ -480,7 +480,7 @@ var webComponents = (function (exports) {
         }
 
         constructor() {
-            super();const el = document.createElement('template');el.innerHTML = `<style>:host{position:relative;display:block;width:100%;min-height:300px}:host .map{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class="map"></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
+            super();const el = document.createElement('template');el.innerHTML = `<style>:host{position:relative;display:block;width:100%;min-height:400px}:host .map{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class="map"></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
 
             registerComponents(GlGoogleMarker);
 
@@ -534,11 +534,7 @@ var webComponents = (function (exports) {
                 zoom: 8
             });
             this.generateOverlay();
-            setTimeout(() => {
-                this.markers = this.markerElems;
-                console.log(this.markerElems);
-                console.log(this.markers);
-            }, 100);
+            this.markers = this.markerElems;
         }
 
         generateOverlay() {
@@ -552,9 +548,34 @@ var webComponents = (function (exports) {
             const mapMarker = new google.maps.Marker({
                 map: this.map,
                 position: { lat: marker.latitude, lng: marker.longitude },
+                icon: {
+                    path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
+                    fillColor: 'red',
+                    fillOpacity: 0.6,
+                    strokeWeight: 0,
+                    anchor: new google.maps.Point(10, 22)
+                },
+                animation: google.maps.Animation.DROP,
                 draggable: true,
             });
-
+            mapMarker.addListener('mouseover', () => {
+                mapMarker.setIcon({
+                    path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
+                    fillColor: 'red',
+                    fillOpacity: 1,
+                    strokeWeight: 0,
+                    anchor: new google.maps.Point(10, 22)
+                });
+            });
+            mapMarker.addListener('mouseout', () => {
+                mapMarker.setIcon({
+                    path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
+                    fillColor: 'red',
+                    fillOpacity: 0.6,
+                    strokeWeight: 0,
+                    anchor: new google.maps.Point(10, 22)
+                });
+            });
             mapMarker.addListener('dragend', (event) => {
                 const dragendEvent = new CustomEvent('dragend', {
                     detail: {
@@ -567,7 +588,6 @@ var webComponents = (function (exports) {
                     }
                 });
                 this.dispatchEvent(dragendEvent);
-                console.log('lat:', event.latLng.lat(), 'lng:', event.latLng.lng());
             });
 
             return mapMarker;
