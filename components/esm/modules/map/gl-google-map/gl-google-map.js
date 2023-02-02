@@ -13,6 +13,7 @@ class GlGoogleMap extends HTMLElement {
             'latitude',
             'longitude',
             'overlay',
+            'map-style',
         ];
     }
 
@@ -32,22 +33,38 @@ class GlGoogleMap extends HTMLElement {
         return { x, y };
     }
 
+    static async getStyle(url) {
+        const repsonse = await fetch(url);
+        const json = await repsonse.json();
+
+        return json;
+    }
+
     constructor() {
         super();const el = document.createElement('template');el.innerHTML = `<style>:host{position:relative;display:block;width:100%;min-height:400px}:host .map{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class="map"></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
 
         registerComponents(GlGoogleMarker);
 
+        this.isAdmin = true;
         this.key = '';
         this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
-        this._overlayElems = [...this.querySelectorAll('gl-google-overlay')];
+        this._imageElem = this.querySelector('img');
         this._markerElems = [...this.querySelectorAll('gl-google-marker')];
         this._markers = [];
+        this._adminMarkers = [];
         this.apiLoadedCBName = `gl_cb_${this._id}`;
         this.map = undefined;
+        this.styleLayer = undefined;
+        this.imageLayer = undefined;
+        this.imageNE = 0.0;
+        this.imageNW = 0.0;
+        this.imageSW = 0.0;
+        this.imageSE = 0.0;
         this.overlayLayer = undefined;
         this.elem = this.shadowRoot.querySelector('.map');
         this.elem.setAttribute('id', `map_${this._id}`);
 
+        this.generateAdminMarker = this.generateAdminMarker.bind(this);
         this.generateMarker = this.generateMarker.bind(this);
     }
 
@@ -65,8 +82,20 @@ class GlGoogleMap extends HTMLElement {
         return this.getAttribute('overlay');
     }
 
+    get mapStyle() {
+        return this.getAttribute('map-style');
+    }
+
     get markerElems() {
         return [...this._markerElems];
+    }
+
+    get adminMarkers() {
+        return this._adminMarkers;
+    }
+
+    set adminMarkers(arr) {
+        this._adminMarkers = Array.isArray(arr) ? arr.map(this.generateAdminMarker) : [];
     }
 
     get markers() {
@@ -75,19 +104,121 @@ class GlGoogleMap extends HTMLElement {
 
     set markers(markers) {
         if (this.map && google && google.maps) {
-            this._markers = markers.map(this.generateMarker);
+            this._markers = [
+                ...this.adminMarkers,
+                ...markers.map(this.generateMarker)
+            ];
         } else {
-            this._markers = [];
+            this._markers = [...this.adminMarkers];
         }
     }
 
+    /**
+     * @todo This should be an async function.
+     * Need a way to know when everything has been loaded and
+     * drawn before actually displaying the map.
+     */
     handleApiLoaded() {
         this.map = new google.maps.Map(this.elem, {
             center: { lat: this.latitude, lng: this.longitude },
             zoom: 8
         });
+        this.setMapStyle();
+        this.placeImages();
         this.generateOverlay();
         this.markers = this.markerElems;
+    }
+
+    async placeImages() {
+        const imageUrl = this._imageElem.getAttribute('src');
+        const neLatitude = parseFloat(this._imageElem.getAttribute('latitude-ne'));
+        const neLongitude = parseFloat(this._imageElem.getAttribute('longitude-ne'));
+        const swLatitude = parseFloat(this._imageElem.getAttribute('latitude-sw'));
+        const swLongitude = parseFloat(this._imageElem.getAttribute('longitude-sw'));
+        const bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(neLatitude, neLongitude),
+            new google.maps.LatLng(swLatitude, swLongitude)
+        );
+        const boxNW = { latitude: swLatitude, longitude: neLongitude };
+        const boxNE = { latitude: neLatitude, longitude: neLongitude };
+        const boxSE = { latitude: neLatitude, longitude: swLongitude };
+        const boxSW = { latitude: swLatitude, longitude: swLongitude };
+
+        this.adminMarkers = [
+            { label: 'nw', ...boxNW },
+            { label: 'ne', ...boxNE },
+            { label: 'se', ...boxSE },
+            { label: 'sw', ...boxSW },
+        ];
+
+        if (!imageUrl) {
+            return;
+        }
+
+        GlGoogleImage.prototype = new google.maps.OverlayView();
+        function GlGoogleImage(bounds, image, map) {
+            this._bounds = bounds;
+            this._imageElem = image;
+            this._map = map;
+            this._div = undefined;
+
+            this.setMap(map);
+        }
+
+        GlGoogleImage.prototype.onAdd = function() {
+            const panes = this.getPanes();
+
+            this._div = document.createElement('div');
+            this._div.style.borderStyle = 'none';
+            this._div.style.borderWidth = '0px';
+            this._div.style.position = 'absolute';
+
+            this._imageElem.parentNode.removeChild(this._imageElem);
+            this._imageElem.style.width = '100%';
+            this._imageElem.style.height = '100%';
+            this._imageElem.style.position = 'absolute';
+            this._imageElem.style.display = 'block';
+            this._div.appendChild(this._imageElem);
+
+            // For draggable positioning, we'll use `floatPane` instead of `overlayLayer`
+            panes.overlayLayer.appendChild(this._div);
+        };
+
+        GlGoogleImage.prototype.draw = function() {
+            const overlayProjection = this.getProjection();
+            const boundsNE = this._bounds.getNorthEast();
+            const boundsSW = this._bounds.getSouthWest();
+            const sw = overlayProjection.fromLatLngToDivPixel(boundsSW);
+            const ne = overlayProjection.fromLatLngToDivPixel(boundsNE);
+
+            if (this._div) {
+                this._div.style.top = `${sw.y}px`;
+                this._div.style.left = `${ne.x}px`;
+                this._div.style.width = `${sw.x - ne.x}px`;
+                this._div.style.height = `${ne.y - sw.y}px`;
+            }
+        };
+
+        GlGoogleImage.prototype.onRemove = function() {
+            if (this._div) {
+                this._div.parentNode.removeChild(this._div);
+                this._div = null;
+            }
+        };
+
+
+        this.imageLayer = new GlGoogleImage(bounds, this._imageElem, this.map);
+        this.imageLayer.setMap(this.map);
+    }
+
+    async setMapStyle() {
+        const mapStyle = await GlGoogleMap.getStyle(this.mapStyle);
+
+        if (mapStyle) {
+            this.styleLayer = new google.maps.StyledMapType(mapStyle, { name: `Map${this._id}` });
+            this.map.mapTypes.set(`map_${this._id}`, this.styleLayer);
+            this.map.setMapTypeId(`map_${this._id}`);
+        }
     }
 
     generateOverlay() {
@@ -95,6 +226,24 @@ class GlGoogleMap extends HTMLElement {
             url: this.overlay,
             map: this.map
         });
+    }
+
+    generateAdminMarker(marker) {
+        const adminMarker = new google.maps.Marker({
+            map: this.map,
+            position: { lat: marker.latitude, lng: marker.longitude },
+            icon: {
+                path: 'M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10Z',
+                scale: 1,
+                fillColor: 'white',
+                strokeColor: 'white',
+                fillOpacity: 0.8,
+                strokeWeight: 2,
+                anchor: new google.maps.Point(10, 10)
+            },
+            draggable: true
+        });
+        return adminMarker;
     }
 
     generateMarker(marker) {
@@ -181,6 +330,7 @@ class GlGoogleMap extends HTMLElement {
             this.removeAttribute('key');
             this.loadGoogleMapsApi();
         }
+
     }
 }
 

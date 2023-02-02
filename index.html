@@ -139,7 +139,22 @@ document.body.append(mortgageCalc);</code></pre>
                             latitude="28.359729644303936"
                             longitude="-81.41682021939336"
                             overlay="https://www.google.com/maps/d/u/0/kml?mid=1mhUHTG8z4u_ynCQjJIll50BqhHmb3EM&nl=1&lid=OOdOIcNvHPY&forcekml=1&cid=mp&cv=byis3_ztGDw.en."
+                            map-style="./map-style.json"
                         >
+                            <!-- <img
+                                src="./map-overlay.png"
+                                latitude-ne="28.360506179305457"
+                                longitude-ne="-81.41572587811528"
+                                latitude-sw="28.358835087823223"
+                                longitude-sw="-81.41820960366307"
+                            > -->
+                            <img
+                                src="./map-overlay.png"
+                                latitude-ne="28.360504"
+                                longitude-ne="-81.414538"
+                                latitude-sw="28.358836"
+                                longitude-sw="-81.41821"
+                            >
                             <gl-google-marker
                                 latitude="28.359547901249183"
                                 longitude="-81.41757660233556"
@@ -193,6 +208,7 @@ document.body.append(mortgageCalc);</code></pre>
     latitude="28.359729644303936"
     longitude="-81.41682021939336"
     overlay="[URL to KML file]"
+    map-style="[URL to JSON file]"
 &gt;
     [LOADING COMPONENT HERE]
     &lt;gl-google-marker
@@ -281,6 +297,7 @@ const markers = [{
 glMap.setAttribute('key', 'YOUR GOOGLE MAPS API KEY HERE');
 glMap.setAttribute('latitude', 28.359729644303936);
 glMap.setAttribute('longitude', -81.41682021939336);
+glMap.setAttribute('map-style', {...})
 
 markers.foreach((marker) => {
     const glMarker = document.createElement('gl-google-marker');
