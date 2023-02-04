@@ -284,7 +284,6 @@ export class GlGoogleMap extends HTMLElement {
         });
         adminMarker.addListener('drag', (event) => {
             const label = marker.label;
-            const bounds = new google.maps.LatLngBounds(event.latLng);
             const lat = event.latLng.lat();
             const lng = event.latLng.lng();
 
