@@ -276,6 +276,7 @@ export class GlGoogleMap extends HTMLElement {
         });
 
         adminMarker.addListener('dragstart', (event) => {
+            console.log('drag began', event);
             // console.log('drag started at', { position: {
             //     latitude: event.latLng.lat(),
             //     longitude: event.latLng.lng()
@@ -299,6 +300,7 @@ export class GlGoogleMap extends HTMLElement {
             // console.log('moving to: ', this.imageElemPosition);
         });
         adminMarker.addListener('dragend', (event) => {
+            console.log('drag finished', event);
             // console.log('drag ended', { position: {
             //     latitude: event.latLng.lat(),
             //     longitude: event.latLng.lng()
