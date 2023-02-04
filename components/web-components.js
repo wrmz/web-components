@@ -537,6 +537,37 @@ var webComponents = (function (exports) {
             return [...this._markerElems];
         }
 
+        get imageElemPosition() {
+            const neLatitude = parseFloat(this._imageElem.getAttribute('latitude-ne'));
+            const neLongitude = parseFloat(this._imageElem.getAttribute('longitude-ne'));
+            const swLatitude = parseFloat(this._imageElem.getAttribute('latitude-sw'));
+            const swLongitude = parseFloat(this._imageElem.getAttribute('longitude-sw'));
+
+            return {
+                neLatitude: isNaN(neLatitude) ? 0.00 : neLatitude,
+                neLongitude: isNaN(neLongitude) ? 0.00 : neLongitude,
+                swLatitude: isNaN(swLatitude) ? 0.00 : swLatitude,
+                swLongitude: isNaN(swLongitude) ? 0.00 : swLongitude
+            };
+        }
+
+        set imageElemPosition(val) {
+            this._imageElem.setAttribute('latitude-ne', val.neLatitude);
+            this._imageElem.setAttribute('longitude-ne', val.neLongitude);
+            this._imageElem.setAttribute('latitude-sw', val.swLatitude);
+            this._imageElem.setAttribute('longitude-sw', val.swLatitude);
+
+            if (google && google.maps && this.imageLayer) {
+                const bounds = new google.maps.LatLngBounds(
+                    new google.maps.LatLng(val.neLatitude, val.neLongitude),
+                    new google.maps.LatLng(val.swLatitude, val.swLongitude)
+                );
+                console.log('drawing imageLayer', bounds);
+                this.imageLayer.setBounds(bounds);
+                this.imageLayer.draw();
+            }
+        }
+
         get adminMarkers() {
             return this._adminMarkers;
         }
@@ -578,24 +609,20 @@ var webComponents = (function (exports) {
 
         async placeImages() {
             const imageUrl = this._imageElem.getAttribute('src');
-            const neLatitude = parseFloat(this._imageElem.getAttribute('latitude-ne'));
-            const neLongitude = parseFloat(this._imageElem.getAttribute('longitude-ne'));
-            const swLatitude = parseFloat(this._imageElem.getAttribute('latitude-sw'));
-            const swLongitude = parseFloat(this._imageElem.getAttribute('longitude-sw'));
+            const neLatitude = this.imageElemPosition.neLatitude;
+            const neLongitude = this.imageElemPosition.neLongitude;
+            const swLatitude = this.imageElemPosition.swLatitude;
+            const swLongitude = this.imageElemPosition.swLongitude;
             const bounds = new google.maps.LatLngBounds(
                 new google.maps.LatLng(neLatitude, neLongitude),
                 new google.maps.LatLng(swLatitude, swLongitude)
             );
-            const boxNW = { latitude: swLatitude, longitude: neLongitude };
-            const boxNE = { latitude: neLatitude, longitude: neLongitude };
-            const boxSE = { latitude: neLatitude, longitude: swLongitude };
-            const boxSW = { latitude: swLatitude, longitude: swLongitude };
 
             this.adminMarkers = [
-                { label: 'nw', ...boxNW },
-                { label: 'ne', ...boxNE },
-                { label: 'se', ...boxSE },
-                { label: 'sw', ...boxSW },
+                { label: 'nw', latitude: swLatitude, longitude: neLongitude },
+                { label: 'ne', latitude: neLatitude, longitude: neLongitude },
+                { label: 'se', latitude: neLatitude, longitude: swLongitude },
+                { label: 'sw', latitude: swLatitude, longitude: swLongitude },
             ];
 
             if (!imageUrl) {
@@ -612,12 +639,17 @@ var webComponents = (function (exports) {
                 this.setMap(map);
             }
 
+            GlGoogleImage.prototype.setBounds = function(bounds) {
+                this._bounds = bounds;
+            };
+
             GlGoogleImage.prototype.onAdd = function() {
                 const panes = this.getPanes();
 
                 this._div = document.createElement('div');
-                this._div.style.borderStyle = 'none';
-                this._div.style.borderWidth = '0px';
+                // this._div.style.borderStyle = 'none';
+                // this._div.style.borderWidth = '0';
+                this._div.style.border = '2px solid red';
                 this._div.style.position = 'absolute';
 
                 this._imageElem.parentNode.removeChild(this._imageElem);
@@ -631,10 +663,10 @@ var webComponents = (function (exports) {
                 panes.overlayLayer.appendChild(this._div);
             };
 
-            GlGoogleImage.prototype.draw = function() {
+            GlGoogleImage.prototype.draw = function(bounds) {
                 const overlayProjection = this.getProjection();
-                const boundsNE = this._bounds.getNorthEast();
-                const boundsSW = this._bounds.getSouthWest();
+                const boundsNE = bounds ? bounds.getNorthEast() : this._bounds.getNorthEast();
+                const boundsSW = bounds ? bounds.getSouthWest() : this._bounds.getSouthWest();
                 const sw = overlayProjection.fromLatLngToDivPixel(boundsSW);
                 const ne = overlayProjection.fromLatLngToDivPixel(boundsNE);
 
@@ -689,6 +721,37 @@ var webComponents = (function (exports) {
                     anchor: new google.maps.Point(10, 10)
                 },
                 draggable: true
+            });
+
+            adminMarker.addListener('dragstart', (event) => {
+                console.log('drag began', event);
+                // console.log('drag started at', { position: {
+                //     latitude: event.latLng.lat(),
+                //     longitude: event.latLng.lng()
+                // }});
+            });
+            adminMarker.addListener('drag', (event) => {
+                const label = marker.label;
+                const lat = event.latLng.lat();
+                const lng = event.latLng.lng();
+
+                // if nw moved, update north east lng
+
+                this.imageElemPosition = {
+                    neLatitude: (label === 'nw' || label === 'ne') ? lat : this.imageElemPosition.neLatitude,
+                    neLongitude: (label === 'nw' || label === 'ne') ? lng : this.imageElemPosition.neLongitude,
+                    swLatitude: (label === 'sw' || label == 'se') ? lat : this.imageElemPosition.swLatitude,
+                    swLongitude: (label === 'sw' || label == 'se') ? lng : this.imageElemPosition.swLongitude,
+                };
+
+                // console.log('moving to: ', this.imageElemPosition);
+            });
+            adminMarker.addListener('dragend', (event) => {
+                console.log('drag finished', event);
+                // console.log('drag ended', { position: {
+                //     latitude: event.latLng.lat(),
+                //     longitude: event.latLng.lng()
+                // }});
             });
             return adminMarker;
         }
