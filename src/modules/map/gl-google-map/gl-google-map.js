@@ -71,7 +71,7 @@ export class GlGoogleMap extends HTMLElement {
     }
 
     get isImageVisible() {
-        this.setAttribute('show-image', val);
+        return this.getAttribute('show-image') === 'true';
     }
 
     set isImageVisible(val) {
