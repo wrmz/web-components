@@ -26,7 +26,6 @@ body {
 
 #app {
     display: grid;
-
 }
 @media screen and (min-width: 978px) {
     #app {
@@ -123,6 +122,26 @@ body {
 .component__content {
     padding: 50px 30px;
     background: #fff;
+}
+.component__options {
+    display: grid;
+    gap: 20px;
+    margin: 0 0 50px;
+}
+@media screen and (min-width: 978px) {
+    .component__options {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.component__option {
+    padding: 10px 20px;
+    border-radius: 4px;
+    background: #f1f1f1;
+}
+.component__option label,
+.component__option input {
+    cursor: pointer;
 }
 .component__scripts {
     display: grid;

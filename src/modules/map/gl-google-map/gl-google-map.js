@@ -13,23 +13,10 @@ export class GlGoogleMap extends HTMLElement {
             'longitude',
             'overlay',
             'map-style',
+            'show-markers',
+            'show-kml',
+            'show-image',
         ];
-    }
-
-    static getNormalizedCoord(coord, zoom) {
-        const y = coord.y;
-        let x = coord.x;
-        const tileRange = 1 << zoom;
-
-        if (y < 0 || y >= tileRange) {
-            return null;
-        }
-
-        if (x < 0 || x >= tileRange) {
-            x = ((x % tileRange) + tileRange) % tileRange;
-        }
-
-        return { x, y };
     }
 
     static async getStyle(url) {
@@ -65,6 +52,30 @@ export class GlGoogleMap extends HTMLElement {
 
         this.generateAdminMarker = this.generateAdminMarker.bind(this);
         this.generateMarker = this.generateMarker.bind(this);
+    }
+
+    get isMarkersVisible() {
+        return this.getAttribute('show-markers') === 'true';
+    }
+
+    set isMarkersVisible(val) {
+        this.setAttribute('show-markers', val);
+    }
+
+    get isKmlVisible() {
+        return this.getAttribute('show-kml') === 'true';
+    }
+
+    set isKmlVisible(val) {
+        this.setAttribute('show-kml', val);
+    }
+
+    get isImageVisible() {
+        this.setAttribute('show-image', val);
+    }
+
+    set isImageVisible(val) {
+        this.setAttribute('show-image', val);
     }
 
     get latitude() {
@@ -107,14 +118,13 @@ export class GlGoogleMap extends HTMLElement {
         this._imageElem.setAttribute('latitude-ne', val.neLatitude);
         this._imageElem.setAttribute('longitude-ne', val.neLongitude);
         this._imageElem.setAttribute('latitude-sw', val.swLatitude);
-        this._imageElem.setAttribute('longitude-sw', val.swLatitude);
+        this._imageElem.setAttribute('longitude-sw', val.swLongitude);
 
         if (google && google.maps && this.imageLayer) {
             const bounds = new google.maps.LatLngBounds(
                 new google.maps.LatLng(val.neLatitude, val.neLongitude),
                 new google.maps.LatLng(val.swLatitude, val.swLongitude)
             );
-            console.log('drawing imageLayer', bounds);
             this.imageLayer.setBounds(bounds);
             this.imageLayer.draw();
         }
@@ -171,9 +181,7 @@ export class GlGoogleMap extends HTMLElement {
         );
 
         this.adminMarkers = [
-            { label: 'nw', latitude: swLatitude, longitude: neLongitude },
             { label: 'ne', latitude: neLatitude, longitude: neLongitude },
-            { label: 'se', latitude: neLatitude, longitude: swLongitude },
             { label: 'sw', latitude: swLatitude, longitude: swLongitude },
         ];
 
@@ -277,17 +285,11 @@ export class GlGoogleMap extends HTMLElement {
 
         adminMarker.addListener('dragstart', (event) => {
             console.log('drag began', event);
-            // console.log('drag started at', { position: {
-            //     latitude: event.latLng.lat(),
-            //     longitude: event.latLng.lng()
-            // }});
         });
         adminMarker.addListener('drag', (event) => {
             const label = marker.label;
             const lat = event.latLng.lat();
             const lng = event.latLng.lng();
-
-            // if nw moved, update north east lng
 
             this.imageElemPosition = {
                 neLatitude: (label === 'nw' || label === 'ne') ? lat : this.imageElemPosition.neLatitude,
@@ -295,15 +297,9 @@ export class GlGoogleMap extends HTMLElement {
                 swLatitude: (label === 'sw' || label == 'se') ? lat : this.imageElemPosition.swLatitude,
                 swLongitude: (label === 'sw' || label == 'se') ? lng : this.imageElemPosition.swLongitude,
             };
-
-            // console.log('moving to: ', this.imageElemPosition);
         });
         adminMarker.addListener('dragend', (event) => {
             console.log('drag finished', event);
-            // console.log('drag ended', { position: {
-            //     latitude: event.latLng.lat(),
-            //     longitude: event.latLng.lng()
-            // }});
         });
         return adminMarker;
     }
@@ -393,6 +389,17 @@ export class GlGoogleMap extends HTMLElement {
             this.loadGoogleMapsApi();
         }
 
+        if (name === 'show-markers') {
+
+        }
+
+        if (name === 'show-kml') {
+
+        }
+
+        if (name === 'show-image') {
+
+        }
     }
 }
 
