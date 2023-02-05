@@ -400,11 +400,16 @@ export class GlGoogleMap extends HTMLElement {
         }
 
         if (name === 'show-kml') {
-
+            this.overlayLayer.setMap(this.isKmlVisible ? this.map : null);
         }
 
         if (name === 'show-image') {
-
+            this.imageLayer.setMap(this.isImageVisible ? this.map : null);
+            this.markers.forEach((marker) => {
+                if (marker.type === 'admin') {
+                    marker.setVisible(this.isImageVisible);
+                }
+            });
         }
     }
 }
