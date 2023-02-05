@@ -252,3 +252,29 @@
 	});
 
 }());
+
+function init() {
+	const checkboxHideMarkers = document.getElementById('hideMarkers');
+	const checkboxHideKml = document.getElementById('hideKml');
+	const checkboxHideImage = document.getElementById('hideImage');
+	const glGoogleMap = document.getElementById('glGoogleMap');
+
+	function toggleMarkers() {
+		glGoogleMap.setAttribute('show-markers', !checkboxHideMarkers.checked);
+	}
+
+	function toggleKml() {
+		glGoogleMap.setAttribute('show-kml', !checkboxHideKml.checked);
+	}
+
+	function toggleImage() {
+		glGoogleMap.setAttribute('show-image', !checkboxHideImage.checked);
+	}
+
+	checkboxHideMarkers.addEventListener('change', toggleMarkers, false);
+	checkboxHideKml.addEventListener('change', toggleKml, false);
+	checkboxHideImage.addEventListener('change', toggleImage, false);
+	window.removeEventListener('load', init);
+}
+
+window.addEventListener('load', init, false);

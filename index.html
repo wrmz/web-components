@@ -134,26 +134,34 @@ document.body.append(mortgageCalc);</code></pre>
                 <div id="google-map" class="component">
                     <h2 class="component__title">Google Map</h2>
                     <div class="component__content">
+                        <div class="component__options">
+                            <div class="component__option">
+                                <input type="checkbox" id="hideMarkers">
+                                <label for="hideMarkers">Hide Markers</label>
+                            </div>
+                            <div class="component__option">
+                                <input type="checkbox" id="hideKml">
+                                <label for="hideKml">Hide KML Layer</label>
+                            </div>
+                            <div class="component__option">
+                                <input type="checkbox" id="hideImage">
+                                <label for="hideImage">Hide Image Layer</label>
+                            </div>
+                        </div>
                         <gl-google-map
+                            id="glGoogleMap"
                             key="AIzaSyAmbaZso7PDRM7VM9wFWd6qSnnm6hzRgg4"
                             latitude="28.359729644303936"
                             longitude="-81.41682021939336"
                             overlay="https://www.google.com/maps/d/u/0/kml?mid=1mhUHTG8z4u_ynCQjJIll50BqhHmb3EM&nl=1&lid=OOdOIcNvHPY&forcekml=1&cid=mp&cv=byis3_ztGDw.en."
                             map-style="./map-style.json"
                         >
-                            <!-- <img
-                                src="./map-overlay.png"
-                                latitude-ne="28.360506179305457"
-                                longitude-ne="-81.41572587811528"
-                                latitude-sw="28.358835087823223"
-                                longitude-sw="-81.41820960366307"
-                            > -->
                             <img
                                 src="./map-overlay.png"
-                                latitude-ne="28.360504"
-                                longitude-ne="-81.414538"
-                                latitude-sw="28.358836"
-                                longitude-sw="-81.41821"
+                                latitude-ne="28.360291574572035"
+                                longitude-ne="-81.41619024075317"
+                                latitude-sw="28.359123958315564"
+                                longitude-sw="-81.41778084655762"
                             >
                             <gl-google-marker
                                 latitude="28.359547901249183"
@@ -213,10 +221,10 @@ document.body.append(mortgageCalc);</code></pre>
     [LOADING COMPONENT HERE]
     &lt;img
         src="[YOUR IMAGE OVERLAY PATH HERE].png"
-        latitude-ne="28.360504"
-        longitude-ne="-81.414538"
-        latitude-sw="28.358836"
-        longitude-sw="-81.41821"
+        latitude-ne="28.360291574572035"
+        longitude-ne="-81.41619024075317"
+        latitude-sw="28.359123958315564"
+        longitude-sw="-81.41778084655762"
     &gt;
     &lt;gl-google-marker
         latitude="28.359547901249183"

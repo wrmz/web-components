@@ -461,23 +461,10 @@ var webComponents = (function (exports) {
                 'longitude',
                 'overlay',
                 'map-style',
+                'show-markers',
+                'show-kml',
+                'show-image',
             ];
-        }
-
-        static getNormalizedCoord(coord, zoom) {
-            const y = coord.y;
-            let x = coord.x;
-            const tileRange = 1 << zoom;
-
-            if (y < 0 || y >= tileRange) {
-                return null;
-            }
-
-            if (x < 0 || x >= tileRange) {
-                x = ((x % tileRange) + tileRange) % tileRange;
-            }
-
-            return { x, y };
         }
 
         static async getStyle(url) {
@@ -513,6 +500,30 @@ var webComponents = (function (exports) {
 
             this.generateAdminMarker = this.generateAdminMarker.bind(this);
             this.generateMarker = this.generateMarker.bind(this);
+        }
+
+        get isMarkersVisible() {
+            return this.getAttribute('show-markers') === 'true';
+        }
+
+        set isMarkersVisible(val) {
+            this.setAttribute('show-markers', val);
+        }
+
+        get isKmlVisible() {
+            return this.getAttribute('show-kml') === 'true';
+        }
+
+        set isKmlVisible(val) {
+            this.setAttribute('show-kml', val);
+        }
+
+        get isImageVisible() {
+            return this.getAttribute('show-image') === 'true';
+        }
+
+        set isImageVisible(val) {
+            this.setAttribute('show-image', val);
         }
 
         get latitude() {
@@ -555,14 +566,13 @@ var webComponents = (function (exports) {
             this._imageElem.setAttribute('latitude-ne', val.neLatitude);
             this._imageElem.setAttribute('longitude-ne', val.neLongitude);
             this._imageElem.setAttribute('latitude-sw', val.swLatitude);
-            this._imageElem.setAttribute('longitude-sw', val.swLatitude);
+            this._imageElem.setAttribute('longitude-sw', val.swLongitude);
 
             if (google && google.maps && this.imageLayer) {
                 const bounds = new google.maps.LatLngBounds(
                     new google.maps.LatLng(val.neLatitude, val.neLongitude),
                     new google.maps.LatLng(val.swLatitude, val.swLongitude)
                 );
-                console.log('drawing imageLayer', bounds);
                 this.imageLayer.setBounds(bounds);
                 this.imageLayer.draw();
             }
@@ -619,9 +629,7 @@ var webComponents = (function (exports) {
             );
 
             this.adminMarkers = [
-                { label: 'nw', latitude: swLatitude, longitude: neLongitude },
                 { label: 'ne', latitude: neLatitude, longitude: neLongitude },
-                { label: 'se', latitude: neLatitude, longitude: swLongitude },
                 { label: 'sw', latitude: swLatitude, longitude: swLongitude },
             ];
 
@@ -710,6 +718,7 @@ var webComponents = (function (exports) {
         generateAdminMarker(marker) {
             const adminMarker = new google.maps.Marker({
                 map: this.map,
+                type: 'admin',
                 position: { lat: marker.latitude, lng: marker.longitude },
                 icon: {
                     path: 'M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10Z',
@@ -725,17 +734,11 @@ var webComponents = (function (exports) {
 
             adminMarker.addListener('dragstart', (event) => {
                 console.log('drag began', event);
-                // console.log('drag started at', { position: {
-                //     latitude: event.latLng.lat(),
-                //     longitude: event.latLng.lng()
-                // }});
             });
             adminMarker.addListener('drag', (event) => {
                 const label = marker.label;
                 const lat = event.latLng.lat();
                 const lng = event.latLng.lng();
-
-                // if nw moved, update north east lng
 
                 this.imageElemPosition = {
                     neLatitude: (label === 'nw' || label === 'ne') ? lat : this.imageElemPosition.neLatitude,
@@ -743,15 +746,9 @@ var webComponents = (function (exports) {
                     swLatitude: (label === 'sw' || label == 'se') ? lat : this.imageElemPosition.swLatitude,
                     swLongitude: (label === 'sw' || label == 'se') ? lng : this.imageElemPosition.swLongitude,
                 };
-
-                // console.log('moving to: ', this.imageElemPosition);
             });
             adminMarker.addListener('dragend', (event) => {
                 console.log('drag finished', event);
-                // console.log('drag ended', { position: {
-                //     latitude: event.latLng.lat(),
-                //     longitude: event.latLng.lng()
-                // }});
             });
             return adminMarker;
         }
@@ -759,6 +756,7 @@ var webComponents = (function (exports) {
         generateMarker(marker) {
             const mapMarker = new google.maps.Marker({
                 map: this.map,
+                type: 'client',
                 position: { lat: marker.latitude, lng: marker.longitude },
                 icon: {
                     path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
@@ -841,6 +839,26 @@ var webComponents = (function (exports) {
                 this.loadGoogleMapsApi();
             }
 
+            if (name === 'show-markers') {
+                this.markers.forEach((marker) => {
+                    if (marker.type === 'client') {
+                        marker.setVisible(this.isMarkersVisible);
+                    }
+                });
+            }
+
+            if (name === 'show-kml') {
+                this.overlayLayer.setMap(this.isKmlVisible ? this.map : null);
+            }
+
+            if (name === 'show-image') {
+                this.imageLayer.setMap(this.isImageVisible ? this.map : null);
+                this.markers.forEach((marker) => {
+                    if (marker.type === 'admin') {
+                        marker.setVisible(this.isImageVisible);
+                    }
+                });
+            }
         }
     }
 
