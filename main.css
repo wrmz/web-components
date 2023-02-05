@@ -34,6 +34,7 @@ body {
 }
 .component-nav {
     background: #f1f1f1;
+    z-index: 10;
 }
 .component-nav__container {
     position: sticky;
@@ -80,14 +81,49 @@ body {
     border: 0;
 }
 .components {
+    position: relative;
     padding: 50px 0 0;
 }
+.components::before,
+.components::after {
+    content: '';
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% + 50px);
+    border-style: solid;
+    border-color: #ddd;
+    box-sizing: border-box;
+    z-index: 3;
+}
+.components::before {
+    border-width: 20px;
+}
+.components::after {
+    border-width: 50px;
+    border-radius: 56px;
+}
+.components::before,
+.components::after {
+    border-bottom: 0;
+}
+@media screen and (min-width: 978px) {
+    .components::before,
+    .components::after {
+        left: 346px;
+        width: calc(100% - 346px);
+    }
+}
 .footer {
+    position: relative;
     padding: 30px 50px 25px;
     font-size: 14px;
     font-weight: 300;
     color: #a89984;
     background: #282828;
+    z-index: 10;
 }
 .footer a {
     text-decoration: none;
@@ -109,15 +145,18 @@ body {
 }
 .component {
     margin: 0 50px 50px;
-    overflow: hidden;
     border-radius: 4px;
 }
 .component__title {
-    margin: 0;
+    position: sticky;
+    top: 50px;
+    margin: 0 0 -1px;
     padding: 20px 30px;
     font-size: 18px;
     font-weight: 500;
+    border-radius: 4px 4px 0 0;
     background: #f1f1f1;
+    z-index: 2;
 }
 .component__content {
     padding: 50px 30px;
@@ -146,6 +185,8 @@ body {
 .component__scripts {
     display: grid;
     gap: 1px;
+    overflow: hidden;
+    border-radius: 0 0 4px 4px;
     background: #504945;
 }
 @media screen and (min-width: 1500px) {
