@@ -270,6 +270,7 @@ export class GlGoogleMap extends HTMLElement {
     generateAdminMarker(marker) {
         const adminMarker = new google.maps.Marker({
             map: this.map,
+            type: 'admin',
             position: { lat: marker.latitude, lng: marker.longitude },
             icon: {
                 path: 'M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10Z',
@@ -307,6 +308,7 @@ export class GlGoogleMap extends HTMLElement {
     generateMarker(marker) {
         const mapMarker = new google.maps.Marker({
             map: this.map,
+            type: 'client',
             position: { lat: marker.latitude, lng: marker.longitude },
             icon: {
                 path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
@@ -390,7 +392,11 @@ export class GlGoogleMap extends HTMLElement {
         }
 
         if (name === 'show-markers') {
-
+            this.markers.forEach((marker) => {
+                if (marker.type === 'client') {
+                    marker.setVisible(this.isMarkersVisible);
+                }
+            });
         }
 
         if (name === 'show-kml') {
