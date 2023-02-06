@@ -46,12 +46,16 @@ export class GlGoogleMap extends HTMLElement {
         this.imageNW = 0.0;
         this.imageSW = 0.0;
         this.imageSE = 0.0;
-        this.overlayLayer = undefined;
-        this.elem = this.shadowRoot.querySelector('.map');
+        this.kmlLayer = undefined;
+        this.elem = this.shadowRoot.querySelector('.gl-map');
+        this.mapElem = this.shadowRoot.querySelector('.gl-map__map');
+        this.detailElem = null;
+
         this.elem.setAttribute('id', `map_${this._id}`);
 
         this.generateAdminMarker = this.generateAdminMarker.bind(this);
         this.generateMarker = this.generateMarker.bind(this);
+        this.loadDetail = this.loadDetail.bind(this);
     }
 
     get isMarkersVisible() {
@@ -159,13 +163,17 @@ export class GlGoogleMap extends HTMLElement {
      * drawn before actually displaying the map.
      */
     handleApiLoaded() {
-        this.map = new google.maps.Map(this.elem, {
+        this.map = new google.maps.Map(this.mapElem, {
             center: { lat: this.latitude, lng: this.longitude },
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
             zoom: 8
         });
         this.setMapStyle();
         this.placeImages();
-        this.generateOverlay();
+        this.generateKml();
         this.markers = this.markerElems;
     }
 
@@ -260,10 +268,11 @@ export class GlGoogleMap extends HTMLElement {
         }
     }
 
-    generateOverlay() {
-        this.overlayLayer = new google.maps.KmlLayer({
+    generateKml() {
+        this.kmlLayer = new google.maps.KmlLayer({
             url: this.overlay,
-            map: this.map
+            map: this.map,
+            suppressInfoWindows: true,
         });
     }
 
@@ -308,6 +317,7 @@ export class GlGoogleMap extends HTMLElement {
     generateMarker(marker) {
         const mapMarker = new google.maps.Marker({
             map: this.map,
+            id: marker.id,
             type: 'client',
             position: { lat: marker.latitude, lng: marker.longitude },
             icon: {
@@ -352,7 +362,58 @@ export class GlGoogleMap extends HTMLElement {
             this.dispatchEvent(dragendEvent);
         });
 
+        mapMarker.addListener('click', () => {
+            this.loadDetail(mapMarker);
+        });
+
         return mapMarker;
+    }
+
+    generateDetail() {
+        const detailElem = document.createElement('div');
+        const contentElem = document.createElement('div');
+        const closeElem = document.createElement('button');
+
+        closeElem.setAttribute('type', 'button');
+        closeElem.className = 'gl-map__detail-close';
+        closeElem.innerHTML = '&times;';
+        closeElem.addEventListener('click', this.closeDetail.bind(this), false);
+
+        contentElem.className = 'gl-map__detail-content';
+
+        detailElem.className = 'gl-map__detail';
+        detailElem.appendChild(contentElem);
+        detailElem.appendChild(closeElem);
+
+        this.elem.appendChild(detailElem);
+        this.detailElem = detailElem;
+        this.detailContentElem = contentElem;
+    }
+
+    loadDetail(marker) {
+        const markerElem = this.markerElems.find(elem => elem.id === marker.id);
+        const markerElemChildren = markerElem ? [...markerElem.children] : [];
+
+        this.elem.classList.remove('has-detail');
+
+        if (!this.detailElem) {
+            this.generateDetail();
+        }
+
+        while (this.detailContentElem.firstChild) {
+            this.detailContentElem.removeChild(this.detailContentElem.lastChild);
+            console.log('removing child');
+        }
+
+        markerElemChildren.forEach((child) => {
+            this.detailContentElem.appendChild(child.cloneNode(true));
+        });
+
+        this.elem.classList.add('has-detail');
+    }
+
+    closeDetail() {
+        this.elem.classList.remove('has-detail');
     }
 
     loadGoogleMapsApi() {
@@ -400,7 +461,7 @@ export class GlGoogleMap extends HTMLElement {
         }
 
         if (name === 'show-kml') {
-            this.overlayLayer.setMap(this.isKmlVisible ? this.map : null);
+            this.kmlLayer.setMap(this.isKmlVisible ? this.map : null);
         }
 
         if (name === 'show-image') {
