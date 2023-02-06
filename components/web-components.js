@@ -475,7 +475,7 @@ var webComponents = (function (exports) {
         }
 
         constructor() {
-            super();const el = document.createElement('template');el.innerHTML = `<style>:host{position:relative;display:block;width:100%;min-height:400px}:host .map{position:absolute;top:0;left:0;width:100%;height:100%}</style><div class="map"></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
+            super();const el = document.createElement('template');el.innerHTML = `<style>.lot__content,.lot__image{background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px)}.lot__content h3 span,.lot__cta{font-weight:300;text-transform:uppercase;color:#fff}:host{position:relative;display:block;width:100%;min-height:400px}:host .gl-map{display:flex;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;overflow:hidden}:host .gl-map__detail,:host .gl-map__map{position:absolute;top:0;height:100%}:host .gl-map__map{left:0;width:100%}:host .gl-map__detail{right:0;width:0;overflow:hidden;box-sizing:border-box;transition:width .2s ease-out;will-change:width}:host .gl-map__detail::after{content:'';position:absolute;top:0;left:0;width:100%;mix-blend-mode:multiply}:host .gl-map.has-detail .gl-map__detail{width:50%}:host .gl-map__detail-close{cursor:pointer;position:absolute;display:flex;align-items:center;justify-content:center;top:9px;right:9px;width:30px;height:30px;margin:0;padding:0;font-size:30px;font-weight:300;color:#666;border:0;border-radius:4px;background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px);transition:color .2s ease-out,background .2s ease-out}.lot,.lot__image{position:relative}:host .gl-map__detail-close:focus,:host .gl-map__detail-close:hover{color:#333;background:#fff}:host .gl-map__detail-content{position:relative;top:3px;width:calc(100% - 3px);height:calc(100% - 6px);overflow:auto;box-sizing:border-box}.lot{display:grid;grid-template-rows:max-content 1fr;height:100%}.lot__image{width:100%;height:0;margin-bottom:3px;padding-top:calc(100% * (9 / 16));border-radius:0 4px 0 0}.lot__cta,.lot__img{width:calc(100% - 6px)}.lot__img{position:absolute;display:block;top:3px;left:3px;height:calc(100% - 6px);object-fit:cover;object-position:center;border-radius:2px 4px 2px 2px}.lot__content{position:relative;padding:17px;border-radius:0 0 4px}.lot__content h3{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;gap:3px;margin:0 0 10px}.lot__content h3 span{display:inline-block;margin:0;padding:.25em .75em;font-size:12px;border-radius:2px;background:#333}.lot__content h3 .sold{background:#600}.lot__content h3 .model,.lot__cta{background:#1649c8}.lot__content h3 .pending{background:#9d7f09}.lot__content p{margin:0;font-size:16px}.lot__snapshot{display:grid;grid-template-columns:repeat(3,max-content);gap:.75em;margin:10px 0;line-height:1}.lot__snapshot div:not(:first-child){padding-left:.75em;border-left:1px solid #666}.lot__cta{position:absolute;display:flex;align-items:center;justify-content:center;height:40px;right:3px;bottom:3px;padding:0 17px;font-size:14px;text-decoration:none;border-radius:2px 2px 4px;box-sizing:border-box;transition:background .2s ease-out}.lot__cta:focus,.lot__cta:hover{background:#142755}</style><div class="gl gl-map"><div class="gl-map__map"></div></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
 
             registerComponents(GlGoogleMarker);
 
@@ -494,12 +494,16 @@ var webComponents = (function (exports) {
             this.imageNW = 0.0;
             this.imageSW = 0.0;
             this.imageSE = 0.0;
-            this.overlayLayer = undefined;
-            this.elem = this.shadowRoot.querySelector('.map');
+            this.kmlLayer = undefined;
+            this.elem = this.shadowRoot.querySelector('.gl-map');
+            this.mapElem = this.shadowRoot.querySelector('.gl-map__map');
+            this.detailElem = null;
+
             this.elem.setAttribute('id', `map_${this._id}`);
 
             this.generateAdminMarker = this.generateAdminMarker.bind(this);
             this.generateMarker = this.generateMarker.bind(this);
+            this.loadDetail = this.loadDetail.bind(this);
         }
 
         get isMarkersVisible() {
@@ -607,13 +611,17 @@ var webComponents = (function (exports) {
          * drawn before actually displaying the map.
          */
         handleApiLoaded() {
-            this.map = new google.maps.Map(this.elem, {
+            this.map = new google.maps.Map(this.mapElem, {
                 center: { lat: this.latitude, lng: this.longitude },
+                mapTypeControl: false,
+                scaleControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
                 zoom: 8
             });
             this.setMapStyle();
             this.placeImages();
-            this.generateOverlay();
+            this.generateKml();
             this.markers = this.markerElems;
         }
 
@@ -708,10 +716,11 @@ var webComponents = (function (exports) {
             }
         }
 
-        generateOverlay() {
-            this.overlayLayer = new google.maps.KmlLayer({
+        generateKml() {
+            this.kmlLayer = new google.maps.KmlLayer({
                 url: this.overlay,
-                map: this.map
+                map: this.map,
+                suppressInfoWindows: true,
             });
         }
 
@@ -756,6 +765,7 @@ var webComponents = (function (exports) {
         generateMarker(marker) {
             const mapMarker = new google.maps.Marker({
                 map: this.map,
+                id: marker.id,
                 type: 'client',
                 position: { lat: marker.latitude, lng: marker.longitude },
                 icon: {
@@ -800,7 +810,58 @@ var webComponents = (function (exports) {
                 this.dispatchEvent(dragendEvent);
             });
 
+            mapMarker.addListener('click', () => {
+                this.loadDetail(mapMarker);
+            });
+
             return mapMarker;
+        }
+
+        generateDetail() {
+            const detailElem = document.createElement('div');
+            const contentElem = document.createElement('div');
+            const closeElem = document.createElement('button');
+
+            closeElem.setAttribute('type', 'button');
+            closeElem.className = 'gl-map__detail-close';
+            closeElem.innerHTML = '&times;';
+            closeElem.addEventListener('click', this.closeDetail.bind(this), false);
+
+            contentElem.className = 'gl-map__detail-content';
+
+            detailElem.className = 'gl-map__detail';
+            detailElem.appendChild(contentElem);
+            detailElem.appendChild(closeElem);
+
+            this.elem.appendChild(detailElem);
+            this.detailElem = detailElem;
+            this.detailContentElem = contentElem;
+        }
+
+        loadDetail(marker) {
+            const markerElem = this.markerElems.find(elem => elem.id === marker.id);
+            const markerElemChildren = markerElem ? [...markerElem.children] : [];
+
+            this.elem.classList.remove('has-detail');
+
+            if (!this.detailElem) {
+                this.generateDetail();
+            }
+
+            while (this.detailContentElem.firstChild) {
+                this.detailContentElem.removeChild(this.detailContentElem.lastChild);
+                console.log('removing child');
+            }
+
+            markerElemChildren.forEach((child) => {
+                this.detailContentElem.appendChild(child.cloneNode(true));
+            });
+
+            this.elem.classList.add('has-detail');
+        }
+
+        closeDetail() {
+            this.elem.classList.remove('has-detail');
         }
 
         loadGoogleMapsApi() {
@@ -848,7 +909,7 @@ var webComponents = (function (exports) {
             }
 
             if (name === 'show-kml') {
-                this.overlayLayer.setMap(this.isKmlVisible ? this.map : null);
+                this.kmlLayer.setMap(this.isKmlVisible ? this.map : null);
             }
 
             if (name === 'show-image') {
