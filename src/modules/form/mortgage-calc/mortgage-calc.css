@@ -1,18 +1,27 @@
 :host {
     display: grid;
-    grid-template-columns: 50% 50%;
     gap: 50px;
-
     --box-shadow-color: var(--primary-light);
     --box-shadow-width: 1px;
     --box-shadow-color2: transparent;
     --box-shadow-width2: 1px;
 }
 
+@media screen and (min-width: 978px) {
+    :host {
+        grid-template-columns: 50% 50%;
+    }
+}
+
 :host .mortgage-calc__form {
     display: grid;
-    grid-template-columns: 50% 50%;
     gap: 20px;
+}
+
+@media screen and (min-width: 978px) {
+    :host .mortgage-calc__form {
+        grid-template-columns: 50% 50%;
+    }
 }
 
 radio-group {
