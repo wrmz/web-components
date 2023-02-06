@@ -33,7 +33,7 @@
     width: 0;
     overflow: hidden;
     box-sizing: border-box;
-    transition: width .2s ease-out;
+    transition: width 0.2s ease-out;
     will-change: width;
 }
 
@@ -67,7 +67,7 @@
     color: #666;
     border: 0;
     border-radius: 4px;
-    background: rgba(255,255,255,0.85);
+    background: rgb(255 255 255 / 0.85);
     backdrop-filter: brightness(140%) blur(10px);
     transition: color .2s ease-out, background .2s ease-out;
 }
@@ -101,7 +101,7 @@
     margin-bottom: 3px;
     padding-top: calc(100% * (9 / 16));
     border-radius: 0 4px 0 0;
-    background: rgba(255,255,255,0.85);
+    background: rgb(255 255 255 / 0.85);
     backdrop-filter: brightness(140%) blur(10px);
 }
 
@@ -121,7 +121,7 @@
     position: relative;
     padding: 17px;
     border-radius: 0 0 4px 0;
-    background: rgba(255,255,255,0.85);
+    background: rgb(255 255 255 / 0.85);
     backdrop-filter: brightness(140%) blur(10px);
 }
 
