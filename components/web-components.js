@@ -618,6 +618,9 @@ var webComponents = (function (exports) {
                 scaleControl: false,
                 streetViewControl: false,
                 fullscreenControl: false,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.TOP_LEFT
+                },
                 zoom: 8
             });
             this.setMapStyle();
