@@ -31,6 +31,7 @@
 :host .gl-map__detail {
     right: 0;
     width: 0;
+    max-width: 360px;
     overflow: hidden;
     box-sizing: border-box;
     transition: width 0.2s ease-out;
