@@ -39,6 +39,7 @@ export class GlGoogleMap extends HTMLElement {
         this._markers = [];
         this._adminMarkers = [];
         this.apiLoadedCBName = `gl_cb_${this._id}`;
+        this.loadDetailTimeout = undefined;
         this.map = undefined;
         this.styleLayer = undefined;
         this.imageLayer = undefined;
@@ -57,6 +58,7 @@ export class GlGoogleMap extends HTMLElement {
         this.generateAdminMarker = this.generateAdminMarker.bind(this);
         this.generateMarker = this.generateMarker.bind(this);
         this.loadDetail = this.loadDetail.bind(this);
+        this.showDetail = this.showDetail.bind(this);
     }
 
     get isMarkersVisible() {
@@ -420,6 +422,10 @@ export class GlGoogleMap extends HTMLElement {
             this.detailContentElem.appendChild(child.cloneNode(true));
         });
 
+        this.loadDetailTimeout = setTimeout(this.showDetail, 200);
+    }
+
+    showDetail() {
         this.elem.classList.add('has-detail');
     }
 
