@@ -487,6 +487,7 @@ var webComponents = (function (exports) {
             this._markers = [];
             this._adminMarkers = [];
             this.apiLoadedCBName = `gl_cb_${this._id}`;
+            this.loadDetailTimeout = undefined;
             this.map = undefined;
             this.styleLayer = undefined;
             this.imageLayer = undefined;
@@ -505,6 +506,7 @@ var webComponents = (function (exports) {
             this.generateAdminMarker = this.generateAdminMarker.bind(this);
             this.generateMarker = this.generateMarker.bind(this);
             this.loadDetail = this.loadDetail.bind(this);
+            this.showDetail = this.showDetail.bind(this);
         }
 
         get isMarkersVisible() {
@@ -868,6 +870,10 @@ var webComponents = (function (exports) {
                 this.detailContentElem.appendChild(child.cloneNode(true));
             });
 
+            this.loadDetailTimeout = setTimeout(this.showDetail, 200);
+        }
+
+        showDetail() {
             this.elem.classList.add('has-detail');
         }
 
