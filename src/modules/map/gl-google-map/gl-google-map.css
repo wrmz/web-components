@@ -4,6 +4,7 @@
     width: 100%;
     min-height: 400px;
 }
+
 :host .gl-map {
     display: flex;
     position: absolute;
@@ -14,16 +15,19 @@
     border-radius: 4px;
     overflow: hidden;
 }
+
 :host .gl-map__map,
 :host .gl-map__detail {
     position: absolute;
     top: 0;
     height: 100%;
 }
+
 :host .gl-map__map {
     left: 0;
     width: 100%;
 }
+
 :host .gl-map__detail {
     right: 0;
     width: 0;
@@ -32,6 +36,7 @@
     transition: width .2s ease-out;
     will-change: width;
 }
+
 :host .gl-map__detail::after {
     content: '';
     position: absolute;
@@ -40,9 +45,11 @@
     width: 100%;
     mix-blend-mode: multiply;
 }
+
 :host .gl-map.has-detail .gl-map__detail {
     width: 50%;
 }
+
 :host .gl-map__detail-close {
     cursor: pointer;
     position: absolute;
@@ -64,11 +71,13 @@
     backdrop-filter: brightness(140%) blur(10px);
     transition: color .2s ease-out, background .2s ease-out;
 }
+
 :host .gl-map__detail-close:hover,
 :host .gl-map__detail-close:focus {
     color: #333;
     background: white;
 }
+
 :host .gl-map__detail-content {
     position: relative;
     top: 3px;
@@ -77,12 +86,14 @@
     overflow: auto;
     box-sizing: border-box;
 }
+
 .lot {
     position: relative;
     display: grid;
     grid-template-rows: max-content 1fr;
     height: 100%;
 }
+
 .lot__image {
     position: relative;
     width: 100%;
@@ -93,6 +104,7 @@
     background: rgba(255,255,255,0.85);
     backdrop-filter: brightness(140%) blur(10px);
 }
+
 .lot__img {
     position: absolute;
     display: block;
@@ -104,6 +116,7 @@
     object-position: center;
     border-radius: 2px 4px 2px 2px;
 }
+
 .lot__content {
     position: relative;
     padding: 17px;
@@ -111,6 +124,7 @@
     background: rgba(255,255,255,0.85);
     backdrop-filter: brightness(140%) blur(10px);
 }
+
 .lot__content h3 {
     display: grid;
     grid-auto-flow: column;
@@ -118,6 +132,7 @@
     gap: 3px;
     margin: 0 0 10px;
 }
+
 .lot__content h3 span {
     display: inline-block;
     margin: 0;
@@ -129,19 +144,24 @@
     border-radius: 2px;
     background: #333;
 }
+
 .lot__content h3 .sold {
     background: #660000;
 }
+
 .lot__content h3 .model {
     background: #1649c8;
 }
+
 .lot__content h3 .pending {
     background: #9d7f09;
 }
+
 .lot__content p {
     margin: 0;
     font-size: 16px;
 }
+
 .lot__snapshot {
     display: grid;
     grid-template-columns: repeat(3, max-content);
@@ -149,10 +169,12 @@
     margin: 10px 0;
     line-height: 1;
 }
+
 .lot__snapshot div:not(:first-child) {
     padding-left: 0.75em;
     border-left: 1px solid #666;
 }
+
 .lot__cta {
     position: absolute;
     display: flex;
@@ -173,6 +195,7 @@
     box-sizing: border-box;
     transition: background .2s ease-out;
 }
+
 .lot__cta:hover,
 .lot__cta:focus {
     background: #142755;
