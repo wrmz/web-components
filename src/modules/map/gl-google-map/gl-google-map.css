@@ -120,7 +120,7 @@
 .lot__content {
     position: relative;
     padding: 17px;
-    border-radius: 0 0 4px 0;
+    border-radius: 0 0 4px;
     background: rgb(255 255 255 / 85%);
     backdrop-filter: brightness(140%) blur(10px);
 }
@@ -190,7 +190,7 @@
     text-transform: uppercase;
     text-decoration: none;
     color: white;
-    border-radius: 2px 2px 4px 2px;
+    border-radius: 2px 2px 4px;
     background: #1649C8;
     box-sizing: border-box;
     transition: background 0.2s ease-out;
