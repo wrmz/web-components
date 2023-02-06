@@ -20,11 +20,11 @@
         "dev": "npm run development",
         "development": "concurrently -k \"node server.js docs\" \"cross-env NODE_ENV=local rollup -c -w\"",
         "prod": "npm run production",
-        "production": "cross-env NODE_ENV=production yarn run build",
+        "production": "cross-env NODE_ENV=production npm run build",
         "build": "rollup -c",
-        "pretest": "cross-env NODE_ENV=local yarn run build",
+        "pretest": "cross-env NODE_ENV=local npm run build",
         "test": "concurrently -k -s first \"nyc --reporter=lcov --reporter=text-summary jasmine\" \"node server.js docs\"",
-        "prepublishOnly": "yarn run lint && yarn test && yarn run build",
+        "prepublishOnly": "npm run lint && npm run test && npm run build",
         "lint": "eslint src/**/*.js && stylelint src/**/*.css && html-validate src/**/*.html"
     },
     "devDependencies": {
