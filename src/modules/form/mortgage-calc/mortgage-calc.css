@@ -1,6 +1,7 @@
 :host {
     display: grid;
     gap: 50px;
+
     --box-shadow-color: var(--primary-light);
     --box-shadow-width: 1px;
     --box-shadow-color2: transparent;
