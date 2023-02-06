@@ -52,6 +52,7 @@ class GlGoogleMap extends HTMLElement {
         this.mapElem = this.shadowRoot.querySelector('.gl-map__map');
         this.detailElem = null;
 
+
         this.elem.setAttribute('id', `map_${this._id}`);
 
         this.generateAdminMarker = this.generateAdminMarker.bind(this);
@@ -364,6 +365,14 @@ class GlGoogleMap extends HTMLElement {
         });
 
         mapMarker.addListener('click', () => {
+            const projection = this.imageLayer.getProjection();
+            const pixelPosition = projection.fromLatLngToDivPixel(mapMarker.getPosition());
+
+            pixelPosition.x += 100;
+
+            const newPosition = projection.fromDivPixelToLatLng(pixelPosition);
+
+            this.map.panTo(newPosition);
             this.loadDetail(mapMarker);
         });
 
@@ -403,7 +412,6 @@ class GlGoogleMap extends HTMLElement {
 
         while (this.detailContentElem.firstChild) {
             this.detailContentElem.removeChild(this.detailContentElem.lastChild);
-            console.log('removing child');
         }
 
         markerElemChildren.forEach((child) => {
@@ -415,6 +423,11 @@ class GlGoogleMap extends HTMLElement {
 
     closeDetail() {
         this.elem.classList.remove('has-detail');
+    }
+
+    getPixelCoordinate(latLng) {
+        const overlayProjection = this.imageLayer.getProjection();
+        return overlayProjection.fromLatLngToDivPixel(latLng);
     }
 
     loadGoogleMapsApi() {
