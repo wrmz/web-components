@@ -40,12 +40,9 @@
     width: 100%;
     mix-blend-mode: multiply;
 }
-
-/* :host .gl-map.has-detail .gl-map__map, */
 :host .gl-map.has-detail .gl-map__detail {
     width: 50%;
 }
-
 :host .gl-map__detail-close {
     cursor: pointer;
     position: absolute;
@@ -80,10 +77,6 @@
     overflow: auto;
     box-sizing: border-box;
 }
-
-
-/** @todo Need to supply these styles another way */
-
 .lot {
     position: relative;
     display: grid;
