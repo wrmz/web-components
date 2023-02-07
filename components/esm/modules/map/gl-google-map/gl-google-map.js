@@ -1,67 +1,8 @@
 import { registerComponents } from '../../common/register-components.js';
 import { GlGoogleMarker } from '../gl-google-marker/gl-google-marker.js';
+import GlGoogleImageFactory from './gl-google-image.factory.js';
 
 /*global google*/
-
-
-class GlGoogleImageFactory {
-    static create(bounds, map, imageElem) {
-        if (!google || !google.maps) {
-            throw new Error('GlGoogleImageFactory: Google Maps API was not loaded.');
-        }
-
-        const GlGoogleImage = function(bounds, map, imageElem) {
-            this._bounds = bounds;
-            this._map = map;
-            this._imageElem = imageElem;
-            this._div = null;
-
-            this.setMap(this._map);
-        };
-        GlGoogleImage.prototype = new google.maps.OverlayView();
-        GlGoogleImage.prototype.setBounds = function(bounds) {
-            this._bounds = bounds;
-        };
-        GlGoogleImage.prototype.onAdd = function() {
-            if (this._imageElem) {
-                const panes = this.getPanes();
-                this._div = document.createElement('div');
-                this._div.style.border = '2px solid red';
-                this._div.style.position = 'absolute';
-                this._imageElem.style.width = '100%';
-                this._imageElem.style.height = '100%';
-                this._imageElem.style.position = 'absolute';
-                this._imageElem.style.display = 'block';
-                this._div.appendChild(this._imageElem);
-                // Use `floatPane` instead of `overlayLayer`?
-                panes.overlayLayer.appendChild(this._div);
-            }
-        };
-        GlGoogleImage.prototype.draw = function(bounds) {
-            const overlayProjection = this.getProjection();
-            const boundsNE = bounds ? bounds.getNorthEast() : this._bounds.getNorthEast();
-            const boundsSW = bounds ? bounds.getSouthWest() : this._bounds.getSouthWest();
-            const ne = overlayProjection.fromLatLngToDivPixel(boundsNE);
-            const sw = overlayProjection.fromLatLngToDivPixel(boundsSW);
-            if (this._div) {
-                this._div.style.top = `${sw.y}px`;
-                this._div.style.left = `${ne.x}px`;
-                this._div.style.width = `${sw.x - ne.x}px`;
-                this._div.style.height = `${ne.y - sw.y}px`;
-            }
-        };
-        GlGoogleImage.prototype.onRemove = function() {
-            if (this._div) {
-                this._div.parentNode.removeChild(this._div);
-                this._div = null;
-                this._imageElem = null;
-            }
-        };
-        Object.freeze(GlGoogleImage.prototype);
-
-        return new GlGoogleImage(bounds, map, imageElem);
-    }
-}
 
 /**
  * @injectHTML
@@ -74,9 +15,9 @@ class GlGoogleMap extends HTMLElement {
             'longitude',
             'overlay',
             'map-style',
-            'show-markers',
-            'show-kml',
-            'show-image',
+            'admin',
+            'hide-kml',
+            'hide-image',
         ];
     }
 
@@ -92,7 +33,6 @@ class GlGoogleMap extends HTMLElement {
 
         registerComponents(GlGoogleMarker);
 
-        this.isAdmin = true;
         this.key = '';
         this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
         this._imageElem = this.querySelector('img');
@@ -113,7 +53,6 @@ class GlGoogleMap extends HTMLElement {
         this.mapElem = this.shadowRoot.querySelector('.gl-map__map');
         this.detailElem = null;
 
-
         this.elem.setAttribute('id', `map_${this._id}`);
 
         this.generateAdminMarker = this.generateAdminMarker.bind(this);
@@ -122,28 +61,20 @@ class GlGoogleMap extends HTMLElement {
         this.showDetail = this.showDetail.bind(this);
     }
 
-    get isMarkersVisible() {
-        return this.getAttribute('show-markers') === 'true';
+    get isAdmin() {
+        return this.getAttribute('admin') === 'true';
     }
 
-    set isMarkersVisible(val) {
-        this.setAttribute('show-markers', val);
+    set isAdmin(val) {
+        this.setAttribute('admin', val);
     }
 
     get isKmlVisible() {
-        return this.getAttribute('show-kml') === 'true';
-    }
-
-    set isKmlVisible(val) {
-        this.setAttribute('show-kml', val);
+        return this.getAttribute('hide-kml') !== 'true';
     }
 
     get isImageVisible() {
-        return this.getAttribute('show-image') === 'true';
-    }
-
-    set isImageVisible(val) {
-        this.setAttribute('show-image', val);
+        return this.getAttribute('hide-image') !== 'true';
     }
 
     get latitude() {
@@ -193,8 +124,7 @@ class GlGoogleMap extends HTMLElement {
                 new google.maps.LatLng(val.neLatitude, val.neLongitude),
                 new google.maps.LatLng(val.swLatitude, val.swLongitude)
             );
-            this.imageLayer.setBounds(bounds);
-            this.imageLayer.draw();
+            this.imageLayer.draw(bounds);
         }
     }
 
@@ -239,32 +169,17 @@ class GlGoogleMap extends HTMLElement {
             zoom: 8
         });
         this.setMapStyle();
-        this.placeImages();
-        this.generateKml();
-        this.markers = this.markerElems;
-    }
 
-    async placeImages() {
-        const imageUrl = this._imageElem.getAttribute('src');
-        const neLatitude = this.imageElemPosition.neLatitude;
-        const neLongitude = this.imageElemPosition.neLongitude;
-        const swLatitude = this.imageElemPosition.swLatitude;
-        const swLongitude = this.imageElemPosition.swLongitude;
-        const bounds = new google.maps.LatLngBounds(
-            new google.maps.LatLng(neLatitude, neLongitude),
-            new google.maps.LatLng(swLatitude, swLongitude)
-        );
-
-        this.adminMarkers = [
-            { label: 'ne', latitude: neLatitude, longitude: neLongitude },
-            { label: 'sw', latitude: swLatitude, longitude: swLongitude },
-        ];
-
-        if (!imageUrl) {
-            return;
+        // Must create an OverlayView derivitive either way for access
+        // to LatLng to pixel methods
+        if (this._imageElem) {
+            this.placeImages();
+        } else {
+            this.imageLayer = GlGoogleImageFactory.create(this.map);
         }
 
-        this.imageLayer = GlGoogleImageFactory.create(bounds, this.map, this._imageElem);
+        this.generateKml();
+        this.markers = this.markerElems;
     }
 
     async setMapStyle() {
@@ -275,6 +190,35 @@ class GlGoogleMap extends HTMLElement {
             this.map.mapTypes.set(`map_${this._id}`, this.styleLayer);
             this.map.setMapTypeId(`map_${this._id}`);
         }
+    }
+
+    placeImages() {
+        const imageUrl = this._imageElem.getAttribute('src');
+        const neLatitude = this.imageElemPosition.neLatitude;
+        const neLongitude = this.imageElemPosition.neLongitude;
+        const swLatitude = this.imageElemPosition.swLatitude;
+        const swLongitude = this.imageElemPosition.swLongitude;
+        const bounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(neLatitude, neLongitude),
+            new google.maps.LatLng(swLatitude, swLongitude)
+        );
+
+        if (!imageUrl) {
+            return;
+        }
+
+        this.imageLayer = GlGoogleImageFactory.create(this.map, bounds, this._imageElem);
+
+        if (this.adminMarkers.length !== 2) {
+            this.adminMarkers = [
+                { label: 'ne', latitude: neLatitude, longitude: neLongitude },
+                { label: 'sw', latitude: swLatitude, longitude: swLongitude },
+            ];
+        }
+    }
+
+    generateImage() {
+
     }
 
     generateKml() {
@@ -299,7 +243,8 @@ class GlGoogleMap extends HTMLElement {
                 strokeWeight: 2,
                 anchor: new google.maps.Point(10, 10)
             },
-            draggable: true
+            visible: this.isAdmin,
+            draggable: this.isAdmin
         });
 
         adminMarker.addListener('dragstart', (event) => {
@@ -337,7 +282,7 @@ class GlGoogleMap extends HTMLElement {
                 anchor: new google.maps.Point(10, 22)
             },
             animation: google.maps.Animation.DROP,
-            draggable: true,
+            draggable: this.isAdmin,
         });
         mapMarker.addListener('mouseover', () => {
             mapMarker.setIcon({
@@ -453,6 +398,22 @@ class GlGoogleMap extends HTMLElement {
         document.head.appendChild(script);
     }
 
+    setAdminMode(isAdmin) {
+        if (this.map) {
+            this.map.isAdmin = isAdmin;
+        }
+        if (this.imageLayer) {
+            this.imageLayer.setAdminMode(isAdmin);
+        }
+
+        this.markers.forEach((marker) => {
+            marker.setDraggable(this.isAdmin);
+            if (marker.type === 'admin') {
+                marker.setVisible(this.isAdmin && this.isImageVisible);
+            }
+        });
+    }
+
     /**
      * Fires when the component is connected to the DOM
      */
@@ -477,23 +438,24 @@ class GlGoogleMap extends HTMLElement {
             this.loadGoogleMapsApi();
         }
 
-        if (name === 'show-markers') {
-            this.markers.forEach((marker) => {
-                if (marker.type === 'client') {
-                    marker.setVisible(this.isMarkersVisible);
-                }
-            });
+        if (name === 'admin') {
+            this.setAdminMode(this.isAdmin);
         }
 
-        if (name === 'show-kml') {
+        if (name === 'hide-kml' && this.kmlLayer) {
             this.kmlLayer.setMap(this.isKmlVisible ? this.map : null);
         }
 
-        if (name === 'show-image') {
-            this.imageLayer.setMap(this.isImageVisible ? this.map : null);
+        if (name === 'hide-image' && this.imageLayer) {
+            if (this.isImageVisible) {
+                this.placeImages();
+            } else {
+                this.imageLayer.setMap(null);
+            }
+
             this.markers.forEach((marker) => {
                 if (marker.type === 'admin') {
-                    marker.setVisible(this.isImageVisible);
+                    marker.setVisible(this.isAdmin && this.isImageVisible);
                 }
             });
         }
@@ -504,5 +466,5 @@ if (!window.customElements.get('gl-google-map')) {
     window.customElements.define('gl-google-map', GlGoogleMap);
 }
 
-export { GlGoogleImageFactory, GlGoogleMap };
+export { GlGoogleMap };
 //# sourceMappingURL=gl-google-map.js.map

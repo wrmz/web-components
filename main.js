@@ -254,26 +254,26 @@
 }());
 
 function init() {
-	const checkboxHideMarkers = document.getElementById('hideMarkers');
-	const checkboxHideKml = document.getElementById('hideKml');
-	const checkboxHideImage = document.getElementById('hideImage');
+	const isGoogleMapAdmin = document.getElementById('isGoogleMapAdmin');
+	const hideKmlLayer = document.getElementById('hideKmlLayer');
+	const hideImageLayer = document.getElementById('hideImageLayer');
 	const glGoogleMap = document.getElementById('glGoogleMap');
 
-	function toggleMarkers() {
-		glGoogleMap.setAttribute('show-markers', !checkboxHideMarkers.checked);
+	function toggleIsGoogleMapAdmin() {
+		glGoogleMap.setAttribute('admin', isGoogleMapAdmin.checked);
 	}
 
-	function toggleKml() {
-		glGoogleMap.setAttribute('show-kml', !checkboxHideKml.checked);
+	function toggleKmlLayerHidden() {
+		glGoogleMap.setAttribute('hide-kml', hideKmlLayer.checked);
 	}
 
-	function toggleImage() {
-		glGoogleMap.setAttribute('show-image', !checkboxHideImage.checked);
+	function toggleImageLayerHidden() {
+		glGoogleMap.setAttribute('hide-image', hideImageLayer.checked);
 	}
 
-	checkboxHideMarkers.addEventListener('change', toggleMarkers, false);
-	checkboxHideKml.addEventListener('change', toggleKml, false);
-	checkboxHideImage.addEventListener('change', toggleImage, false);
+	isGoogleMapAdmin.addEventListener('change', toggleIsGoogleMapAdmin, false);
+	hideKmlLayer.addEventListener('change', toggleKmlLayerHidden, false);
+	hideImageLayer.addEventListener('change', toggleImageLayerHidden, false);
 	window.removeEventListener('load', init);
 }
 
