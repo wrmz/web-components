@@ -1,3 +1,4 @@
+/*global google*/
 export default class GlGoogleImageFactory {
     static create(map, bounds, imageElem) {
         if (!google || !google.maps) {
