@@ -55,7 +55,7 @@ export class GlGoogleImageFactory {
                 this._div = null;
                 this._imageElem = null;
             }
-        }
+        };
         Object.freeze(GlGoogleImage.prototype);
 
         return new GlGoogleImage(bounds, map, imageElem);
