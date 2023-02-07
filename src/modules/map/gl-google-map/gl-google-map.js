@@ -402,7 +402,7 @@ export class GlGoogleMap extends HTMLElement {
             this.map.isAdmin = isAdmin;
         }
         if (this.imageLayer) {
-            this.imageLayer.setAdminMode(isAdmin)
+            this.imageLayer.setAdminMode(isAdmin);
         }
 
         this.markers.forEach((marker) => {
