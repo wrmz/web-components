@@ -164,10 +164,38 @@ document.body.append(mortgageCalc);</code></pre>
                                 latitude-sw="28.359105075827006"
                                 longitude-sw="-81.41777548213959"
                             >
+                            <gl-google-legend>
+                                <div class="legend-item available">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                    </svg>
+                                    <div>Available</div>
+                                </div>
+                                <div class="legend-item pending">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                    </svg>
+                                    <div>Pending</div>
+                                </div>
+                                <div class="legend-item model">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                    </svg>
+                                    <div>Model</div>
+                                </div>
+                                <div class="legend-item sold">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                    </svg>
+                                    <div>Sold</div>
+                                </div>
+                            </gl-google-legend>
                             <gl-google-marker
                                 id="item1"
                                 latitude="28.359547901249183"
                                 longitude="-81.41757660233556"
+                                status="model"
+                                color="#1649c8"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -200,6 +228,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item2"
                                 latitude="28.359806353941554"
                                 longitude="-81.41734727346478"
+                                status="sold"
+                                color="#600"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -232,6 +262,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item3"
                                 latitude="28.359919058000852"
                                 longitude="-81.41708173477231"
+                                status="pending"
+                                color="#9d7f09"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -264,6 +296,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item4"
                                 latitude="28.359998127792913"
                                 longitude="-81.41679876172124"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -295,6 +329,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item5"
                                 latitude="28.360135024607075"
                                 longitude="-81.4163776549059"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -326,6 +362,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item6"
                                 latitude="28.359860640728538"
                                 longitude="-81.41639240705548"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -357,6 +395,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item7"
                                 latitude="28.359619300343706"
                                 longitude="-81.41647689663945"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -388,6 +428,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item8"
                                 latitude="28.359254633391174"
                                 longitude="-81.41651981198369"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -419,6 +461,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item9"
                                 latitude="28.359336063984454"
                                 longitude="-81.41678803288518"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -450,6 +494,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item10"
                                 latitude="28.359340784596633"
                                 longitude="-81.4170428427416"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
@@ -481,6 +527,8 @@ document.body.append(mortgageCalc);</code></pre>
                                 id="item11"
                                 latitude="28.35935494643191"
                                 longitude="-81.4172963114935"
+                                status="available"
+                                color="#666"
                             >
                                 <article class="lot">
                                     <div class="lot__image">
