@@ -29,7 +29,7 @@ class GlGoogleMap extends HTMLElement {
     }
 
     constructor() {
-        super();const el = document.createElement('template');el.innerHTML = `<style>.lot__content,.lot__image{background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px)}.lot__content h3 span,.lot__cta{font-weight:300;text-transform:uppercase;color:#fff}:host{position:relative;display:block;width:100%;min-height:410px}:host .gl-map{display:flex;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;overflow:hidden}:host .gl-map__detail,:host .gl-map__map{position:absolute;top:0;height:100%}:host .gl-map__map{left:0;width:100%}:host .gm-style .gmnoprint.gm-bundled-control{margin:3px!important}:host .gl-map__detail{right:0;width:0;max-width:360px;overflow:hidden;box-sizing:border-box;transition:width .2s ease-out;will-change:width}:host .gl-map__detail::after{content:'';position:absolute;top:0;left:0;width:100%;mix-blend-mode:multiply}:host .gl-map.has-detail .gl-map__detail{width:50%}:host .gl-map__detail-close{cursor:pointer;position:absolute;display:flex;align-items:center;justify-content:center;top:9px;right:9px;width:30px;height:30px;margin:0;padding:0;font-size:30px;font-weight:300;color:#666;border:0;border-radius:4px;background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px);transition:color .2s ease-out,background .2s ease-out}:host .gl-map__detail-close:focus,:host .gl-map__detail-close:hover{color:#333;background:#fff}:host .gl-map__detail-content{position:relative;top:3px;width:calc(100% - 3px);height:calc(100% - 6px);overflow:auto;box-sizing:border-box}:host .gl-map__legend{position:relative;height:80px;padding:0 33px 0 0;margin:3px;border-radius:3px;box-sizing:border-box;overflow:hidden}:host .gl-map__legend-toggle{cursor:pointer;position:absolute;top:0;right:0;width:80px;height:30px;font-size:20px;letter-spacing:2px;color:#666;border:0;border-radius:3px;box-sizing:border-box;background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px);transform-origin:top left;transform:rotate(90deg) translate(0,-80px);transition:color .2s ease-out}.lot,.lot__image{position:relative}:host .gl-map__legend-toggle:focus,:host .gl-map__legend-toggle:hover{color:#000}:host .gl-map__legend-drawer{height:100%}:host .gl-map__legend-content{position:relative;display:grid;grid-auto-flow:column dense;grid-auto-columns:minmax(0,1fr);gap:3px;height:100%;padding:3px;box-sizing:border-box;background:rgb(255 255 255 / 65%);backdrop-filter:brightness(140%) blur(6px)}.lot{display:grid;grid-template-rows:max-content 1fr;height:100%}.lot__image{width:100%;height:0;margin-bottom:3px;padding-top:calc(100% * (9 / 16));border-radius:0 4px 0 0}.lot__cta,.lot__img{width:calc(100% - 6px)}.lot__img{position:absolute;display:block;top:3px;left:3px;height:calc(100% - 6px);object-fit:cover;object-position:center;border-radius:2px 4px 2px 2px}.lot__content{position:relative;padding:17px;border-radius:0 0 4px}.lot__content h3{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;gap:3px;margin:0 0 10px}.lot__content h3 span{display:inline-block;margin:0;padding:.25em .75em;font-size:12px;border-radius:2px;background:#333}.lot__content h3 .sold{background:#d72525}.lot__content h3 .model{background:#0089d1}.lot__content h3 .pending{background:#9d7f09}.lot__content p{margin:0;font-size:16px}.lot__snapshot{display:grid;grid-template-columns:repeat(3,max-content);gap:.75em;margin:10px 0;line-height:1}.lot__snapshot div:not(:first-child){padding-left:.75em;border-left:1px solid #666}.lot__cta{position:absolute;display:flex;align-items:center;justify-content:center;height:40px;right:3px;bottom:3px;padding:0 17px;font-size:14px;text-decoration:none;border-radius:2px 2px 4px;background:#1649c8;box-sizing:border-box;transition:background .2s ease-out}.lot__cta:focus,.lot__cta:hover{background:#142755}.legend-item{display:grid;align-items:center;justify-items:center;padding:10px;background:rgb(255 255 255 / 50%);box-sizing:border-box}.legend-item:first-child{border:3px}.legend-item.available svg{color:#666}.legend-item.pending svg{color:#9d7f09}.legend-item.model svg{color:#0089d1}.legend-item.sold svg{color:#d72525}</style><div class="gl gl-map"><div class="gl-map__map"></div></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
+        super();const el = document.createElement('template');el.innerHTML = `<style>.lot__content,.lot__image{background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px)}.lot__content h3 span,.lot__cta{font-weight:300;text-transform:uppercase;color:#fff}:host{position:relative;display:block;width:100%;min-height:410px}:host .gl-map{display:flex;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:4px;overflow:hidden}:host .gl-map__detail,:host .gl-map__map{position:absolute;top:0;height:100%}:host .gl-map__map{left:0;width:100%}:host .gm-style .gmnoprint.gm-bundled-control{margin:3px!important}:host .gl-map__detail{right:0;width:0;max-width:360px;overflow:hidden;box-sizing:border-box;transition:width .2s ease-out;will-change:width}:host .gl-map__detail::after{content:'';position:absolute;top:0;left:0;width:100%;mix-blend-mode:multiply}:host .gl-map.has-detail .gl-map__detail{width:50%}:host .gl-map__detail-close{cursor:pointer;position:absolute;display:flex;align-items:center;justify-content:center;top:9px;right:9px;width:30px;height:30px;margin:0;padding:0;font-size:30px;font-weight:300;color:#666;border:0;border-radius:4px;background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px);transition:color .2s ease-out,background .2s ease-out}:host .gl-map__detail-close:focus,:host .gl-map__detail-close:hover{color:#333;background:#fff}:host .gl-map__detail-content{position:relative;top:3px;width:calc(100% - 3px);height:calc(100% - 6px);overflow:auto;box-sizing:border-box}:host .gl-map__legend{position:relative;height:80px;max-width:calc(100% - 49px);padding:0 33px 0 0;margin:3px;border-radius:3px;box-sizing:border-box}:host .gl-map__legend-toggle{cursor:pointer;position:absolute;top:0;right:0;width:80px;height:30px;font-size:20px;letter-spacing:2px;color:#666;border:0;border-radius:3px;box-sizing:border-box;background:rgb(255 255 255 / 85%);backdrop-filter:brightness(140%) blur(10px);transform-origin:top left;transform:rotate(90deg) translate(0,-80px);transition:color .2s ease-out,border-radius .2s ease-out,background .2s ease-out}:host .gl-map__legend-toggle:hover{color:#000;background:#fff}:host .gl-map__legend-drawer{position:absolute;top:0;left:auto;right:33px;height:100%;max-width:0;overflow:hidden;transition:max-width .3s ease-out}.lot,.lot__image{position:relative}:host .gl-map__legend-content{position:relative;display:grid;grid-auto-flow:column dense;grid-auto-columns:minmax(64px,1fr);gap:3px;height:100%;padding:3px;box-sizing:border-box;background:rgb(255 255 255 / 65%);backdrop-filter:brightness(140%) blur(6px)}:host .gl-map__legend-toggle[aria-expanded=true]{border-radius:0 3px 3px 0}:host .gl-map__legend-toggle[aria-expanded=true]+.gl-map__legend-drawer{max-width:2000px;transition:max-width .6s ease-in-out}.lot{display:grid;grid-template-rows:max-content 1fr;height:100%}.lot__image{width:100%;height:0;margin-bottom:3px;padding-top:calc(100% * (9 / 16));border-radius:0 4px 0 0}.lot__cta,.lot__img{width:calc(100% - 6px)}.lot__img{position:absolute;display:block;top:3px;left:3px;height:calc(100% - 6px);object-fit:cover;object-position:center;border-radius:2px 4px 2px 2px}.lot__content{position:relative;padding:17px;border-radius:0 0 4px}.lot__content h3{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;gap:3px;margin:0 0 10px}.lot__content h3 span{display:inline-block;margin:0;padding:.25em .75em;font-size:12px;border-radius:2px;background:#333}.lot__content h3 .sold{background:#d72525}.lot__content h3 .model{background:#0089d1}.lot__content h3 .pending{background:#9d7f09}.lot__content p{margin:0;font-size:16px}.lot__snapshot{display:grid;grid-template-columns:repeat(3,max-content);gap:.75em;margin:10px 0;line-height:1}.lot__snapshot div:not(:first-child){padding-left:.75em;border-left:1px solid #666}.lot__cta{position:absolute;display:flex;align-items:center;justify-content:center;height:40px;right:3px;bottom:3px;padding:0 17px;font-size:14px;text-decoration:none;border-radius:2px 2px 4px;background:#1649c8;box-sizing:border-box;transition:background .2s ease-out}.lot__cta:focus,.lot__cta:hover{background:#142755}.legend-item{display:grid;align-items:center;justify-items:center;padding:10px;background:rgb(255 255 255 / 50%);box-sizing:border-box}.legend-item:first-child{border:3px}.legend-item.available svg{color:#666}.legend-item.pending svg{color:#9d7f09}.legend-item.model svg{color:#0089d1}.legend-item.sold svg{color:#d72525}</style><div class="gl gl-map"><div class="gl-map__map"></div></div>`;this.attachShadow({mode:'open'});this.shadowRoot.appendChild(el.content.cloneNode(true));
 
         registerComponents(GlGoogleMarker);
 
@@ -46,6 +46,7 @@ class GlGoogleMap extends HTMLElement {
         this.map = undefined;
         this.styleLayer = undefined;
         this.imageLayer = undefined;
+        this.legendToggleElem = undefined;
         this.imageNE = 0.0;
         this.imageNW = 0.0;
         this.imageSW = 0.0;
@@ -62,6 +63,7 @@ class GlGoogleMap extends HTMLElement {
         this.generateMarker = this.generateMarker.bind(this);
         this.loadDetail = this.loadDetail.bind(this);
         this.showDetail = this.showDetail.bind(this);
+        this.toggleLegend = this.toggleLegend.bind(this);
     }
 
     get isAdmin() {
@@ -291,7 +293,6 @@ class GlGoogleMap extends HTMLElement {
             animation: google.maps.Animation.DROP,
             draggable: this.isAdmin,
         });
-        console.log('marker', marker.status, marker.color, marker.latitude);
         mapMarker.addListener('mouseover', () => {
             if (!mapMarker.isSelected) {
                 mapMarker.setIcon({
@@ -374,6 +375,14 @@ class GlGoogleMap extends HTMLElement {
         return mapMarker;
     }
 
+    toggleLegend() {
+        if (this.legendToggleElem.getAttribute('aria-expanded') === 'true') {
+            this.legendToggleElem.setAttribute('aria-expanded', false);
+        } else {
+            this.legendToggleElem.setAttribute('aria-expanded', true);
+        }
+    }
+
     generateLegend() {
         const legendElem = document.createElement('div');
         const legendToggleElem = document.createElement('button');
@@ -397,11 +406,13 @@ class GlGoogleMap extends HTMLElement {
         legendToggleElem.setAttribute('title', 'Show Map Legend');
         legendToggleElem.className = 'gl-map__legend-toggle';
         legendToggleElem.textContent = '•••';
+        this.legendToggleElem = legendToggleElem;
+        this.legendToggleElem.addEventListener('click', this.toggleLegend, false);
 
         legendElem.style.userSelect = 'none';
         legendElem.className = 'gl-map__legend';
+        legendElem.appendChild(this.legendToggleElem);
         legendElem.appendChild(legendDrawerElem);
-        legendElem.appendChild(legendToggleElem);
 
         this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(legendElem);
     }
