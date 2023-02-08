@@ -31,6 +31,7 @@ export default class GlGoogleImageFactory {
                 this._div = document.createElement('div');
 
                 this._div.style.position = 'absolute';
+                this._div.style.userSelect = 'none';
                 this._imageElem.style.width = '100%';
                 this._imageElem.style.height = '100%';
                 this._imageElem.style.position = 'absolute';
