@@ -124,7 +124,7 @@
 
 :host .gl-map__legend-toggle:hover {
     color: #000;
-    background: #fff;
+    background: white;
 }
 
 :host .gl-map__legend-drawer {
