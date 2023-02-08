@@ -3,6 +3,8 @@ export class GlGoogleMarker extends HTMLElement {
         return [
             'latitude',
             'longitude',
+            'status',
+            'color',
         ];
     }
 
@@ -12,12 +14,20 @@ export class GlGoogleMarker extends HTMLElement {
 
     get latitude() {
         const latitude = parseFloat(this.hasAttribute('latitude') ? this.getAttribute('latitude') : '0');
-        return  isNaN(latitude) ? 0 : latitude;
+        return isNaN(latitude) ? 0 : latitude;
     }
 
     get longitude() {
         const longitude = parseFloat(this.hasAttribute('longitude') ? this.getAttribute('longitude') : '0');
-        return  isNaN(longitude) ? 0 : longitude;
+        return isNaN(longitude) ? 0 : longitude;
+    }
+
+    get status() {
+        return this.getAttribute('status');
+    }
+
+    get color() {
+        return this.getAttribute('color');
     }
 }
 

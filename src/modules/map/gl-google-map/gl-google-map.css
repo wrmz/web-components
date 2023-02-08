@@ -261,19 +261,23 @@
     background: rgb(255 255 255 / 50%);
     box-sizing: border-box;
 }
+
 .legend-item:first-child {
     border: 3px 0 0 3px;
 }
 
 .legend-item.available svg {
-    color:
+    color: #666;
 }
+
 .legend-item.pending svg {
-    color: #9d7f09;
+    color: #9D7F09;
 }
+
 .legend-item.model svg {
-    color: #1649c8;
+    color: #1649C8;
 }
+
 .legend-item.sold svg {
     color: #600;
 }

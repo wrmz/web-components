@@ -37,6 +37,7 @@ export class GlGoogleMap extends HTMLElement {
         this._imageElem = this.querySelector('img');
         this._legendElem = this.querySelector('gl-google-legend');
         this._markerElems = [...this.querySelectorAll('gl-google-marker')];
+        this._markerPath = 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z';
         this._markers = [];
         this._adminMarkers = [];
         this.apiLoadedCBName = `gl_cb_${this._id}`;
@@ -276,10 +277,12 @@ export class GlGoogleMap extends HTMLElement {
             map: this.map,
             id: marker.id,
             type: 'client',
+            status: marker.status,
+            color: marker.color,
             position: { lat: marker.latitude, lng: marker.longitude },
             icon: {
-                path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                fillColor: '#0089d1',
+                path: this._markerPath,
+                fillColor: marker.color,
                 fillOpacity: 0.6,
                 strokeWeight: 0,
                 anchor: new google.maps.Point(10, 22)
@@ -287,11 +290,12 @@ export class GlGoogleMap extends HTMLElement {
             animation: google.maps.Animation.DROP,
             draggable: this.isAdmin,
         });
+        console.log('marker', marker.status, marker.color, marker.latitude);
         mapMarker.addListener('mouseover', () => {
             if (!mapMarker.isSelected) {
                 mapMarker.setIcon({
-                    path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                    fillColor: '#0089d1',
+                    path: this._markerPath,
+                    fillColor: mapMarker.color,
                     fillOpacity: 1,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
@@ -301,8 +305,8 @@ export class GlGoogleMap extends HTMLElement {
         mapMarker.addListener('mouseout', () => {
             if (!mapMarker.isSelected) {
                 mapMarker.setIcon({
-                    path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                    fillColor: '#0089d1',
+                    path: this._markerPath,
+                    fillColor: mapMarker.color,
                     fillOpacity: 0.6,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
@@ -343,7 +347,7 @@ export class GlGoogleMap extends HTMLElement {
                     if (marker.id === mapMarker.id) {
                         marker.isSelected = true;
                         marker.setIcon({
-                            path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
+                            path: this._markerPath,
                             fillColor: 'white',
                             fillOpacity: 1,
                             strokeWeight: 0,
@@ -352,8 +356,8 @@ export class GlGoogleMap extends HTMLElement {
                     } else {
                         marker.isSelected = false;
                         marker.setIcon({
-                            path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                            fillColor: '#0089d1',
+                            path: this._markerPath,
+                            fillColor: marker.color,
                             fillOpacity: 0.6,
                             strokeWeight: 0,
                             anchor: new google.maps.Point(10, 22)
@@ -451,8 +455,8 @@ export class GlGoogleMap extends HTMLElement {
         this.markers.forEach((marker) => {
             if (marker.isSelected && marker.type !== 'admin') {
                 marker.setIcon({
-                    path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                    fillColor: '#0089d1',
+                    path: this._markerPath,
+                    fillColor: marker.color,
                     fillOpacity: 0.6,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
