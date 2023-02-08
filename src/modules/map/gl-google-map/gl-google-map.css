@@ -203,11 +203,11 @@
 }
 
 .lot__content h3 .sold {
-    background: #600;
+    background: #D72525;
 }
 
 .lot__content h3 .model {
-    background: #1649C8;
+    background: #0089d1;
 }
 
 .lot__content h3 .pending {
@@ -280,9 +280,9 @@
 }
 
 .legend-item.model svg {
-    color: #1649C8;
+    color: #0089d1
 }
 
 .legend-item.sold svg {
-    color: #600;
+    color: #D72525;
 }

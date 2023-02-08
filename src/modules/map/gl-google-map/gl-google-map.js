@@ -283,7 +283,7 @@ export class GlGoogleMap extends HTMLElement {
             icon: {
                 path: this._markerPath,
                 fillColor: marker.color,
-                fillOpacity: 0.6,
+                fillOpacity: 1,
                 strokeWeight: 0,
                 anchor: new google.maps.Point(10, 22)
             },
@@ -295,7 +295,7 @@ export class GlGoogleMap extends HTMLElement {
             if (!mapMarker.isSelected) {
                 mapMarker.setIcon({
                     path: this._markerPath,
-                    fillColor: mapMarker.color,
+                    fillColor: 'white',
                     fillOpacity: 1,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
@@ -307,7 +307,7 @@ export class GlGoogleMap extends HTMLElement {
                 mapMarker.setIcon({
                     path: this._markerPath,
                     fillColor: mapMarker.color,
-                    fillOpacity: 0.6,
+                    fillOpacity: 1,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
                 });
@@ -358,7 +358,7 @@ export class GlGoogleMap extends HTMLElement {
                         marker.setIcon({
                             path: this._markerPath,
                             fillColor: marker.color,
-                            fillOpacity: 0.6,
+                            fillOpacity: 1,
                             strokeWeight: 0,
                             anchor: new google.maps.Point(10, 22)
                         });
@@ -457,7 +457,7 @@ export class GlGoogleMap extends HTMLElement {
                 marker.setIcon({
                     path: this._markerPath,
                     fillColor: marker.color,
-                    fillOpacity: 0.6,
+                    fillOpacity: 1,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
                 });
