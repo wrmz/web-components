@@ -91,6 +91,7 @@
     overflow: auto;
     box-sizing: border-box;
 }
+
 :host .gl-map__legend {
     position: relative;
     height: 80px;
@@ -100,6 +101,7 @@
     box-sizing: border-box;
     overflow: hidden;
 }
+
 :host .gl-map__legend-toggle {
     cursor: pointer;
     position: absolute;
@@ -119,13 +121,16 @@
     transform: rotate(90deg) translate(0, -80px);
     transition: color 0.2s ease-out;
 }
+
 :host .gl-map__legend-toggle:hover,
 :host .gl-map__legend-toggle:focus {
     color: #000;
 }
+
 :host .gl-map__legend-drawer {
     height: 100%;
 }
+
 :host .gl-map__legend-content {
     position: relative;
     display: grid;
