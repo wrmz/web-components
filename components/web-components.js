@@ -491,6 +491,7 @@ var webComponents = (function (exports) {
                     this._div = document.createElement('div');
 
                     this._div.style.position = 'absolute';
+                    this._div.style.userSelect = 'none';
                     this._imageElem.style.width = '100%';
                     this._imageElem.style.height = '100%';
                     this._imageElem.style.position = 'absolute';
@@ -929,6 +930,7 @@ var webComponents = (function (exports) {
             legendToggleElem.className = 'gl-map__legend-toggle';
             legendToggleElem.textContent = '•••';
 
+            legendElem.style.userSelect = 'none';
             legendElem.className = 'gl-map__legend';
             legendElem.appendChild(legendDrawerElem);
             legendElem.appendChild(legendToggleElem);

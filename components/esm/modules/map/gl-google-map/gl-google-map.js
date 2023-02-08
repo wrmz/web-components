@@ -398,6 +398,7 @@ class GlGoogleMap extends HTMLElement {
         legendToggleElem.className = 'gl-map__legend-toggle';
         legendToggleElem.textContent = '•••';
 
+        legendElem.style.userSelect = 'none';
         legendElem.className = 'gl-map__legend';
         legendElem.appendChild(legendDrawerElem);
         legendElem.appendChild(legendToggleElem);
