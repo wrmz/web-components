@@ -28,6 +28,10 @@
     width: 100%;
 }
 
+:host .gm-style .gmnoprint.gm-bundled-control {
+    margin: 3px !important;
+}
+
 :host .gl-map__detail {
     right: 0;
     width: 0;
@@ -86,6 +90,53 @@
     height: calc(100% - 6px);
     overflow: auto;
     box-sizing: border-box;
+}
+:host .gl-map__legend {
+    position: relative;
+    height: 80px;
+    padding: 0 33px 0 0;
+    margin: 3px;
+    border-radius: 3px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+:host .gl-map__legend-toggle {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 30px;
+    font-size: 20px;
+    letter-spacing: 2px;
+    color: #666;
+    border: 0;
+    border-radius: 3px;
+    box-sizing: border-box;
+    background: rgb(255 255 255 / 85%);
+    backdrop-filter: brightness(140%) blur(10px);
+    transform-origin: top left;
+    transform: rotate(90deg) translate(0, -80px);
+    transition: color 0.2s ease-out;
+}
+:host .gl-map__legend-toggle:hover,
+:host .gl-map__legend-toggle:focus {
+    color: #000;
+}
+:host .gl-map__legend-drawer {
+    height: 100%;
+}
+:host .gl-map__legend-content {
+    position: relative;
+    display: grid;
+    grid-auto-flow: column dense;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 3px;
+    height: 100%;
+    padding: 3px;
+    box-sizing: border-box;
+    background: rgb(255 255 255 / 65%);
+    backdrop-filter: brightness(140%) blur(6px);
 }
 
 .lot {
@@ -200,4 +251,29 @@
 .lot__cta:hover,
 .lot__cta:focus {
     background: #142755;
+}
+
+.legend-item {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    padding: 10px;
+    background: rgb(255 255 255 / 50%);
+    box-sizing: border-box;
+}
+.legend-item:first-child {
+    border: 3px 0 0 3px;
+}
+
+.legend-item.available svg {
+    color:
+}
+.legend-item.pending svg {
+    color: #9d7f09;
+}
+.legend-item.model svg {
+    color: #1649c8;
+}
+.legend-item.sold svg {
+    color: #600;
 }

@@ -35,6 +35,7 @@ export class GlGoogleMap extends HTMLElement {
         this.key = '';
         this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
         this._imageElem = this.querySelector('img');
+        this._legendElem = this.querySelector('gl-google-legend');
         this._markerElems = [...this.querySelectorAll('gl-google-marker')];
         this._markers = [];
         this._adminMarkers = [];
@@ -54,6 +55,7 @@ export class GlGoogleMap extends HTMLElement {
 
         this.elem.setAttribute('id', `map_${this._id}`);
 
+        this.generateLegend = this.generateLegend.bind(this);
         this.generateAdminMarker = this.generateAdminMarker.bind(this);
         this.generateMarker = this.generateMarker.bind(this);
         this.loadDetail = this.loadDetail.bind(this);
@@ -167,7 +169,13 @@ export class GlGoogleMap extends HTMLElement {
             },
             zoom: 8
         });
+
+
         this.setMapStyle();
+
+        if (this._legendElem) {
+            this.generateLegend();
+        }
 
         // Must create an OverlayView derivitive either way for access
         // to LatLng to pixel methods
@@ -214,10 +222,6 @@ export class GlGoogleMap extends HTMLElement {
                 { label: 'sw', latitude: swLatitude, longitude: swLongitude },
             ];
         }
-    }
-
-    generateImage() {
-
     }
 
     generateKml() {
@@ -275,7 +279,7 @@ export class GlGoogleMap extends HTMLElement {
             position: { lat: marker.latitude, lng: marker.longitude },
             icon: {
                 path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                fillColor: 'red',
+                fillColor: '#0089d1',
                 fillOpacity: 0.6,
                 strokeWeight: 0,
                 anchor: new google.maps.Point(10, 22)
@@ -287,7 +291,7 @@ export class GlGoogleMap extends HTMLElement {
             if (!mapMarker.isSelected) {
                 mapMarker.setIcon({
                     path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                    fillColor: 'red',
+                    fillColor: '#0089d1',
                     fillOpacity: 1,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
@@ -298,7 +302,7 @@ export class GlGoogleMap extends HTMLElement {
             if (!mapMarker.isSelected) {
                 mapMarker.setIcon({
                     path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                    fillColor: 'red',
+                    fillColor: '#0089d1',
                     fillOpacity: 0.6,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
@@ -317,6 +321,14 @@ export class GlGoogleMap extends HTMLElement {
                 }
             });
             this.dispatchEvent(dragendEvent);
+        });
+
+        mapMarker.addListener('mouseover', () => {
+
+        });
+
+        mapMarker.addListener('mouseout', () => {
+
         });
 
         mapMarker.addListener('click', () => {
@@ -341,7 +353,7 @@ export class GlGoogleMap extends HTMLElement {
                         marker.isSelected = false;
                         marker.setIcon({
                             path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                            fillColor: 'red',
+                            fillColor: '#0089d1',
                             fillOpacity: 0.6,
                             strokeWeight: 0,
                             anchor: new google.maps.Point(10, 22)
@@ -355,6 +367,37 @@ export class GlGoogleMap extends HTMLElement {
         });
 
         return mapMarker;
+    }
+
+    generateLegend() {
+        const legendElem = document.createElement('div');
+        const legendToggleElem = document.createElement('button');
+        const legendDrawerElem = document.createElement('div');
+        const legendContentElem = document.createElement('div');
+        const legendContentElems = [...this._legendElem.childNodes];
+
+        legendContentElem.className = 'gl-map__legend-content';
+        legendContentElems.forEach((elem) => {
+            legendContentElem.appendChild(elem);
+        });
+
+        legendDrawerElem.setAttribute('id', `gl_legend_${this._id}`);
+        legendDrawerElem.className = 'gl-map__legend-drawer';
+        legendDrawerElem.appendChild(legendContentElem);
+
+        legendToggleElem.setAttribute('type', 'button');
+        legendToggleElem.setAttribute('id', `gl_legend_toggle_${this._id}`);
+        legendToggleElem.setAttribute('aria-controls', `gl_legend_${this._id}`);
+        legendToggleElem.setAttribute('aria-expanded', false);
+        legendToggleElem.setAttribute('title', 'Show Map Legend');
+        legendToggleElem.className = 'gl-map__legend-toggle';
+        legendToggleElem.textContent = '•••';
+
+        legendElem.className = 'gl-map__legend';
+        legendElem.appendChild(legendDrawerElem);
+        legendElem.appendChild(legendToggleElem);
+
+        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(legendElem);
     }
 
     generateDetail() {
@@ -409,7 +452,7 @@ export class GlGoogleMap extends HTMLElement {
             if (marker.isSelected && marker.type !== 'admin') {
                 marker.setIcon({
                     path: 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z',
-                    fillColor: 'red',
+                    fillColor: '#0089d1',
                     fillOpacity: 0.6,
                     strokeWeight: 0,
                     anchor: new google.maps.Point(10, 22)
