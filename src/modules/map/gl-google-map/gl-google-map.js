@@ -45,6 +45,7 @@ export class GlGoogleMap extends HTMLElement {
         this.map = undefined;
         this.styleLayer = undefined;
         this.imageLayer = undefined;
+        this.legendToggleElem = undefined;
         this.imageNE = 0.0;
         this.imageNW = 0.0;
         this.imageSW = 0.0;
@@ -61,6 +62,7 @@ export class GlGoogleMap extends HTMLElement {
         this.generateMarker = this.generateMarker.bind(this);
         this.loadDetail = this.loadDetail.bind(this);
         this.showDetail = this.showDetail.bind(this);
+        this.toggleLegend = this.toggleLegend.bind(this);
     }
 
     get isAdmin() {
@@ -290,7 +292,6 @@ export class GlGoogleMap extends HTMLElement {
             animation: google.maps.Animation.DROP,
             draggable: this.isAdmin,
         });
-        console.log('marker', marker.status, marker.color, marker.latitude);
         mapMarker.addListener('mouseover', () => {
             if (!mapMarker.isSelected) {
                 mapMarker.setIcon({
@@ -373,6 +374,14 @@ export class GlGoogleMap extends HTMLElement {
         return mapMarker;
     }
 
+    toggleLegend() {
+        if (this.legendToggleElem.getAttribute('aria-expanded') === 'true') {
+            this.legendToggleElem.setAttribute('aria-expanded', false);
+        } else {
+            this.legendToggleElem.setAttribute('aria-expanded', true);
+        }
+    }
+
     generateLegend() {
         const legendElem = document.createElement('div');
         const legendToggleElem = document.createElement('button');
@@ -396,11 +405,13 @@ export class GlGoogleMap extends HTMLElement {
         legendToggleElem.setAttribute('title', 'Show Map Legend');
         legendToggleElem.className = 'gl-map__legend-toggle';
         legendToggleElem.textContent = '•••';
+        this.legendToggleElem = legendToggleElem;
+        this.legendToggleElem.addEventListener('click', this.toggleLegend, false);
 
         legendElem.style.userSelect = 'none';
         legendElem.className = 'gl-map__legend';
+        legendElem.appendChild(this.legendToggleElem);
         legendElem.appendChild(legendDrawerElem);
-        legendElem.appendChild(legendToggleElem);
 
         this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(legendElem);
     }
