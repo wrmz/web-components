@@ -12,6 +12,10 @@ class GlGoogleMarker extends HTMLElement {
         super();
     }
 
+    get map() {
+        return this.parentElement.map;
+    }
+
     get latitude() {
         const latitude = parseFloat(this.hasAttribute('latitude') ? this.getAttribute('latitude') : '0');
         return isNaN(latitude) ? 0 : latitude;

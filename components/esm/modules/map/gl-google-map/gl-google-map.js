@@ -58,6 +58,7 @@ class GlGoogleMap extends HTMLElement {
 
         this.elem.setAttribute('id', `map_${this._id}`);
 
+        this.emitMarkerEvent = this.emitMarkerEvent.bind(this);
         this.generateLegend = this.generateLegend.bind(this);
         this.generateAdminMarker = this.generateAdminMarker.bind(this);
         this.generateMarker = this.generateMarker.bind(this);
@@ -282,6 +283,7 @@ class GlGoogleMap extends HTMLElement {
             type: 'client',
             status: marker.status,
             color: marker.color,
+            isSelected: false,
             position: { lat: marker.latitude, lng: marker.longitude },
             icon: {
                 path: this._markerPath,
@@ -293,86 +295,140 @@ class GlGoogleMap extends HTMLElement {
             animation: google.maps.Animation.DROP,
             draggable: this.isAdmin,
         });
-        mapMarker.addListener('mouseover', () => {
-            if (!mapMarker.isSelected) {
-                mapMarker.setIcon({
-                    path: this._markerPath,
-                    fillColor: 'white',
-                    fillOpacity: 1,
-                    strokeWeight: 0,
-                    anchor: new google.maps.Point(10, 22)
-                });
-            }
-        });
-        mapMarker.addListener('mouseout', () => {
-            if (!mapMarker.isSelected) {
-                mapMarker.setIcon({
-                    path: this._markerPath,
-                    fillColor: mapMarker.color,
-                    fillOpacity: 1,
-                    strokeWeight: 0,
-                    anchor: new google.maps.Point(10, 22)
-                });
-            }
-        });
-        mapMarker.addListener('dragend', (event) => {
-            const dragendEvent = new CustomEvent('dragend', {
-                detail: {
-                    map: this.map,
-                    marker: mapMarker,
-                    position: {
-                        latitude: event.latLng.lat(),
-                        longitude: event.latLng.lng()
-                    }
-                }
-            });
-            this.dispatchEvent(dragendEvent);
-        });
 
-        mapMarker.addListener('mouseover', () => {
-
-        });
-
-        mapMarker.addListener('mouseout', () => {
-
-        });
-
-        mapMarker.addListener('click', () => {
-            const projection = this.imageLayer.getProjection();
-            const pixelPosition = projection.fromLatLngToDivPixel(mapMarker.getPosition());
-
-            pixelPosition.x += 100;
-
-            const newPosition = projection.fromDivPixelToLatLng(pixelPosition);
-            this.markers.forEach((marker) => {
-                if (marker.type !== 'admin') {
-                    if (marker.id === mapMarker.id) {
-                        marker.isSelected = true;
-                        marker.setIcon({
-                            path: this._markerPath,
-                            fillColor: 'white',
-                            fillOpacity: 1,
-                            strokeWeight: 0,
-                            anchor: new google.maps.Point(10, 22)
-                        });
-                    } else {
-                        marker.isSelected = false;
-                        marker.setIcon({
-                            path: this._markerPath,
-                            fillColor: marker.color,
-                            fillOpacity: 1,
-                            strokeWeight: 0,
-                            anchor: new google.maps.Point(10, 22)
-                        });
-                    }
-                }
-            });
-
-            this.map.panTo(newPosition);
-            this.loadDetail(mapMarker);
-        });
+        mapMarker.addListener('mouseover', this.handleMarkerMouseover.bind(this, mapMarker));
+        mapMarker.addListener('mouseout', this.handleMarkerMouseout.bind(this, mapMarker));
+        mapMarker.addListener('dragend', this.handleMarkerDragend.bind(this, mapMarker));
+        mapMarker.addListener('click', this.handleMarkerClick.bind(this, mapMarker));
 
         return mapMarker;
+    }
+
+    /**
+     * Emits a marker event from GlGoogleMap
+     *
+     * @this GlGoogleMap
+     * @param {string} eventType
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.event} event
+     * @emits CustomEvent
+     */
+    emitMarkerEvent(eventType, marker, event) {
+        const customEvent = new CustomEvent(eventType, {
+            detail: {
+                map: this,
+                marker: marker,
+                pixel: event.pixel,
+                domEvent: event.domEvent,
+                position: {
+                    latitude: event.latLng.lat(),
+                    longitude: event.latLng.lng()
+                }
+            }
+        });
+
+        this.dispatchEvent(customEvent);
+    }
+
+    /**
+     * Handles & dispatches from GlGoogleMap a marker click event
+     *
+     * @this GlGoogleMap
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.event} event
+     * @emits GlGoogleMap#click
+     */
+    handleMarkerClick(marker, event) {
+        const projection = this.imageLayer.getProjection();
+        const pixelPosition = projection.fromLatLngToDivPixel(marker.getPosition());
+        pixelPosition.x += 100;
+        const newPosition = projection.fromDivPixelToLatLng(pixelPosition);
+
+        this.markers.forEach((m) => {
+            if (m.type !== 'admin') {
+                if (m.id === marker.id) {
+                    m.isSelected = true;
+                    m.setIcon({
+                        path: this._markerPath,
+                        fillColor: 'white',
+                        fillOpacity: 1,
+                        strokeWeight: 0,
+                        anchor: new google.maps.Point(10, 22)
+                    });
+                } else {
+                    m.isSelected = false;
+                    m.setIcon({
+                        path: this._markerPath,
+                        fillColor: m.color,
+                        fillOpacity: 1,
+                        strokeWeight: 0,
+                        anchor: new google.maps.Point(10, 22)
+                    });
+                }
+            }
+        });
+
+        this.map.panTo(newPosition);
+        this.loadDetail(marker);
+
+        this.emitMarkerEvent('click', marker, event);
+    }
+
+    /**
+     * Handles & dispatches from GlGoogleMap a marker mouseover event
+     *
+     * @this GlGoogleMap
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.event} event
+     * @emits GlGoogleMap#mouseover
+     */
+    handleMarkerMouseover(marker, event) {
+        if (!marker.isSelected) {
+            marker.setIcon({
+                path: this._markerPath,
+                fillColor: 'white',
+                fillOpacity: 1,
+                strokeWeight: 0,
+                anchor: new google.maps.Point(10, 22)
+            });
+        }
+
+        this.emitMarkerEvent('mouseover', marker, event);
+    }
+
+    /**
+     * Handles & dispatches from GlGoogleMap a marker mouseout event
+     *
+     * @this GlGoogleMap
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.event} event
+     * @emits GlGoogleMap#mouseout
+     */
+    handleMarkerMouseout(marker, event) {
+        if (!marker.isSelected) {
+            marker.setIcon({
+                path: this._markerPath,
+                fillColor: marker.color,
+                fillOpacity: 1,
+                strokeWeight: 0,
+                anchor: new google.maps.Point(10, 22)
+            });
+        }
+
+        this.emitMarkerEvent('mouseout', marker, event);
+    }
+
+
+    /**
+     * Handles & dispatches from GlGoogleMap a marker dragend event
+     *
+     * @this GlGoogleMap
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.Event} event
+     * @emits GlGoogleMap#dragend
+     */
+    handleMarkerDragend(marker, event) {
+        this.emitMarkerEvent('dragend', marker, event);
     }
 
     toggleLegend() {
@@ -482,6 +538,8 @@ class GlGoogleMap extends HTMLElement {
         const overlayProjection = this.imageLayer.getProjection();
         return overlayProjection.fromLatLngToDivPixel(latLng);
     }
+
+
 
     loadGoogleMapsApi() {
         const endpoint = 'https://maps.googleapis.com/maps/api/js';
