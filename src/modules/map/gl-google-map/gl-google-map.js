@@ -228,6 +228,9 @@ export class GlGoogleMap extends HTMLElement {
         }
     }
 
+    /**
+     * Generates a KML layer on the map
+     */
     generateKml() {
         this.kmlLayer = new google.maps.KmlLayer({
             url: this.overlay,
@@ -236,6 +239,12 @@ export class GlGoogleMap extends HTMLElement {
         });
     }
 
+    /**
+     * Generates an admin marker
+     *
+     * @param {Object} marker
+     * @returns {google.maps.Marker}
+     */
     generateAdminMarker(marker) {
         const adminMarker = new google.maps.Marker({
             map: this.map,
@@ -261,6 +270,12 @@ export class GlGoogleMap extends HTMLElement {
         return adminMarker;
     }
 
+    /**
+     * Generates a marker
+     *
+     * @param {Object} marker
+     * @returns {google.maps.Marker}
+     */
     generateMarker(marker) {
         const mapMarker = new google.maps.Marker({
             map: this.map,
@@ -454,6 +469,10 @@ export class GlGoogleMap extends HTMLElement {
         this.emitMarkerEvent('mouseout', glMarker, marker, event);
     }
 
+    /**
+     * Toggles the legend visibility via CSS by changing the
+     * `aria-expanded` attribute value
+     */
     toggleLegend() {
         if (this.legendToggleElem.getAttribute('aria-expanded') === 'true') {
             this.legendToggleElem.setAttribute('aria-expanded', false);
@@ -462,6 +481,12 @@ export class GlGoogleMap extends HTMLElement {
         }
     }
 
+    /**
+     * Generates the legend container elements for a supplied
+     * GlGoogleLegend element
+     *
+     * @todo This should be its own imported custom element
+     */
     generateLegend() {
         const legendElem = document.createElement('div');
         const legendToggleElem = document.createElement('button');
@@ -496,6 +521,9 @@ export class GlGoogleMap extends HTMLElement {
         this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(legendElem);
     }
 
+    /**
+     * Generates the detail container elements for marker details
+     */
     generateDetail() {
         const detailElem = document.createElement('div');
         const contentElem = document.createElement('div');
@@ -517,6 +545,11 @@ export class GlGoogleMap extends HTMLElement {
         this.detailContentElem = contentElem;
     }
 
+    /**
+     * Loads the detail for a selected marker
+     *
+     * @param {google.maps.Marker} marker
+     */
     loadDetail(marker) {
         const markerElem = this.markerElems.find(elem => elem.id === marker.id);
         const markerElemChildren = markerElem ? [...markerElem.children] : [];
@@ -538,10 +571,17 @@ export class GlGoogleMap extends HTMLElement {
         this.loadDetailTimeout = setTimeout(this.showDetail, 200);
     }
 
+    /**
+     * Shows the detail by adding a class name to
+     * GlGoogleMap element
+     */
     showDetail() {
         this.elem.classList.add('has-detail');
     }
 
+    /**
+     * Closes the detail
+     */
     closeDetail() {
         this.elem.classList.remove('has-detail');
         this.markers.forEach((marker) => {
@@ -557,12 +597,16 @@ export class GlGoogleMap extends HTMLElement {
         });
     }
 
+    /**
+     * Converts google latLng coordinates to div pixel coordinates
+     *
+     * @param {google.maps.LatLng} latLng
+     * @returns {Object}
+     */
     getPixelCoordinate(latLng) {
         const overlayProjection = this.imageLayer.getProjection();
         return overlayProjection.fromLatLngToDivPixel(latLng);
     }
-
-
 
     loadGoogleMapsApi() {
         const endpoint = 'https://maps.googleapis.com/maps/api/js';
