@@ -594,6 +594,8 @@ export class GlGoogleMap extends HTMLElement {
 
     /**
      * Pans the map to a marker which has been selected or clicked
+     * Currently assumes conjunction of `GlGoogleMap.showDetail`,
+     * this the 100px x-coordinate offset
      *
      * @param {google.maps.Marker} marker
      * @param {number=} [offsetX=100]
