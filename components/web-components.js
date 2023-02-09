@@ -880,11 +880,6 @@ var webComponents = (function (exports) {
          * @emits GlGoogleMap#click
          */
         handleMarkerClick(glMarker, marker, event) {
-            const projection = this.imageLayer.getProjection();
-            const pixelPosition = projection.fromLatLngToDivPixel(marker.getPosition());
-            pixelPosition.x += 100;
-            const newPosition = projection.fromDivPixelToLatLng(pixelPosition);
-
             this.markers.forEach((m) => {
                 if (m.type !== 'admin') {
                     if (m.id === marker.id) {
@@ -909,9 +904,8 @@ var webComponents = (function (exports) {
                 }
             });
 
-            this.map.panTo(newPosition);
             this.loadDetail(marker);
-
+            this.panToSelectedMarker(marker);
             this.emitMarkerEvent('click', glMarker, marker, event);
         }
 
@@ -1149,6 +1143,24 @@ var webComponents = (function (exports) {
                     marker.setVisible(this.isAdmin && this.isImageVisible);
                 }
             });
+        }
+
+        /**
+         * Pans the map to a marker which has been selected or clicked
+         *
+         * @param {google.maps.Marker} marker
+         * @param {number=} [offsetX=100]
+         * @param {number=} [offsetY=0]
+         */
+        panToSelectedMarker(marker, offsetX = 100, offsetY = 0) {
+            const projection = this.imageLayer.getProjection();
+            const pixelPosition = projection.fromLatLngToDivPixel(marker.getPosition());
+            const newPixelPosition = {
+                x: pixelPosition.x + offsetX,
+                y: pixelPosition.y + offsetY
+            };
+
+            this.map.panTo(projection.fromDivPixelToLatLng(newPixelPosition));
         }
 
         /**
