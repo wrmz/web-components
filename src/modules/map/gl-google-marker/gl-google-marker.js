@@ -21,17 +21,33 @@ export class GlGoogleMarker extends HTMLElement {
         return isNaN(latitude) ? 0 : latitude;
     }
 
+    set latitude(val) {
+        this.setAttribute('latitude', val);
+    }
+
     get longitude() {
         const longitude = parseFloat(this.hasAttribute('longitude') ? this.getAttribute('longitude') : '0');
         return isNaN(longitude) ? 0 : longitude;
+    }
+
+    set longitude(val) {
+        this.setAttribute('longitude', val);
     }
 
     get status() {
         return this.getAttribute('status');
     }
 
+    set status(val) {
+        this.setAttribute('status', val);
+    }
+
     get color() {
         return this.getAttribute('color');
+    }
+
+    set color(val) {
+        this.setAttribute('color', val);
     }
 }
 

@@ -254,24 +254,10 @@ export class GlGoogleMap extends HTMLElement {
             draggable: this.isAdmin
         });
 
-        adminMarker.addListener('dragstart', (event) => {
-            console.log('drag began', event);
-        });
-        adminMarker.addListener('drag', (event) => {
-            const label = marker.label;
-            const lat = event.latLng.lat();
-            const lng = event.latLng.lng();
+        adminMarker.addListener('dragend', this.handleMarkerDragend.bind(this, marker, adminMarker));
+        adminMarker.addListener('dragstart', this.handleMarkerDragstart.bind(this, marker, adminMarker));
+        adminMarker.addListener('drag', this.handleMarkerDrag.bind(this, marker, adminMarker));
 
-            this.imageElemPosition = {
-                neLatitude: (label === 'nw' || label === 'ne') ? lat : this.imageElemPosition.neLatitude,
-                neLongitude: (label === 'nw' || label === 'ne') ? lng : this.imageElemPosition.neLongitude,
-                swLatitude: (label === 'sw' || label == 'se') ? lat : this.imageElemPosition.swLatitude,
-                swLongitude: (label === 'sw' || label == 'se') ? lng : this.imageElemPosition.swLongitude,
-            };
-        });
-        adminMarker.addListener('dragend', (event) => {
-            console.log('drag finished', event);
-        });
         return adminMarker;
     }
 
@@ -295,10 +281,10 @@ export class GlGoogleMap extends HTMLElement {
             draggable: this.isAdmin,
         });
 
-        mapMarker.addListener('mouseover', this.handleMarkerMouseover.bind(this, mapMarker));
-        mapMarker.addListener('mouseout', this.handleMarkerMouseout.bind(this, mapMarker));
-        mapMarker.addListener('dragend', this.handleMarkerDragend.bind(this, mapMarker));
-        mapMarker.addListener('click', this.handleMarkerClick.bind(this, mapMarker));
+        mapMarker.addListener('mouseover', this.handleMarkerMouseover.bind(this, marker, mapMarker));
+        mapMarker.addListener('mouseout', this.handleMarkerMouseout.bind(this, marker, mapMarker));
+        mapMarker.addListener('dragend', this.handleMarkerDragend.bind(this, marker, mapMarker));
+        mapMarker.addListener('click', this.handleMarkerClick.bind(this, marker, mapMarker));
 
         return mapMarker;
     }
@@ -308,15 +294,17 @@ export class GlGoogleMap extends HTMLElement {
      *
      * @this GlGoogleMap
      * @param {string} eventType
+     * @param {GlGoogleMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.event} event
      * @emits CustomEvent
      */
-    emitMarkerEvent(eventType, marker, event) {
+    emitMarkerEvent(eventType, glMarker, marker, event) {
         const customEvent = new CustomEvent(eventType, {
             detail: {
                 map: this,
                 marker: marker,
+                glMarker: glMarker,
                 pixel: event.pixel,
                 domEvent: event.domEvent,
                 position: {
@@ -333,11 +321,12 @@ export class GlGoogleMap extends HTMLElement {
      * Handles & dispatches from GlGoogleMap a marker click event
      *
      * @this GlGoogleMap
+     * @param {GlGoogleMap} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.event} event
      * @emits GlGoogleMap#click
      */
-    handleMarkerClick(marker, event) {
+    handleMarkerClick(glMarker, marker, event) {
         const projection = this.imageLayer.getProjection();
         const pixelPosition = projection.fromLatLngToDivPixel(marker.getPosition());
         pixelPosition.x += 100;
@@ -370,18 +359,71 @@ export class GlGoogleMap extends HTMLElement {
         this.map.panTo(newPosition);
         this.loadDetail(marker);
 
-        this.emitMarkerEvent('click', marker, event);
+        this.emitMarkerEvent('click', glMarker, marker, event);
+    }
+
+    /**
+     * Handles & dispatches from GlGoogleMap a marker drag event
+     *
+     * @this GlGoogleMap
+     * @param {GlGoogleMarker} glMarker
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.Event} event
+     * @emits GlGoogleMap#drag
+     */
+    handleMarkerDrag(glMarker, marker, event) {
+        if (marker.type === 'admin') {
+            const label = glMarker.label;
+            const lat = event.latLng.lat();
+            const lng = event.latLng.lng();
+
+            this.imageElemPosition = {
+                neLatitude: (label === 'nw' || label === 'ne') ? lat : this.imageElemPosition.neLatitude,
+                neLongitude: (label === 'nw' || label === 'ne') ? lng : this.imageElemPosition.neLongitude,
+                swLatitude: (label === 'sw' || label == 'se') ? lat : this.imageElemPosition.swLatitude,
+                swLongitude: (label === 'sw' || label == 'se') ? lng : this.imageElemPosition.swLongitude,
+            };
+        }
+
+        this.emitMarkerEvent('drag', glMarker, marker, event);
+    }
+
+    /**
+     * Handles & dispatches from GlGoogleMap a marker dragend event
+     *
+     * @this GlGoogleMap
+     * @param {GlGoogleMarker} glMarker
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.Event} event
+     * @emits GlGoogleMap#dragend
+     */
+    handleMarkerDragend(glMarker, marker, event) {
+        this.emitMarkerEvent('dragend', glMarker, marker, event);
+    }
+
+    /**
+     * Handles & dispatches from GlGoogleMap a marker dragstart event
+     *
+     * @this GlGoogleMap
+     * @param {GlGoogleMarker} glMarker
+     * @param {google.maps.Marker} marker
+     * @param {google.maps.Event} event
+     * @emits GlGoogleMap#dragstart
+     */
+    handleMarkerDragstart(glMarker, marker, event) {
+        this.emitMarkerEvent('dragstart', glMarker, marker, event);
     }
 
     /**
      * Handles & dispatches from GlGoogleMap a marker mouseover event
      *
      * @this GlGoogleMap
+     * @param {GlGoogleMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.event} event
      * @emits GlGoogleMap#mouseover
      */
-    handleMarkerMouseover(marker, event) {
+    handleMarkerMouseover(glMarker, marker, event) {
         if (!marker.isSelected) {
             marker.setIcon({
                 path: this._markerPath,
@@ -392,18 +434,19 @@ export class GlGoogleMap extends HTMLElement {
             });
         }
 
-        this.emitMarkerEvent('mouseover', marker, event);
+        this.emitMarkerEvent('mouseover', glMarker, marker, event);
     }
 
     /**
      * Handles & dispatches from GlGoogleMap a marker mouseout event
      *
      * @this GlGoogleMap
+     * @param {GlGoogleMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.event} event
      * @emits GlGoogleMap#mouseout
      */
-    handleMarkerMouseout(marker, event) {
+    handleMarkerMouseout(glMarker, marker, event) {
         if (!marker.isSelected) {
             marker.setIcon({
                 path: this._markerPath,
@@ -414,20 +457,7 @@ export class GlGoogleMap extends HTMLElement {
             });
         }
 
-        this.emitMarkerEvent('mouseout', marker, event);
-    }
-
-
-    /**
-     * Handles & dispatches from GlGoogleMap a marker dragend event
-     *
-     * @this GlGoogleMap
-     * @param {google.maps.Marker} marker
-     * @param {google.maps.Event} event
-     * @emits GlGoogleMap#dragend
-     */
-    handleMarkerDragend(marker, event) {
-        this.emitMarkerEvent('dragend', marker, event);
+        this.emitMarkerEvent('mouseout', glMarker, marker, event);
     }
 
     toggleLegend() {
