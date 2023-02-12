@@ -92,13 +92,36 @@
     box-sizing: border-box;
 }
 
+:host .gl-map__center-button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 3px !important;
+    top: 87px !important;
+    width: 40px;
+    height: 40px;
+    color: #666;
+    border: 0;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 85%);
+    backdrop-filter: brightness(140%) blur(10px);
+    transition: color 0.2s ease-out, background 0.2s ease-out;
+}
+
+:host .gl-map__center-button:hover,
+:host .gl-map__center-button:focus {
+    color: #333;
+    background: white;
+}
+
 :host .gl-map__legend {
     position: relative;
     height: 80px;
     max-width: calc(100% - 49px);
     padding: 0 33px 0 0;
     margin: 3px;
-    border-radius: 3px;
+    border-radius: 2px;
     box-sizing: border-box;
 }
 
@@ -113,7 +136,7 @@
     letter-spacing: 2px;
     color: #666;
     border: 0;
-    border-radius: 3px;
+    border-radius: 2px;
     box-sizing: border-box;
     background: rgb(255 255 255 / 85%);
     backdrop-filter: brightness(140%) blur(10px);
