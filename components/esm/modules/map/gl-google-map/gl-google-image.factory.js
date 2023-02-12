@@ -20,8 +20,10 @@ class GlGoogleImageFactory {
             if (this._div) {
                 if (adminMode) {
                     this._div.style.boxShadow = '0 0 0 2px #0388d1';
+                    this._imageElem.style.backdropFilter = 'blur(2px) brightness(1.3)';
                 } else {
                     this._div.style.boxShadow = 'none';
+                    this._imageElem.style.backdropFilter = 'blur(0) brightness(1)';
                 }
             }
         };
@@ -32,12 +34,18 @@ class GlGoogleImageFactory {
 
                 this._div.style.position = 'absolute';
                 this._div.style.userSelect = 'none';
+                this._div.style.cursor = 'hand';
+                this._div.draggable = true;
                 this._imageElem.style.width = '100%';
                 this._imageElem.style.height = '100%';
                 this._imageElem.style.position = 'absolute';
                 this._imageElem.style.display = 'block';
+                this._imageElem.style.transition = 'all .2s ease-out';
                 this._div.appendChild(this._imageElem);
+
+
                 // Use `floatPane` instead of `overlayLayer`?
+                // panes.floatPane.appendChild(this._div);
                 panes.overlayLayer.appendChild(this._div);
             }
         };
