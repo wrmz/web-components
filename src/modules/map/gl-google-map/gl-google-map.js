@@ -65,6 +65,7 @@ export class GlGoogleMap extends HTMLElement {
         this.loadDetail = this.loadDetail.bind(this);
         this.showDetail = this.showDetail.bind(this);
         this.toggleLegend = this.toggleLegend.bind(this);
+        this.recenterMap = this.recenterMap.bind(this);
     }
 
     get isAdmin() {
@@ -471,6 +472,15 @@ export class GlGoogleMap extends HTMLElement {
         this.emitMarkerEvent('mouseout', glMarker, marker, event);
     }
 
+    recenterMap() {
+        const imageBounds = this.imageLayer.getBounds();
+        const bounds = new google.maps.LatLngBounds();
+
+        bounds.extend(imageBounds.getNorthEast());
+        bounds.extend(imageBounds.getSouthWest());
+        this.map.fitBounds(bounds);
+    }
+
     /**
      * Toggles the legend visibility via CSS by changing the
      * `aria-expanded` attribute value
@@ -531,6 +541,8 @@ export class GlGoogleMap extends HTMLElement {
         centerMapElem.className = 'gl-map__center-button';
 
         centerMapElem.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10s-4.47715 10-10 10S0 15.52285 0 10 4.47715 0 10 0ZM3.72462 10.63068h-2.4409c.30834 4.32356 3.76204 7.77726 8.0856 8.0856v-2.4409c-2.97945-.29584-5.34886-2.66525-5.6447-5.6447Zm14.99251-.01202-.04376.00775-.07354.00424-2.32445.00007c-.29584 2.97941-2.66525 5.34882-5.6447 5.64466v2.4409c4.32757-.30863 7.78366-3.76844 8.08645-8.09762Zm-8.08627-4.35022-.0002.89139c0 .3483-.28236.63065-.63066.63065-.32342 0-.58998-.24346-.62641-.5571l-.00424-.07355-.00021-.8914c-1.58435.2659-2.8348 1.51636-3.1007 3.1007l1.1959.00022c.3483 0 .63065.28235.63065.63065 0 .32342-.24345.58998-.5571.62641l-.07355.00424-1.1959.00021c.2659 1.58435 1.51635 2.8348 3.1007 3.1007l.0002-1.21748c0-.3483.28236-.63065.63066-.63065.32342 0 .58998.24346.62641.5571l.00424.07355.00021 1.21748c1.58435-.2659 2.8348-1.51635 3.1007-3.1007l-1.38427-.0002c-.3483 0-.63065-.28236-.63065-.63066 0-.32342.24346-.58998.5571-.62641l.07355-.00424 1.38427-.00021c-.2659-1.58435-1.51635-2.8348-3.1007-3.1007Zm-.00018-4.98472v2.4409c2.97945.29584 5.34886 2.66525 5.6447 5.64466l2.32445.00007a.6341.6341 0 0 1 .11726.01088c-.30275-4.32807-3.75884-7.78788-8.0864-8.09651Zm-9.34696 8.0856h2.4409c.29584-2.97945 2.66525-5.34886 5.6447-5.6447v-2.4409c-4.32356.30834-7.77726 3.76204-8.0856 8.0856Z"/></svg>';
+
+        centerMapElem.addEventListener('click', this.recenterMap, false);
 
         this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(centerMapElem);
     }

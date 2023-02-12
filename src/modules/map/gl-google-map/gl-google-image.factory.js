@@ -15,6 +15,9 @@ export default class GlGoogleImageFactory {
             this.setMap(this._map);
         };
         GlGoogleImage.prototype = new google.maps.OverlayView();
+        GlGoogleImage.prototype.getBounds = function() {
+            return this._bounds;
+        };
         GlGoogleImage.prototype.setAdminMode = function(adminMode) {
             this._isAdmin = adminMode;
             if (this._div) {
