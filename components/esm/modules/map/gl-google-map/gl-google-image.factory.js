@@ -46,7 +46,6 @@ class GlGoogleImageFactory {
                 this._imageElem.style.transition = 'all .2s ease-out';
                 this._div.appendChild(this._imageElem);
 
-
                 // Use `floatPane` instead of `overlayLayer`?
                 // panes.floatPane.appendChild(this._div);
                 panes.overlayLayer.appendChild(this._div);
