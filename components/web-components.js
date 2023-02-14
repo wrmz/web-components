@@ -491,10 +491,18 @@ var webComponents = (function (exports) {
                 this._imageElem = imageElem;
                 this._div = null;
                 this._isAdmin = false;
+                this._rotate = 0;
 
                 this.setMap(this._map);
             };
             GlGoogleImage.prototype = new google.maps.OverlayView();
+            GlGoogleImage.prototype.getRotate = function() {
+                return this._rotate;
+            };
+            GlGoogleImage.prototype.setRotate = function(val) {
+                this._rotate = val;
+                this._imageElem.style.transform = `rotate(${val}deg)`;
+            };
             GlGoogleImage.prototype.getBounds = function() {
                 return this._bounds;
             };
@@ -609,6 +617,7 @@ var webComponents = (function (exports) {
             this.styleLayer = undefined;
             this.imageLayer = undefined;
             this.legendToggleElem = undefined;
+            this.rotateButtonElem = undefined;
             this.imageNE = 0.0;
             this.imageNW = 0.0;
             this.imageSW = 0.0;
@@ -621,7 +630,6 @@ var webComponents = (function (exports) {
             this.elem.setAttribute('id', `map_${this._id}`);
 
             this.emitMarkerEvent = this.emitMarkerEvent.bind(this);
-            this.generateCenterMapControl = this.generateCenterMapControl.bind(this);
             this.generateLegend = this.generateLegend.bind(this);
             this.generateAdminMarker = this.generateAdminMarker.bind(this);
             this.generateMarker = this.generateMarker.bind(this);
@@ -629,6 +637,8 @@ var webComponents = (function (exports) {
             this.showDetail = this.showDetail.bind(this);
             this.toggleLegend = this.toggleLegend.bind(this);
             this.recenterMap = this.recenterMap.bind(this);
+            this.handleRotateButtonClick = this.handleRotateButtonClick.bind(this);
+
         }
 
         get isAdmin() {
@@ -729,7 +739,7 @@ var webComponents = (function (exports) {
         handleApiLoaded() {
             this.map = new google.maps.Map(this.mapElem, {
                 center: { lat: this.latitude, lng: this.longitude },
-                mapTypeControl: false,
+                mapTypeControl: true,
                 scaleControl: false,
                 streetViewControl: false,
                 fullscreenControl: false,
@@ -742,6 +752,7 @@ var webComponents = (function (exports) {
 
             this.setMapStyle();
             this.generateCenterMapControl();
+            this.generateMapRotateControl();
 
             if (this._legendElem) {
                 this.generateLegend();
@@ -1035,6 +1046,14 @@ var webComponents = (function (exports) {
             this.emitMarkerEvent('mouseout', glMarker, marker, event);
         }
 
+        handleRotateButtonClick() {
+            const currentRotation = this.imageLayer.getRotate();
+            this.imageLayer.setRotate(currentRotation + 15);
+        }
+
+        /**
+         * Recenters the map
+         */
         recenterMap() {
             const imageBounds = this.imageLayer.getBounds();
             const bounds = new google.maps.LatLngBounds();
@@ -1096,11 +1115,23 @@ var webComponents = (function (exports) {
             this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(legendElem);
         }
 
+        generateMapRotateControl() {
+            this.rotateButtonElem = document.createElement('button');
+
+            this.rotateButtonElem.type = 'button';
+            this.rotateButtonElem.className = 'gl__edit gl__edit-rotate';
+            this.rotateButtonElem.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M19.51613 0h-.40323c-.26721 0-.48387.21665-.48387.48387v4.46077C16.8923 1.98634 13.6784 0 10 0 4.64629 0 .27516 4.20718.0125 9.49569-.00117 9.7706.22077 10 .496 10h.40388c.25617 0 .4696-.19956.48294-.45536C1.61923 5.0087 5.36682 1.37097 10 1.37097c3.34121 0 6.2394 1.89826 7.67294 4.67742h-4.60842c-.26722 0-.48387.21665-.48387.48387v.40322c0 .26722.21665.48387.48387.48387h6.4516c.26723 0 .48388-.21665.48388-.48387V.48388C20 .21664 19.78335 0 19.51613 0Zm-.01214 10h-.40383c-.25613 0-.46964.19956-.48294.45536-.23653 4.55101-3.99843 8.17367-8.61722 8.17367-3.33097 0-6.23677-1.89322-7.67335-4.67742h4.60883c.26722 0 .48387-.21665.48387-.48387v-.40322c0-.26722-.21665-.48387-.48387-.48387H.48388c-.26723 0-.48388.21665-.48388.48387v6.4516C0 19.78336.21665 20 .48387 20H.8871c.26721 0 .48387-.21665.48387-.48387v-4.46077C3.1077 18.01366 6.32165 20 10 20c5.35375 0 9.72484-4.20718 9.9875-9.49569C20.00117 10.2294 19.77923 10 19.504 10Z"/></svg>';
+
+            this.rotateButtonElem.addEventListener('click', this.handleRotateButtonClick, false);
+
+            this.map.controls[google.maps.ControlPosition.CENTER].push(this.rotateButtonElem);
+        }
+
         generateCenterMapControl() {
             const centerMapElem = document.createElement('button');
 
-            centerMapElem.setAttribute('type', 'button');
-            centerMapElem.setAttribute('title', 'Center the Map');
+            centerMapElem.type = 'button';
+            centerMapElem.title = 'Center the Map';
             centerMapElem.className = 'gl-map__center-button';
 
             centerMapElem.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10s-4.47715 10-10 10S0 15.52285 0 10 4.47715 0 10 0ZM3.72462 10.63068h-2.4409c.30834 4.32356 3.76204 7.77726 8.0856 8.0856v-2.4409c-2.97945-.29584-5.34886-2.66525-5.6447-5.6447Zm14.99251-.01202-.04376.00775-.07354.00424-2.32445.00007c-.29584 2.97941-2.66525 5.34882-5.6447 5.64466v2.4409c4.32757-.30863 7.78366-3.76844 8.08645-8.09762Zm-8.08627-4.35022-.0002.89139c0 .3483-.28236.63065-.63066.63065-.32342 0-.58998-.24346-.62641-.5571l-.00424-.07355-.00021-.8914c-1.58435.2659-2.8348 1.51636-3.1007 3.1007l1.1959.00022c.3483 0 .63065.28235.63065.63065 0 .32342-.24345.58998-.5571.62641l-.07355.00424-1.1959.00021c.2659 1.58435 1.51635 2.8348 3.1007 3.1007l.0002-1.21748c0-.3483.28236-.63065.63066-.63065.32342 0 .58998.24346.62641.5571l.00424.07355.00021 1.21748c1.58435-.2659 2.8348-1.51635 3.1007-3.1007l-1.38427-.0002c-.3483 0-.63065-.28236-.63065-.63066 0-.32342.24346-.58998.5571-.62641l.07355-.00424 1.38427-.00021c-.2659-1.58435-1.51635-2.8348-3.1007-3.1007Zm-.00018-4.98472v2.4409c2.97945.29584 5.34886 2.66525 5.6447 5.64466l2.32445.00007a.6341.6341 0 0 1 .11726.01088c-.30275-4.32807-3.75884-7.78788-8.0864-8.09651Zm-9.34696 8.0856h2.4409c.29584-2.97945 2.66525-5.34886 5.6447-5.6447v-2.4409c-4.32356.30834-7.77726 3.76204-8.0856 8.0856Z"/></svg>';
@@ -1215,6 +1246,9 @@ var webComponents = (function (exports) {
             }
             if (this.imageLayer) {
                 this.imageLayer.setAdminMode(isAdmin);
+            }
+            if (this.rotateButtonElem) {
+                this.rotateButtonElem.style.display = isAdmin ? 'flex' : 'none';
             }
 
             this.markers.forEach((marker) => {

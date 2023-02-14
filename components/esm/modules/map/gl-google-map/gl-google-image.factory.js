@@ -11,10 +11,18 @@ class GlGoogleImageFactory {
             this._imageElem = imageElem;
             this._div = null;
             this._isAdmin = false;
+            this._rotate = 0;
 
             this.setMap(this._map);
         };
         GlGoogleImage.prototype = new google.maps.OverlayView();
+        GlGoogleImage.prototype.getRotate = function() {
+            return this._rotate;
+        };
+        GlGoogleImage.prototype.setRotate = function(val) {
+            this._rotate = val;
+            this._imageElem.style.transform = `rotate(${val}deg)`;
+        };
         GlGoogleImage.prototype.getBounds = function() {
             return this._bounds;
         };
