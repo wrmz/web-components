@@ -168,7 +168,7 @@ export class GlGoogleMap extends HTMLElement {
     handleApiLoaded() {
         this.map = new google.maps.Map(this.mapElem, {
             center: { lat: this.latitude, lng: this.longitude },
-            mapTypeControl: false,
+            mapTypeControl: true,
             scaleControl: false,
             streetViewControl: false,
             fullscreenControl: false,
@@ -476,7 +476,8 @@ export class GlGoogleMap extends HTMLElement {
     }
 
     handleRotateButtonClick() {
-        console.log('rotate mode');
+        const currentRotation = this.imageLayer.getRotate();
+        this.imageLayer.setRotate(currentRotation + 15)
     }
 
     /**
