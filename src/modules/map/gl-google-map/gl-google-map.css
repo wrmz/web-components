@@ -92,6 +92,28 @@
     box-sizing: border-box;
 }
 
+:host .gl__edit {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: #666;
+    border: 0;
+    border-radius: 4px;
+    background: white;
+    background: rgb(255 255 255 / 85%);
+    backdrop-filter: blur(10px);
+    transition: color 0.2s ease-out, background 0.2s ease-out;
+}
+
+:host .gl__edit:hover,
+:host .gl__edit:focus {
+    color: #333;
+    background: white;
+}
+
 :host .gl-map__center-button {
     cursor: pointer;
     display: flex;
