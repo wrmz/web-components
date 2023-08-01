@@ -1,1 +1,1 @@
-var e;(e={}).debounce=function(e,t){let n;return function(){const u=()=>{n=null,e.apply(this,arguments)};clearTimeout(n),n=setTimeout(u,t),n||e.apply(this,arguments)}},Object.defineProperty(e,"__esModule",{value:!0});
+var e;(e={}).debounce=function(e,t){let u;return function(){clearTimeout(u),u=setTimeout((()=>{u=null,e.apply(this,arguments)}),t),u||e.apply(this,arguments)}},Object.defineProperty(e,"__esModule",{value:!0});

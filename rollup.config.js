@@ -7,12 +7,12 @@ const modules = !dev ? getModules() : [];
 
 export default [
     {
-        input: 'src/web-components.js',
+        input: 'src/gl-web-components.js',
         output: [{
             sourcemap: true,
             format: 'iife',
             dir: dev ? 'docs/components' : 'dist',
-            name: 'webComponents',
+            name: 'glWebComponents',
         }, {
             sourcemap: true,
             format: 'esm',

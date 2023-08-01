@@ -43,8 +43,10 @@ body {
     grid-auto-flow: row dense;
     grid-auto-rows: max-content;
     gap: 5px;
-    padding: 50px 30px;
+    padding: 15px;
+    transition: padding 0.5s ease-in-out;
 }
+
 .component-nav__group {
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -82,8 +84,10 @@ body {
 }
 .components {
     position: relative;
-    padding: 50px 0 0;
+    padding: 15px 0 0;
+    transition: padding 2s ease-in-out;
 }
+
 .components::before,
 .components::after {
     content: '';
@@ -92,30 +96,25 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% + 50px);
+    height: calc(100% + 15px);
     border-style: solid;
     border-color: #ddd;
     box-sizing: border-box;
     z-index: 3;
+    transition: border 0.5s ease-in-out;
 }
 .components::before {
-    border-width: 20px;
+    border-width: 10px;
 }
 .components::after {
-    border-width: 50px;
-    border-radius: 56px;
+    border-width: 15px;
+    border-radius: 21px;
 }
 .components::before,
 .components::after {
     border-bottom: 0;
 }
-@media screen and (min-width: 978px) {
-    .components::before,
-    .components::after {
-        left: 346px;
-        width: calc(100% - 346px);
-    }
-}
+
 .footer {
     position: relative;
     padding: 30px 50px 25px;
@@ -144,12 +143,13 @@ body {
     font-size: 14px;
 }
 .component {
-    margin: 0 50px 50px;
+    margin: 0 15px 15px;
     border-radius: 4px;
+    transition: all 0.5s ease-in-out;
 }
 .component__title {
     position: sticky;
-    top: 50px;
+    top: 15px;
     margin: 0 0 -1px;
     padding: 20px 30px;
     font-size: 18px;
@@ -157,31 +157,88 @@ body {
     border-radius: 4px 4px 0 0;
     background: #f1f1f1;
     z-index: 2;
+    transition: top 0.5s ease-in-out;
 }
 .component__content {
-    padding: 50px 30px;
+    padding: 15px 15px;
     background: #fff;
 }
 .component__options {
     display: grid;
     gap: 20px;
-    margin: 0 0 50px;
+    margin: 0 0 15px;
+}
+@media screen and (min-width: 768px) {
+    .component-nav__container {
+        padding: 50px 30px;
+    }
+    .components {
+        padding: 50px 0 0;
+    }
+    .components::before,
+    .components::after {
+        height: calc(100% + 50px);
+    }
+    .components::before {
+        border-width: 20px;
+    }
+    .components::after {
+        border-width: 50px;
+        border-radius: 56px;
+    }
+    .components::before,
+    .components::after {
+        border-bottom: 0;
+    }
+    .component {
+        margin: 0 50px 50px;
+    }
+    .component__content {
+        padding: 50px 30px;
+    }
+    .component__options {
+        margin: 0 0 50px;
+    }
+    .component__title {
+        top: 50px;
+    }
+}
+@media screen and (min-width: 978px) {
+    .components::before,
+    .components::after {
+        left: 346px;
+        width: calc(100% - 346px);
+    }
 }
 @media screen and (min-width: 978px) {
     .component__options {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
-
 .component__option {
     padding: 10px 20px;
     border-radius: 4px;
     background: #f1f1f1;
 }
+
 .component__option label,
 .component__option input {
     cursor: pointer;
 }
+
+.component__option button {
+    cursor: pointer;
+    padding: 0.5em 1em;
+    border: 1px solid #666;
+    background: white;
+    transition: background 0.2s ease-out;
+}
+
+.component__option button:hover,
+.component__option button:focus-visible {
+    background: #ddd;
+}
+
 .component__scripts {
     display: grid;
     gap: 1px;
@@ -401,4 +458,26 @@ pre.language-js::before {
     padding: 10px;
     font-size: 12px;
     color: #a89984;
+}
+
+.available svg {
+    color: #666;
+}
+
+.pending svg {
+    color: #9D7F09;
+}
+
+.model svg {
+    color: #0089D1;
+}
+
+.sold svg {
+    color: #D72525;
+}
+
+#tileMap {
+    min-height: 0;
+    height: 0;
+    padding-top: 95%;
 }

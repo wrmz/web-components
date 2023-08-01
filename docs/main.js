@@ -19,7 +19,6 @@
 	 */
 	var NEW_LINE_EXP = /\n(?!$)/g;
 
-
 	/**
 	 * Global exports
 	 */
@@ -254,26 +253,34 @@
 }());
 
 function init() {
+	const isLexingtonMapAdmin = document.getElementById('isLexingtonMapAdmin');
+	const isWestbayMapAdmin = document.getElementById('isWestbayMapAdmin');
 	const isGoogleMapAdmin = document.getElementById('isGoogleMapAdmin');
-	const hideKmlLayer = document.getElementById('hideKmlLayer');
-	const hideImageLayer = document.getElementById('hideImageLayer');
-	const glGoogleMap = document.getElementById('glGoogleMap');
+	const isTileMapAdmin = document.getElementById('isTileMapAdmin');
+	const westbayMap = document.getElementById('westbayMap');
+	const tileMap = document.getElementById('tileMap');
+	const glMap = document.getElementById('glMap');
+
+	function toggleIsLexingtonMapAdmin() {
+		lexingtonMap.mode = isLexingtonMapAdmin.checked ? 'admin' : 'default';
+	}
+
+	function toggleIsWestbayMapAdmin() {
+		westbayMap.mode = isWestbayMapAdmin.checked ? 'admin' : 'default';
+	}
 
 	function toggleIsGoogleMapAdmin() {
-		glGoogleMap.setAttribute('admin', isGoogleMapAdmin.checked);
+		glMap.mode = isGoogleMapAdmin.checked ? 'admin' : 'default';
 	}
 
-	function toggleKmlLayerHidden() {
-		glGoogleMap.setAttribute('hide-kml', hideKmlLayer.checked);
+	function toggleTileMapAdmin() {
+		tileMap.mode = isTileMapAdmin.checked ? 'admin' : 'default';
 	}
 
-	function toggleImageLayerHidden() {
-		glGoogleMap.setAttribute('hide-image', hideImageLayer.checked);
-	}
-
+	isLexingtonMapAdmin.addEventListener('change', toggleIsLexingtonMapAdmin, false);
+	isWestbayMapAdmin.addEventListener('change', toggleIsWestbayMapAdmin, false);
 	isGoogleMapAdmin.addEventListener('change', toggleIsGoogleMapAdmin, false);
-	hideKmlLayer.addEventListener('change', toggleKmlLayerHidden, false);
-	hideImageLayer.addEventListener('change', toggleImageLayerHidden, false);
+	isTileMapAdmin.addEventListener('change', toggleTileMapAdmin, false);
 	window.removeEventListener('load', init);
 }
 

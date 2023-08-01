@@ -6,91 +6,391 @@
         <title>Web Components</title>
         <link rel="shortcut icon" sizes="16x16 24x24 32x32 48x48 64x64" href="favicon.ico" />
         <link rel="stylesheet" href="main.css" />
+        <link rel="preload" href="./lotmap.webp" as="image" />
     </head>
     <body class="line-numbers">
         <div id="app">
             <div class="component-nav">
                 <div class="component-nav__container">
                     <h1 class="app__title">Graphic Language<br/>Web Components</h1>
-                    <p class="app__copy">A collection of framework independent, dependency-free web components.</p>
+                    <p class="app__copy">A collection of framework independent web components.</p>
                     <div class="component-nav__group">
-                        <a href="#mortgage-calc-donut-chart" class="component-nav__link">Donut Chart</a>
-                        <a href="#mortgage-calc-donut-chart-code" class="component-nav__link">&lt; / &gt;</a>
+                        <a href="#gl-lexington-map" class="component-nav__link">Lexington Demo</a>
+                        <a href="#gl-lexington-map-code" class="component-nav__link">&lt; / &gt;</a>
                     </div>
                     <div class="component-nav__group">
-                        <a href="#mortgage-calc-input" class="component-nav__link">Mortgage Calculator Input</a>
-                        <a href="#mortgage-calc-input-code" class="component-nav__link">&lt; / &gt;</a>
+                        <a href="#gl-tile-map" class="component-nav__link">Gl Tile Map</a>
+                        <a href="#gl-tile-map-code" class="component-nav__link">&lt; / &gt;</a>
+                    </div>
+                    <div class="component-nav__group">
+                        <a href="#gl-google-map" class="component-nav__link">Gl Google Map</a>
+                        <a href="#gl-google-map-code" class="component-nav__link">&lt; / &gt;</a>
+                    </div>
+                    <div class="component-nav__group">
+                        <a href="#gl-westbay-map" class="component-nav__link">Westbay Demo</a>
+                        <a href="#gl-westbay-map-code" class="component-nav__link">&lt; / &gt;</a>
                     </div>
                     <div class="component-nav__group">
                         <a href="#mortgage-calc" class="component-nav__link">Mortgage Calculator</a>
                         <a href="#mortgage-calc-code" class="component-nav__link">&lt; / &gt;</a>
                     </div>
-                    <div class="component-nav__group">
-                        <a href="#google-map" class="component-nav__link">Google Map</a>
-                        <a href="#google-map-code" class="component-nav__link">&lt; / &gt;</a>
-                    </div>
                 </div>
             </div>
             <div class="components">
-
-                <div id="mortgage-calc-donut-chart" class="component">
-                    <h2 class="component__title">Donut Chart</h2>
+                <div id="gl-lexington-map" class="component">
+                    <h2 class="component__title">Graphic Language Lexington Demo Map</h2>
                     <div class="component__content">
-                        <chart-donut
-                            colors="['red', 'green', 'blue']"
-                            labels="['Red', 'Green', 'Blue']"
-                            values="[25, 45, 30]"
-                        ></chart-donut>
+                        <div class="component__options">
+                            <div class="component__option">
+                                <input type="checkbox" id="isLexingtonMapAdmin">
+                                <label for="isLexingtonMapAdmin">Admin Mode</label>
+                            </div>
+                        </div>
+                        <gl-map
+                            id="lexingtonMap"
+                            type="google"
+                            key="AIzaSyAmbaZso7PDRM7VM9wFWd6qSnnm6hzRgg4"
+                            latitude="41.76629292749864"
+                            longitude="-88.14124637405043"
+                            marker-color="#f8971d"
+                        >
+                            <img
+                                src="./lexington-sitemap.png"
+                                loading="lazy"
+                                decoding="async"
+                                width="0"
+                                height="0"
+                                ne-lat="41.820165532300386"
+                                ne-lng="-88.20798397064209"
+                                sw-lat="41.81895391661391"
+                                sw-lng="-88.21008950471878"
+                            />
+
+
+                            <!-- <gl-marker
+                                id="item1"
+                                latitude="28.359547901249183"
+                                longitude="-81.41757660233556"
+                                status="model"
+                                color="#60b3df"
+                                path="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"
+                            >
+                                <article class="lot">
+                                    <div class="lot__image">
+                                        <img
+                                            alt=""
+                                            src="https://picsum.photos/id/237/320/240"
+                                            width="320"
+                                            height="240"
+                                            loading="lazy"
+                                            class="lot__img"
+                                        >
+                                    </div>
+                                    <div class="lot__content">
+                                        <h3>
+                                            <span contenteditable="true">Dog</span>
+                                            <span class="model">Model</span>
+                                        </h3>
+                                        <p>Block 1, Homesite 1</p>
+                                        <p>Lot location, Orlando, FL 32837</p>
+                                        <div class="lot__snapshot">
+                                            <div><strong>3</strong> bds</div>
+                                            <div><strong>2</strong> ba</div>
+                                            <div><strong>1,447</strong> sqft</div>
+                                        </div>
+                                        <a href="#google-map-code" class="lot__cta">Say More</a>
+                                    </div>
+                                </article>
+                            </gl-marker> -->
+                        </gl-map>
                     </div>
-                    <div id="mortgage-calc-donut-chart-code" class="component__scripts">
+                    <div id="gl-lexington-map-code" class="component__scripts">
                         <div class="component__script-block">
-                            <pre><code class="language-html">&#x3C;chart-donut
-    colors=&#x22;[&#x27;red&#x27;, &#x27;green&#x27;, &#x27;blue&#x27;]&#x22;
-    labels=&#x22;[&#x27;Red&#x27;, &#x27;Green&#x27;, &#x27;Blue&#x27;]&#x22;
-    values=&#x22;[25, 45, 30]&#x22;
-&#x3E;&#x3C;/chart-donut&#x3E;</code></pre>
+                            <pre><code class="language-html"></code></pre>
                         </div>
                         <div class="component__script-block">
-                            <pre><code class="language-js">const chartElement = document.createElement('chart-donut');
-chartElement.colors = ['red', 'green', 'blue'];
-chartElement.labels = ['Red', 'Green', 'Blue'];
-chartElement.values = [25, 45, 30];
-
-document.body.append(this.chartElement);</code></pre>
+                            <pre><code class="language-js"></code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div id="gl-tile-map" class="component">
+                    <h2 class="component__title">Graphic Language Tile Map</h2>
+                    <div class="component__content">
+                        <div class="component__options">
+                            <div class="component__option">
+                                <input type="checkbox" id="isTileMapAdmin">
+                                <label for="isTileMapAdmin">Admin Mode</label>
+                            </div>
+                        </div>
+                        <gl-map
+                            id="tileMap"
+                            type="google"
+                            key="AIzaSyAmbaZso7PDRM7VM9wFWd6qSnnm6hzRgg4"
+                            latitude="27.808052026945997"
+                            longitude="-82.22663379292536"
+                            map-style="./westbay-map-style.json"
+                            map-tiles="https://hayden-homes-com-smartedit-production-or.s3.us-west-2.amazonaws.com/Tiles/mc-kenzie-meadows-village/tile_{z}_{x}-{y}.png?v=4"
+                            marker-color="#f8971d"
+                        >
+                            <!-- Intentionally blank for now -->
+                        </gl-map>
+                    </div>
+                    <div id="gl-tile-map-code" class="component__scripts">
+                        <div class="component__script-block">
+                            <pre><code class="language-html"></code></pre>
+                        </div>
+                        <div class="component__script-block">
+                            <pre><code class="language-js"></code></pre>
                         </div>
                     </div>
                 </div>
 
-                <div id="mortgage-calc-input" class="component">
-                    <h2 class="component__title">Mortgage Calculator Input</h2>
+                <div id="gl-google-map" class="component">
+                    <h2 class="component__title">Graphic Language Google Overlay Map</h2>
                     <div class="component__content">
-                        <mortgage-calc-input name="price" type="currency">
-                            <label for="price" slot="label">Price</label>
-                            <input type="text" id="price" slot="input" placeholder="123,456" pattern="[0-9$,]+" maxlength="9" />
-                        </mortgage-calc-input>
+                        <div class="component__options">
+                            <div class="component__option">
+                                <input type="checkbox" id="isGoogleMapAdmin">
+                                <label for="isGoogleMapAdmin">Admin Mode</label>
+                            </div>
+                        </div>
+                        <gl-map
+                            id="glMap"
+                            type="google"
+                            key="AIzaSyAmbaZso7PDRM7VM9wFWd6qSnnm6hzRgg4"
+                            latitude="28.359729644303936"
+                            longitude="-81.41682021939336"
+                            map-style="./map-style.json"
+                        >
+                            <div slot="legend" class="legend-item available" data-for="available">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23" class="available">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Available</div>
+                            </div>
+                            <div slot="legend" class="legend-item pending" data-for="pending">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Pending</div>
+                            </div>
+                            <div slot="legend" class="legend-item model" data-for="model">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Model</div>
+                            </div>
+                            <div slot="legend" class="legend-item sold" data-for="sold">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Sold</div>
+                            </div>
+                            <!-- <img
+                                src="./map-overlay.png"
+                                ne-lat="28.36028685400214"
+                                ne-lng="-81.41617951191711"
+                                sw-lat="28.359105075827006"
+                                sw-lng="-81.41777548213959"
+                            /> -->
+                            <img
+                                src="./lotmap.webp"
+                                loading="lazy"
+                                decoding="async"
+                                width="0"
+                                height="0"
+                                ne-lat="28.36216525514667"
+                                ne-lng="-81.41516625881195"
+                                sw-lat="28.355712610058234"
+                                sw-lng="-81.42111003398895"
+                            />
+                            <gl-marker
+                                id="item1"
+                                latitude="28.359547901249183"
+                                longitude="-81.41757660233556"
+                                status="model"
+                                color="#60b3df"
+                                path="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"
+                            >
+                                <article class="lot">
+                                    <div class="lot__image">
+                                        <img
+                                            alt=""
+                                            src="https://picsum.photos/id/237/320/240"
+                                            width="320"
+                                            height="240"
+                                            loading="lazy"
+                                            class="lot__img"
+                                        >
+                                    </div>
+                                    <div class="lot__content">
+                                        <h3>
+                                            <span contenteditable="true">Dog</span>
+                                            <span class="model">Model</span>
+                                        </h3>
+                                        <p>Block 1, Homesite 1</p>
+                                        <p>Lot location, Orlando, FL 32837</p>
+                                        <div class="lot__snapshot">
+                                            <div><strong>3</strong> bds</div>
+                                            <div><strong>2</strong> ba</div>
+                                            <div><strong>1,447</strong> sqft</div>
+                                        </div>
+                                        <a href="#google-map-code" class="lot__cta">Say More</a>
+                                    </div>
+                                </article>
+                            </gl-marker>
+                        </gl-map>
                     </div>
-                    <div id="mortgage-calc-input-code" class="component__scripts">
+                    <div id="gl-google-map-code" class="component__scripts">
                         <div class="component__script-block">
-                            <pre><code class="language-html">&#x3C;mortgage-calc-input name=&#x22;price&#x22; type=&#x22;currency&#x22;&#x3E;
-    &#x3C;label for=&#x22;price&#x22; slot=&#x22;label&#x22;&#x3E;Price&#x3C;/label&#x3E;
-    &#x3C;input
-        type=&#x22;text&#x22;
-        id=&#x22;price&#x22;
-        slot=&#x22;input&#x22;
-        placeholder=&#x22;123,456&#x22;
-        pattern=&#x22;[0-9$,]+&#x22;
-        maxlength=&#x22;9&#x22;
-    /&#x3E;
-&#x3C;/mortgage-calc-input&#x3E;</code></pre>
+                            <pre><code class="language-html">&lt;gl-map
+    key="[YOUR API KEY HERE]"
+    latitude="28.359729644303936"
+    longitude="-81.41682021939336"
+    map-style="[URL to JSON file]"
+&gt;
+    &lt;img
+        src="[YOUR IMAGE OVERLAY PATH HERE].png"
+        latitude-ne="28.360291574572035"
+        longitude-ne="-81.41619024075317"
+        latitude-sw="28.359123958315564"
+        longitude-sw="-81.41778084655762"
+    &gt;
+    ...
+&lt;/gl-map&gt;</code></pre>
                         </div>
                         <div class="component__script-block">
-                            <pre><code class="language-js">const mortgageCalcInput = document.createElement('mortgage-calc-input');
+                            <pre><code class="language-js">const glMap = document.createElement('gl-map');
+const markers = [{
+    latitude: 28.359547901249183,
+    longitude: -81.41757660233556
+}, {
+    latitude: 28.359806353941554,
+    longitude: -81.41734727346478
+}, {
+    latitude: 28.359919058000852,
+    longitude: -81.41708173477231
+}, ...];
 
-mortgageCalc.append(mortgageCalcInput);</code></pre>
+glMap.setAttribute('key', 'YOUR GOOGLE MAPS API KEY HERE');
+glMap.setAttribute('latitude', 28.359729644303936);
+glMap.setAttribute('longitude', -81.41682021939336);
+glMap.setAttribute('map-style', {...})
+
+markers.forEach((marker) => {
+    const glMarker = document.createElement('gl-marker');
+    glMarker.setAttribute('latitude', marker.latitude);
+    glMarker.setAttribute('longitude', marker.longitude);
+    glMap.appendChild(glMarker);
+});
+
+document.body.append(glMap);
+                            </code></pre>
                         </div>
                     </div>
                 </div>
 
+                <div id="gl-westbay-map" class="component">
+                    <h2 class="component__title">Graphic Language Westbay Demo Map</h2>
+                    <div class="component__content">
+                        <div class="component__options">
+                            <div class="component__option">
+                                <input type="checkbox" id="isWestbayMapAdmin">
+                                <label for="isWestbayMapAdmin">Admin Mode</label>
+                            </div>
+                        </div>
+                        <gl-map
+                            id="westbayMap"
+                            type="google"
+                            key="AIzaSyAmbaZso7PDRM7VM9wFWd6qSnnm6hzRgg4"
+                            latitude="27.808052026945997"
+                            longitude="-82.22663379292536"
+                            map-style="./westbay-map-style.json"
+                            marker-color="#f8971d"
+                        >
+                            <div slot="legend" class="legend-item available" data-for="available">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23" class="available">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Available</div>
+                            </div>
+                            <div slot="legend" class="legend-item pending" data-for="pending">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Pending</div>
+                            </div>
+                            <div slot="legend" class="legend-item model" data-for="model">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Model</div>
+                            </div>
+                            <div slot="legend" class="legend-item sold" data-for="sold">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
+                                    <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
+                                </svg>
+                                <div contenteditable="true">Sold</div>
+                            </div>
+                            <img
+                                src="./hawstone-site-map.webp"
+                                loading="lazy"
+                                decoding="async"
+                                width="0"
+                                height="0"
+                                ne-lat="27.81034270968778"
+                                ne-lng="-82.22156971693039"
+                                sw-lat="27.804328738932103"
+                                sw-lng="-82.23129272460938"
+                            />
+
+
+                            <gl-marker
+                                id="item1"
+                                latitude="28.359547901249183"
+                                longitude="-81.41757660233556"
+                                status="model"
+                                color="#60b3df"
+                                path="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"
+                            >
+                                <article class="lot">
+                                    <div class="lot__image">
+                                        <img
+                                            alt=""
+                                            src="https://picsum.photos/id/237/320/240"
+                                            width="320"
+                                            height="240"
+                                            loading="lazy"
+                                            class="lot__img"
+                                        >
+                                    </div>
+                                    <div class="lot__content">
+                                        <h3>
+                                            <span contenteditable="true">Dog</span>
+                                            <span class="model">Model</span>
+                                        </h3>
+                                        <p>Block 1, Homesite 1</p>
+                                        <p>Lot location, Orlando, FL 32837</p>
+                                        <div class="lot__snapshot">
+                                            <div><strong>3</strong> bds</div>
+                                            <div><strong>2</strong> ba</div>
+                                            <div><strong>1,447</strong> sqft</div>
+                                        </div>
+                                        <a href="#google-map-code" class="lot__cta">Say More</a>
+                                    </div>
+                                </article>
+                            </gl-marker>
+                        </gl-map>
+                    </div>
+                    <div id="gl-westbay-map-code" class="component__scripts">
+                        <div class="component__script-block">
+                            <pre><code class="language-html"></code></pre>
+                        </div>
+                        <div class="component__script-block">
+                            <pre><code class="language-js"></code></pre>
+                        </div>
+                    </div>
+                </div>
 
                 <div id="mortgage-calc" class="component">
                     <h2 class="component__title">Mortgage Calculator</h2>
@@ -132,500 +432,14 @@ document.body.append(mortgageCalc);</code></pre>
                         </div>
                     </div>
                 </div>
-                <div id="google-map" class="component">
-                    <h2 class="component__title">Google Map</h2>
-                    <div class="component__content">
-                        <div class="component__options">
-                            <div class="component__option">
-                                <input type="checkbox" id="isGoogleMapAdmin">
-                                <label for="isGoogleMapAdmin">Admin Mode</label>
-                            </div>
-                            <div class="component__option">
-                                <input type="checkbox" id="hideKmlLayer">
-                                <label for="hideKmlLayer">Hide KML Layer</label>
-                            </div>
-                            <div class="component__option">
-                                <input type="checkbox" id="hideImageLayer">
-                                <label for="hideImageLayer">Hide Image Layer</label>
-                            </div>
-                        </div>
-                        <gl-google-map
-                            id="glGoogleMap"
-                            key="AIzaSyAmbaZso7PDRM7VM9wFWd6qSnnm6hzRgg4"
-                            latitude="28.359729644303936"
-                            longitude="-81.41682021939336"
-                            overlay="https://www.google.com/maps/d/u/0/kml?mid=1mhUHTG8z4u_ynCQjJIll50BqhHmb3EM&nl=1&lid=OOdOIcNvHPY&forcekml=1&cid=mp&cv=byis3_ztGDw.en."
-                            map-style="./map-style.json"
-                        >
-                            <img
-                                src="./map-overlay.png"
-                                latitude-ne="28.36028685400214"
-                                longitude-ne="-81.41617951191711"
-                                latitude-sw="28.359105075827006"
-                                longitude-sw="-81.41777548213959"
-                            >
-                            <gl-google-legend>
-                                <div class="legend-item available">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
-                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
-                                    </svg>
-                                    <div>Available</div>
-                                </div>
-                                <div class="legend-item pending">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
-                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
-                                    </svg>
-                                    <div>Pending</div>
-                                </div>
-                                <div class="legend-item model">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
-                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
-                                    </svg>
-                                    <div>Model</div>
-                                </div>
-                                <div class="legend-item sold">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23">
-                                        <path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z"/>
-                                    </svg>
-                                    <div>Sold</div>
-                                </div>
-                            </gl-google-legend>
-                            <gl-google-marker
-                                id="item1"
-                                latitude="28.359547901249183"
-                                longitude="-81.41757660233556"
-                                status="model"
-                                color="#0089D1"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/237/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Dog</span>
-                                            <span class="model">Model</span>
-                                        </h3>
-                                        <p>Block 1, Homesite 1</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item2"
-                                latitude="28.359806353941554"
-                                longitude="-81.41734727346478"
-                                status="sold"
-                                color="#D72525"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/244/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Pelican</span>
-                                            <span class="sold">Sold</span>
-                                        </h3>
-                                        <p>Block 3, Homesite 3</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item3"
-                                latitude="28.359919058000852"
-                                longitude="-81.41708173477231"
-                                status="pending"
-                                color="#9D7F09"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/433/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Bear</span>
-                                            <span class="pending">Pending</span>
-                                        </h3>
-                                        <p>Block 3, Homesite 3</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item4"
-                                latitude="28.359998127792913"
-                                longitude="-81.41679876172124"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/577/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Elk</span>
-                                        </h3>
-                                        <p>Block 4, Homesite 4</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item5"
-                                latitude="28.360135024607075"
-                                longitude="-81.4163776549059"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/582/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Fox</span>
-                                        </h3>
-                                        <p>Block 5, Homesite 5</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item6"
-                                latitude="28.359860640728538"
-                                longitude="-81.41639240705548"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/584/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Horses</span>
-                                        </h3>
-                                        <p>Block 6, Homesite 6</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item7"
-                                latitude="28.359619300343706"
-                                longitude="-81.41647689663945"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/783/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Monkey</span>
-                                        </h3>
-                                        <p>Block 7, Homesite 7</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item8"
-                                latitude="28.359254633391174"
-                                longitude="-81.41651981198369"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/1084/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Walrus</span>
-                                        </h3>
-                                        <p>Block 8, Homesite 8</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item9"
-                                latitude="28.359336063984454"
-                                longitude="-81.41678803288518"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/1069/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Jellyfish</span>
-                                        </h3>
-                                        <p>Block 9, Homesite 9</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item10"
-                                latitude="28.359340784596633"
-                                longitude="-81.4170428427416"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""1024
-                                            src="https://picsum.photos/id/1024/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Vulture</span>
-                                        </h3>
-                                        <p>Block 10, Homesite 10</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                            <gl-google-marker
-                                id="item11"
-                                latitude="28.35935494643191"
-                                longitude="-81.4172963114935"
-                                status="available"
-                                color="#666"
-                            >
-                                <article class="lot">
-                                    <div class="lot__image">
-                                        <img
-                                            alt=""
-                                            src="https://picsum.photos/id/937/320/240"
-                                            width="320"
-                                            height="240"
-                                            loading="lazy"
-                                            class="lot__img"
-                                        >
-                                    </div>
-                                    <div class="lot__content">
-                                        <h3>
-                                            <span contenteditable="true">Goat</span>
-                                        </h3>
-                                        <p>Block 11, Homesite 11</p>
-                                        <p>Lot location, Orlando, FL 32837</p>
-                                        <div class="lot__snapshot">
-                                            <div><strong>3</strong> bds</div>
-                                            <div><strong>2</strong> ba</div>
-                                            <div><strong>1,447</strong> sqft</div>
-                                        </div>
-                                        <a href="#google-map-code" class="lot__cta">Say More</a>
-                                    </div>
-                                </article>
-                            </gl-google-marker>
-                        </gl-google-map>
-                    </div>
-                    <div id="google-map-code" class="component__scripts">
-                        <div class="component__script-block">
-                            <pre><code class="language-html">&lt;gl-google-map
-    key="[YOUR API KEY HERE]"
-    latitude="28.359729644303936"
-    longitude="-81.41682021939336"
-    overlay="[URL to KML file]"
-    map-style="[URL to JSON file]"
-&gt;
-    &lt;img
-        src="[YOUR IMAGE OVERLAY PATH HERE].png"
-        latitude-ne="28.360291574572035"
-        longitude-ne="-81.41619024075317"
-        latitude-sw="28.359123958315564"
-        longitude-sw="-81.41778084655762"
-    &gt;
-    &lt;!-- @todo Add pixel coord support. Map is coord system with 0,0 in center --&gt;
-    &lt;gl-google-marker latitude="28.359547901249183" longitude="-81.41757660233556"&gt;
-        &lt;div&gt;Info Window Content&lt;/div&gt;
-    &lt;/gl-google-marker&gt;
-    &lt;gl-google-marker
-        latitude="28.359806353941554"
-        longitude="-81.41734727346478"
-    &gt;&lt;/gl-google-marker&gt;
-    &lt;gl-google-marker
-        latitude="28.359919058000852"
-        longitude="-81.41708173477231"
-    &gt;&lt;/gl-google-marker&gt;
-    ...
-&lt;/gl-google-map&gt;</code></pre>
-                        </div>
-                        <div class="component__script-block">
-                            <pre><code class="language-js">const glMap = document.createElement('gl-google-map');
-const markers = [{
-    latitude: 28.359547901249183,
-    longitude: -81.41757660233556
-}, {
-    latitude: 28.359806353941554,
-    longitude: -81.41734727346478
-}, {
-    latitude: 28.359919058000852,
-    longitude: -81.41708173477231
-}, ...];
 
-glMap.setAttribute('key', 'YOUR GOOGLE MAPS API KEY HERE');
-glMap.setAttribute('latitude', 28.359729644303936);
-glMap.setAttribute('longitude', -81.41682021939336);
-glMap.setAttribute('map-style', {...})
-
-markers.foreach((marker) => {
-    const glMarker = document.createElement('gl-google-marker');
-    glMarker.setAttribute('latitude', marker.latitude);
-    glMarker.setAttribute('longitude', marker.longitude);
-    glMap.appendChild(glMarker);
-});
-
-document.body.append(glMap);
-                            </code></pre>
-                        </div>
-                    </div>
-                </div>
                 <footer class="footer">
                     &copy; <script>document.write(new Date().getFullYear())</script> <a href="https://graphiclanguage.net/">Graphic Language, Inc.</a> All rights reserved.
                 </footer>
             </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.26.0/prism.min.js" integrity="sha512-pSVqGtpGygQlhN8ZTHXx1kqkjQr30eM+S6OoSzhHGTjh6DKdfy7WZlo1DNO9bhtM0Imf6xNLznZ7iVC2YUMwJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script type="module" src="components/web-components.js"></script>
+        <script type="module" src="components/gl-web-components.js"></script>
         <script type="module" src="main.js"></script>
     </body>
 </html>

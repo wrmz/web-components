@@ -23,11 +23,12 @@
     :host .mortgage-calc__form {
         grid-template-columns: 50% 50%;
     }
+    radio-group {
+        grid-column: 1 / span 2;
+    }
+
 }
 
-radio-group {
-    grid-column: 1 / span 2;
-}
 
 :host .mortgage-calc__radio {
     position: relative;

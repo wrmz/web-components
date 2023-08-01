@@ -1,5 +1,5 @@
 {
-    "name": "@wrmz/web-components",
+    "name": "gl-web-components",
     "version": "1.0.0",
     "description": "A set of web components for Graphic Language, Inc.",
     "private": true,
@@ -7,15 +7,15 @@
     "sideEffects": false,
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/wrmz/web-components.git"
+        "url": "https://bitbucket.org/graphiclanguage/gl-web-components.git"
     },
-    "main": "dist/web-components.js",
+    "main": "dist/gl-web-components.js",
+    "module": "dist/esm/gl-web-components.js",
     "files": [
         "dist/*.js",
         "dist/**/*.js"
     ],
     "type": "module",
-    "module": "dist/esm/web-components.js",
     "scripts": {
         "dev": "npm run development",
         "development": "concurrently -k \"node server.js docs\" \"cross-env NODE_ENV=local rollup -c -w\"",
@@ -28,6 +28,7 @@
         "lint": "eslint src/**/*.js && stylelint src/**/*.css && html-validate src/**/*.html"
     },
     "devDependencies": {
+        "@rollup/plugin-terser": "^0.4.0",
         "axe-core": "^4.3.5",
         "clean-css": "^5.2.2",
         "concurrently": "^6.3.0",
@@ -40,9 +41,7 @@
         "puppeteer": "^19.5.2",
         "puppeteer-to-istanbul": "^1.4.0",
         "rollup": "^2.58.3",
-        "rollup-plugin-terser": "^7.0.2",
         "stylelint": "^14.0.1",
         "stylelint-config-standard": "^23.0.0"
-    },
-    "dependencies": {}
+    }
 }

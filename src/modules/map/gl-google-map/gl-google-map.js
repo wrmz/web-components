@@ -1,288 +1,205 @@
 /*global google*/
-import { registerComponents } from '../../common/register-components.js';
-import { GlGoogleMarker } from '../gl-google-marker/gl-google-marker.js';
+import { GlMap } from '../gl-map/gl-map.js';
 import GlGoogleImageFactory from './gl-google-image.factory.js';
 
 /**
  * @injectHTML
  */
-export class GlGoogleMap extends HTMLElement {
-    static get observedAttributes() {
-        return [
-            'key',
-            'latitude',
-            'longitude',
-            'overlay',
-            'map-style',
-            'admin',
-            'hide-kml',
-            'hide-image',
-        ];
-    }
-
+export class GlGoogleMap {
     static async getStyle(url) {
-        const repsonse = await fetch(url);
-        const json = await repsonse.json();
+        if (!url) return null;
+
+        const response = await fetch(url);
+        const json = await response.json();
 
         return json;
     }
 
-    constructor() {
-        super();
+    #id = '';
+    #previousMode;
+    #previousState;
+    #currentMode = GlMap.MODES.DEFAULT;
+    #currentState = GlMap.STATES.LOADING;
+    #map;
+    #mapElem;
+    #tileMap;
+    #legendElem;
+    #imageElem;
+    #detailElem;
+    #glMarkers = [];
+    #markers = [];
+    #subscribers = [];
+    #activeMarker;
 
-        registerComponents(GlGoogleMarker);
+    // Map layers
+    #styleLayer;
+    #imageLayer;
 
-        this.key = '';
-        this._id = crypto.randomUUID ? crypto.randomUUID().split('-').pop() : Math.round(Math.random() * 9999);
-        this._imageElem = this.querySelector('img');
-        this._legendElem = this.querySelector('gl-google-legend');
-        this._markerElems = [...this.querySelectorAll('gl-google-marker')];
-        this._markerPath = 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z';
-        this._markers = [];
-        this._adminMarkers = [];
-        this.apiLoadedCBName = `gl_cb_${this._id}`;
-        this.loadDetailTimeout = undefined;
-        this.map = undefined;
-        this.styleLayer = undefined;
-        this.imageLayer = undefined;
-        this.legendToggleElem = undefined;
-        this.rotateButtonElem = undefined;
+    constructor(id, mapElem, {
+        latitude,
+        longitude,
+        mapStyle = null,
+        mapTiles = null,
+        legendElem = null,
+        imageElem = null,
+        markerElems = [],
+        detailElem = null
+    }) {
+        this.#id = id;
+        this.#mapElem = mapElem;
+        this.#legendElem = legendElem;
+        this.#imageElem = imageElem;
+        this.#detailElem = detailElem;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.mapStyle = mapStyle;
+        this.mapTiles = mapTiles;
+        this.tileMap = null;
+        this.loadDetailTimeout = null;
         this.imageNE = 0.0;
         this.imageNW = 0.0;
         this.imageSW = 0.0;
         this.imageSE = 0.0;
-        this.kmlLayer = undefined;
-        this.elem = this.shadowRoot.querySelector('.gl-map');
-        this.mapElem = this.shadowRoot.querySelector('.gl-map__map');
-        this.detailElem = null;
+        this.mapControls = {
+            recenter: null,
+            resize: null,
+            drag: null,
+            addMarker: null,
+            removeMarker: null,
+        };
 
-        this.elem.setAttribute('id', `map_${this._id}`);
+        this.loadTimeout = null;
 
         this.emitMarkerEvent = this.emitMarkerEvent.bind(this);
-        this.generateLegend = this.generateLegend.bind(this);
-        this.generateAdminMarker = this.generateAdminMarker.bind(this);
-        this.generateMarker = this.generateMarker.bind(this);
-        this.loadDetail = this.loadDetail.bind(this);
-        this.showDetail = this.showDetail.bind(this);
-        this.toggleLegend = this.toggleLegend.bind(this);
+        this.createMarker = this.createMarker.bind(this);
         this.recenterMap = this.recenterMap.bind(this);
-        this.handleRotateButtonClick = this.handleRotateButtonClick.bind(this);
+        this.restrictPanning = this.restrictPanning.bind(this);
+        this.toggleResizeState = this.toggleResizeState.bind(this);
+        this.toggleDragState = this.toggleDragState.bind(this);
+        this.toggleAddMarkerState = this.toggleAddMarkerState.bind(this);
+        this.toggleRemoveMarkerState = this.toggleRemoveMarkerState.bind(this);
+        this.getNormlizedTileCoord = this.getNormlizedTileCoord.bind(this);
+        this.onLoaded = this.onLoaded.bind(this);
+        this.onAddMarkerClick = this.onAddMarkerClick.bind(this);
 
-    }
+        if (this.mapTiles) {
+            this.map = new google.maps.Map(this.#mapElem, {
+                center: { lat: 0, lng: 0 },
+                mapTypeControl: false,
+                scaleControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.TOP_LEFT
+                },
+                zoom: 1,
+                // @todo - I do not know why these defaults work.
+                restriction: {
+                    latLngBounds: {
+                        north: 88.999,
+                        south: -88.999,
+                        west: -179.999,
+                        east: 179.999,
+                    },
+                    strictBounds: false,
+                }
+            });
 
-    get isAdmin() {
-        return this.getAttribute('admin') === 'true';
-    }
+            this.tileMap = new google.maps.ImageMapType({
+                getTileUrl: this.getNormlizedTileCoord,
+                tileSize: new google.maps.Size(256, 256),
+                maxZoom: 3,
+                minZoom: 2,
+                name: `tileMap${this.#id}`
+            });
 
-    set isAdmin(val) {
-        this.setAttribute('admin', val);
-    }
-
-    get isKmlVisible() {
-        return this.getAttribute('hide-kml') !== 'true';
-    }
-
-    get isImageVisible() {
-        return this.getAttribute('hide-image') !== 'true';
-    }
-
-    get latitude() {
-        const latitude = parseFloat(this.hasAttribute('latitude') ? this.getAttribute('latitude') : '0');
-        return  isNaN(latitude) ? 0 : latitude;
-    }
-
-    get longitude() {
-        const longitude = parseFloat(this.hasAttribute('longitude') ? this.getAttribute('longitude') : '0');
-        return  isNaN(longitude) ? 0 : longitude;
-    }
-
-    get overlay() {
-        return this.getAttribute('overlay');
-    }
-
-    get mapStyle() {
-        return this.getAttribute('map-style');
-    }
-
-    get markerElems() {
-        return [...this._markerElems];
-    }
-
-    get imageElemPosition() {
-        const neLatitude = parseFloat(this._imageElem.getAttribute('latitude-ne'));
-        const neLongitude = parseFloat(this._imageElem.getAttribute('longitude-ne'));
-        const swLatitude = parseFloat(this._imageElem.getAttribute('latitude-sw'));
-        const swLongitude = parseFloat(this._imageElem.getAttribute('longitude-sw'));
-
-        return {
-            neLatitude: isNaN(neLatitude) ? 0.00 : neLatitude,
-            neLongitude: isNaN(neLongitude) ? 0.00 : neLongitude,
-            swLatitude: isNaN(swLatitude) ? 0.00 : swLatitude,
-            swLongitude: isNaN(swLongitude) ? 0.00 : swLongitude
-        };
-    }
-
-    set imageElemPosition(val) {
-        this._imageElem.setAttribute('latitude-ne', val.neLatitude);
-        this._imageElem.setAttribute('longitude-ne', val.neLongitude);
-        this._imageElem.setAttribute('latitude-sw', val.swLatitude);
-        this._imageElem.setAttribute('longitude-sw', val.swLongitude);
-
-        if (google && google.maps && this.imageLayer) {
-            const bounds = new google.maps.LatLngBounds(
-                new google.maps.LatLng(val.neLatitude, val.neLongitude),
-                new google.maps.LatLng(val.swLatitude, val.swLongitude)
-            );
-            this.imageLayer.draw(bounds);
-        }
-    }
-
-    get adminMarkers() {
-        return this._adminMarkers;
-    }
-
-    set adminMarkers(arr) {
-        this._adminMarkers = Array.isArray(arr) ? arr.map(this.generateAdminMarker) : [];
-    }
-
-    get markers() {
-        return this._markers;
-    }
-
-    set markers(markers) {
-        if (this.map && google && google.maps) {
-            this._markers = [
-                ...this.adminMarkers,
-                ...markers.map(this.generateMarker)
-            ];
+            this.map.mapTypes.set(`tileMap${this.#id}`, this.tileMap);
+            this.map.setMapTypeId(`tileMap${this.#id}`);
         } else {
-            this._markers = [...this.adminMarkers];
-        }
-    }
-
-    /**
-     * @todo This should be an async function.
-     * Need a way to know when everything has been loaded and
-     * drawn before actually displaying the map.
-     */
-    handleApiLoaded() {
-        this.map = new google.maps.Map(this.mapElem, {
-            center: { lat: this.latitude, lng: this.longitude },
-            mapTypeControl: true,
-            scaleControl: false,
-            streetViewControl: false,
-            fullscreenControl: false,
-            zoomControlOptions: {
-                position: google.maps.ControlPosition.TOP_LEFT
-            },
-            zoom: 8
-        });
-
-
-        this.setMapStyle();
-        this.generateCenterMapControl();
-        this.generateMapRotateControl();
-
-        if (this._legendElem) {
-            this.generateLegend();
+            this.map = new google.maps.Map(this.#mapElem, {
+                center: { lat: this.latitude, lng: this.longitude },
+                mapTypeControl: false,
+                scaleControl: false,
+                streetViewControl: false,
+                fullscreenControl: false,
+                zoomControlOptions: {
+                    position: google.maps.ControlPosition.TOP_LEFT
+                },
+                zoom: 17,
+                maxZoom: 19,
+                minZoom: 10,
+            });
+            this.setMapStyle();
         }
 
-        // Must create an OverlayView derivitive either way for access
-        // to LatLng to pixel methods
-        if (this._imageElem) {
-            this.placeImages();
-        } else {
-            this.imageLayer = GlGoogleImageFactory.create(this.map);
-        }
+        this.map.addListener('dragend', this.restrictPanning);
+        this.markers = markerElems;
 
-        this.generateKml();
-        this.markers = this.markerElems;
+        this.loadImage();
+        this.createLegendControl();
+        this.createCenterMapControl();
+        this.createResizeMapControl();
+        this.createDragMapControl();
+        this.createAddMarkerControl();
+        this.createRemoveMarkerControl();
+        this.loadTimeout = setTimeout(this.onLoaded, 1000);
     }
 
     async setMapStyle() {
         const mapStyle = await GlGoogleMap.getStyle(this.mapStyle);
 
         if (mapStyle) {
-            this.styleLayer = new google.maps.StyledMapType(mapStyle, { name: `Map${this._id}` });
-            this.map.mapTypes.set(`map_${this._id}`, this.styleLayer);
-            this.map.setMapTypeId(`map_${this._id}`);
+            this.styleLayer = new google.maps.StyledMapType(mapStyle, { name: `Map${this.#id}` });
+            this.map.mapTypes.set(`map_${this.#id}`, this.styleLayer);
+            this.map.setMapTypeId(`map_${this.#id}`);
         }
     }
 
-    placeImages() {
-        const imageUrl = this._imageElem.getAttribute('src');
-        const neLatitude = this.imageElemPosition.neLatitude;
-        const neLongitude = this.imageElemPosition.neLongitude;
-        const swLatitude = this.imageElemPosition.swLatitude;
-        const swLongitude = this.imageElemPosition.swLongitude;
-        const bounds = new google.maps.LatLngBounds(
-            new google.maps.LatLng(neLatitude, neLongitude),
-            new google.maps.LatLng(swLatitude, swLongitude)
-        );
-
-        if (!imageUrl) {
-            return;
-        }
-
-        this.imageLayer = GlGoogleImageFactory.create(this.map, bounds, this._imageElem);
-
-        if (this.adminMarkers.length !== 2) {
-            this.adminMarkers = [
-                { label: 'ne', latitude: neLatitude, longitude: neLongitude },
-                { label: 'sw', latitude: swLatitude, longitude: swLongitude },
-            ];
+    loadImage() {
+        if (!this.#imageElem || (this.#imageElem && !this.#imageElem.hasAttribute('src'))) {
+            this.#imageLayer = GlGoogleImageFactory.create(this);
+        } else {
+            const imageUrl = this.#imageElem.getAttribute('src');
+            this.#imageLayer = GlGoogleImageFactory.create(this, this.#imageElem);
         }
     }
 
     /**
-     * Generates a KML layer on the map
+     * Normlizes tile coordinates for a tiled map image so that
+     * tiles repeat across the x axis (horizontally)
+     * @param {*} coord
+     * @param {*} zoom
      */
-    generateKml() {
-        this.kmlLayer = new google.maps.KmlLayer({
-            url: this.overlay,
-            map: this.map,
-            suppressInfoWindows: true,
-        });
-    }
+    getNormlizedTileCoord(coord, zoom) {
+        // Tile range in one direction range is dependent on zoom level
+        // 0 = 1 tile, 1 = 2 tiles, 2 = 4 tiles, 3 = 8 times, etc
+        const tileRange = 1 << zoom;
+        const bound = Math.pow(2, zoom);
+        const y = coord.y;
+        let x = coord.x;
 
-    /**
-     * Generates an admin marker
-     *
-     * @param {Object} marker
-     * @returns {google.maps.Marker}
-     */
-    generateAdminMarker(marker) {
-        const adminMarker = new google.maps.Marker({
-            map: this.map,
-            type: 'admin',
-            position: { lat: marker.latitude, lng: marker.longitude },
-            icon: {
-                path: 'M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10Z',
-                scale: 1,
-                fillColor: 'white',
-                strokeColor: 'white',
-                fillOpacity: 0.8,
-                strokeWeight: 2,
-                anchor: new google.maps.Point(10, 10)
-            },
-            visible: this.isAdmin,
-            draggable: this.isAdmin
-        });
+        // Don't repeat acros y-axis (vertically)
+        if (y < 0 || y >= tileRange) {
+            return '';
+        }
+        // Repeat across x-axis
+        if (x < 0 || x >= tileRange) {
+            x = ((x % tileRange) + tileRange) % tileRange;
+        }
 
-        adminMarker.addListener('dragend', this.handleMarkerDragend.bind(this, marker, adminMarker));
-        adminMarker.addListener('dragstart', this.handleMarkerDragstart.bind(this, marker, adminMarker));
-        adminMarker.addListener('drag', this.handleMarkerDrag.bind(this, marker, adminMarker));
-
-        return adminMarker;
+        return this.mapTiles
+            .replace('{x}', x)
+            .replace('{y}', y)
+            .replace('{z}', zoom);
     }
 
     /**
      * Generates a marker
      *
-     * @param {Object} marker
+     * @param {GlMarker} marker
      * @returns {google.maps.Marker}
      */
-    generateMarker(marker) {
+    createMarker(marker) {
         const mapMarker = new google.maps.Marker({
             map: this.map,
             id: marker.id,
@@ -291,22 +208,24 @@ export class GlGoogleMap extends HTMLElement {
             color: marker.color,
             isSelected: false,
             position: { lat: marker.latitude, lng: marker.longitude },
+            path: marker.path,
             icon: {
-                path: this._markerPath,
+                path: marker.path,
                 fillColor: marker.color,
                 fillOpacity: 1,
                 strokeWeight: 0,
+                strokeColor: '#ffffff',
                 anchor: new google.maps.Point(10, 22)
             },
             animation: google.maps.Animation.DROP,
-            draggable: this.isAdmin,
+            draggable: this.mode === 'admin',
         });
 
-        mapMarker.addListener('mouseover', this.handleMarkerMouseover.bind(this, marker, mapMarker));
-        mapMarker.addListener('mouseout', this.handleMarkerMouseout.bind(this, marker, mapMarker));
-        mapMarker.addListener('dragend', this.handleMarkerDragend.bind(this, marker, mapMarker));
-        mapMarker.addListener('click', this.handleMarkerClick.bind(this, marker, mapMarker));
-
+        marker.mapMarker = mapMarker;
+        mapMarker.addListener('mouseover', this.onMarkerMouseover.bind(this, marker, mapMarker));
+        mapMarker.addListener('mouseout', this.onMarkerMouseout.bind(this, marker, mapMarker));
+        mapMarker.addListener('dragend', this.onMarkerDragend.bind(this, marker, mapMarker));
+        mapMarker.addListener('click', this.onMarkerClick.bind(this, marker, mapMarker));
         return mapMarker;
     }
 
@@ -315,7 +234,7 @@ export class GlGoogleMap extends HTMLElement {
      *
      * @this GlGoogleMap
      * @param {string} eventType
-     * @param {GlGoogleMarker} glMarker
+     * @param {GlMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.event} event
      * @emits CustomEvent
@@ -339,7 +258,7 @@ export class GlGoogleMap extends HTMLElement {
     }
 
     /**
-     * Handles & dispatches from GlGoogleMap a marker click event
+     * ons & dispatches from GlGoogleMap a marker click event
      *
      * @this GlGoogleMap
      * @param {GlGoogleMap} glMarker
@@ -347,101 +266,73 @@ export class GlGoogleMap extends HTMLElement {
      * @param {google.maps.event} event
      * @emits GlGoogleMap#click
      */
-    handleMarkerClick(glMarker, marker, event) {
+    onMarkerClick(glMarker, marker, event) {
         this.markers.forEach((m) => {
-            if (m.type !== 'admin') {
-                if (m.id === marker.id) {
-                    m.isSelected = true;
-                    m.setIcon({
-                        path: this._markerPath,
-                        fillColor: 'white',
-                        fillOpacity: 1,
-                        strokeWeight: 0,
-                        anchor: new google.maps.Point(10, 22)
-                    });
-                } else {
-                    m.isSelected = false;
-                    m.setIcon({
-                        path: this._markerPath,
-                        fillColor: m.color,
-                        fillOpacity: 1,
-                        strokeWeight: 0,
-                        anchor: new google.maps.Point(10, 22)
-                    });
-                }
-            }
+            const isSelected = m.id === marker.id;
+            m.setIcon({
+                path: glMarker.path,
+                fillColor: isSelected ? 'white' : m.color ,
+                fillOpacity: 1,
+                strokeWeight: 0,
+                anchor: new google.maps.Point(10, 22),
+            });
         });
 
-        this.loadDetail(marker);
         this.panToSelectedMarker(marker);
-        this.emitMarkerEvent('click', glMarker, marker, event);
+        this.notifySubscribers('marker-click', { glMarker, event });
     }
 
     /**
-     * Handles & dispatches from GlGoogleMap a marker drag event
+     * ons & dispatches from GlGoogleMap a marker drag event
      *
      * @this GlGoogleMap
-     * @param {GlGoogleMarker} glMarker
-     * @param {google.maps.Marker} marker
+     * @param {GlMarker} glMarker
      * @param {google.maps.Event} event
      * @emits GlGoogleMap#drag
      */
-    handleMarkerDrag(glMarker, marker, event) {
-        if (marker.type === 'admin') {
-            const label = glMarker.label;
-            const lat = event.latLng.lat();
-            const lng = event.latLng.lng();
-
-            this.imageElemPosition = {
-                neLatitude: (label === 'nw' || label === 'ne') ? lat : this.imageElemPosition.neLatitude,
-                neLongitude: (label === 'nw' || label === 'ne') ? lng : this.imageElemPosition.neLongitude,
-                swLatitude: (label === 'sw' || label == 'se') ? lat : this.imageElemPosition.swLatitude,
-                swLongitude: (label === 'sw' || label == 'se') ? lng : this.imageElemPosition.swLongitude,
-            };
-        }
-
-        this.emitMarkerEvent('drag', glMarker, marker, event);
+    onMarkerDrag(glMarker, event) {
+        this.notifySubscribers('marker-drag', { glMarker, event });
     }
 
     /**
-     * Handles & dispatches from GlGoogleMap a marker dragend event
+     * ons & dispatches from GlGoogleMap a marker dragend event
      *
      * @this GlGoogleMap
-     * @param {GlGoogleMarker} glMarker
+     * @param {GlMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.Event} event
      * @emits GlGoogleMap#dragend
      */
-    handleMarkerDragend(glMarker, marker, event) {
-        this.emitMarkerEvent('dragend', glMarker, marker, event);
+    onMarkerDragend(glMarker, marker, event) {
+        this.notifySubscribers('marker-dragend', { glMarker, event });
     }
 
     /**
-     * Handles & dispatches from GlGoogleMap a marker dragstart event
+     * ons & dispatches from GlGoogleMap a marker dragstart event
      *
      * @this GlGoogleMap
-     * @param {GlGoogleMarker} glMarker
+     * @param {GlMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.Event} event
      * @emits GlGoogleMap#dragstart
      */
-    handleMarkerDragstart(glMarker, marker, event) {
-        this.emitMarkerEvent('dragstart', glMarker, marker, event);
+    onMarkerDragstart(glMarker, marker, event) {
+        this.notifySubscribers('marker-dragstart', { glMarker, event });
     }
 
     /**
-     * Handles & dispatches from GlGoogleMap a marker mouseover event
+     * ons & dispatches from GlGoogleMap a marker mouseover event
      *
      * @this GlGoogleMap
-     * @param {GlGoogleMarker} glMarker
+     * @param {GlMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.event} event
      * @emits GlGoogleMap#mouseover
      */
-    handleMarkerMouseover(glMarker, marker, event) {
+    onMarkerMouseover(glMarker, marker, event) {
         if (!marker.isSelected) {
             marker.setIcon({
-                path: this._markerPath,
+                path: glMarker.path,
                 fillColor: 'white',
                 fillOpacity: 1,
                 strokeWeight: 0,
@@ -449,22 +340,22 @@ export class GlGoogleMap extends HTMLElement {
             });
         }
 
-        this.emitMarkerEvent('mouseover', glMarker, marker, event);
+        this.notifySubscribers('marker-mouseover', { glMarker, event });
     }
 
     /**
-     * Handles & dispatches from GlGoogleMap a marker mouseout event
+     * ons & dispatches from GlGoogleMap a marker mouseout event
      *
      * @this GlGoogleMap
-     * @param {GlGoogleMarker} glMarker
+     * @param {GlMarker} glMarker
      * @param {google.maps.Marker} marker
      * @param {google.maps.event} event
      * @emits GlGoogleMap#mouseout
      */
-    handleMarkerMouseout(glMarker, marker, event) {
+    onMarkerMouseout(glMarker, marker, event) {
         if (!marker.isSelected) {
             marker.setIcon({
-                path: this._markerPath,
+                path: glMarker.path,
                 fillColor: marker.color,
                 fillOpacity: 1,
                 strokeWeight: 0,
@@ -472,171 +363,135 @@ export class GlGoogleMap extends HTMLElement {
             });
         }
 
-        this.emitMarkerEvent('mouseout', glMarker, marker, event);
+        this.notifySubscribers('marker-mouseout', { glMarker, event });
     }
 
-    handleRotateButtonClick() {
-        const currentRotation = this.imageLayer.getRotate();
-        this.imageLayer.setRotate(currentRotation + 15);
+    onLoaded() {
+        clearTimeout(this.loadTimeout);
+        this.loadTimeout = null;
+        this.state = GlMap.STATES.DEFAULT;
     }
 
     /**
-     * Recenters the map
+     * Creates a button that fires a click event ond by `this.recenterMap`.
      */
+    createCenterMapControl() {
+        const recenterButton = document.createElement('button');
+        recenterButton.type = 'button';
+        recenterButton.title = 'Reorient the map to the Image position.';
+        recenterButton.className = 'gl-map__button gl-map__recenter';
+        recenterButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10s-4.47715 10-10 10S0 15.52285 0 10 4.47715 0 10 0ZM3.72462 10.63068h-2.4409c.30834 4.32356 3.76204 7.77726 8.0856 8.0856v-2.4409c-2.97945-.29584-5.34886-2.66525-5.6447-5.6447Zm14.99251-.01202-.04376.00775-.07354.00424-2.32445.00007c-.29584 2.97941-2.66525 5.34882-5.6447 5.64466v2.4409c4.32757-.30863 7.78366-3.76844 8.08645-8.09762Zm-8.08627-4.35022-.0002.89139c0 .3483-.28236.63065-.63066.63065-.32342 0-.58998-.24346-.62641-.5571l-.00424-.07355-.00021-.8914c-1.58435.2659-2.8348 1.51636-3.1007 3.1007l1.1959.00022c.3483 0 .63065.28235.63065.63065 0 .32342-.24345.58998-.5571.62641l-.07355.00424-1.1959.00021c.2659 1.58435 1.51635 2.8348 3.1007 3.1007l.0002-1.21748c0-.3483.28236-.63065.63066-.63065.32342 0 .58998.24346.62641.5571l.00424.07355.00021 1.21748c1.58435-.2659 2.8348-1.51635 3.1007-3.1007l-1.38427-.0002c-.3483 0-.63065-.28236-.63065-.63066 0-.32342.24346-.58998.5571-.62641l.07355-.00424 1.38427-.00021c-.2659-1.58435-1.51635-2.8348-3.1007-3.1007Zm-.00018-4.98472v2.4409c2.97945.29584 5.34886 2.66525 5.6447 5.64466l2.32445.00007a.6341.6341 0 0 1 .11726.01088c-.30275-4.32807-3.75884-7.78788-8.0864-8.09651Zm-9.34696 8.0856h2.4409c.29584-2.97945 2.66525-5.34886 5.6447-5.6447v-2.4409c-4.32356.30834-7.77726 3.76204-8.0856 8.0856Z"/></svg>';
+        this.mapControls.recenter = recenterButton;
+        this.mapControls.recenter.addEventListener('click', this.recenterMap, false);
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(this.mapControls.recenter);
+    }
+
+    createResizeMapControl() {
+        const resizeButton = document.createElement('button');
+        resizeButton.type = 'button';
+        resizeButton.title = 'Resize the Image.';
+        resizeButton.className = 'gl-map__button gl-map__resize';
+        resizeButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21"><path fill="currentColor" fill-rule="nonzero" d="m19.831.574.051.061.064.111.018.046.02.065.01.051.006.093v16a.625.625 0 0 1-1.243.092l-.007-.092V2.508l-3.756 3.758.006.11v13a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1h13l.109.006 3.757-3.756H3.375A.625.625 0 0 1 3.283.383l.092-.007h16c.04 0 .079.003.117.01l.06.015.067.024.063.031.068.045.081.073ZM12.5 7.875h-10v10h10v-10Z"/></svg>';
+        this.mapControls.resize = resizeButton;
+        this.mapControls.resize.style.display = 'none';
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(this.mapControls.resize);
+    }
+
+    createDragMapControl() {
+        const dragButton = document.createElement('button');
+        dragButton.type = 'button';
+        dragButton.title = 'Drag the Image.';
+        dragButton.className = 'gl-map__button gl-map__drag';
+        dragButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 21 21"><path fill="currentColor" fill-rule="nonzero" d="m10.346.875.09.01.078.019.058.021.046.022a.624.624 0 0 1 .15.11l2.17 2.172a.625.625 0 0 1-.813.944l-.07-.06-1.104-1.105v7.242h7.24l-1.103-1.104a.625.625 0 0 1 .814-.944l.07.06 2.171 2.171.064.075.059.099.037.1.02.101.003.088-.01.09-.019.077-.021.058-.022.046a.624.624 0 0 1-.11.15l-2.172 2.17a.625.625 0 0 1-.944-.813l.06-.07 1.104-1.104H10.95v7.241l1.105-1.103a.625.625 0 0 1 .944.813l-.06.07-2.171 2.171-.075.064-.099.06-.1.037-.101.019-.088.003-.09-.01-.077-.018-.058-.022-.046-.022a.624.624 0 0 1-.15-.11l-2.17-2.171a.625.625 0 0 1 .813-.945l.07.06 1.104 1.104V11.5H2.46l1.103 1.104a.625.625 0 0 1-.813.944l-.07-.06-2.171-2.171-.064-.075-.06-.099-.037-.1-.019-.101-.003-.088.01-.09.018-.077.022-.058.022-.046a.624.624 0 0 1 .11-.15l2.171-2.17a.625.625 0 0 1 .945.813l-.06.07-1.105 1.104H9.7V3.008L8.598 4.112a.625.625 0 0 1-.944-.813l.06-.07 2.17-2.171.075-.064.1-.059.1-.038.101-.019.087-.003Z"/></svg>';
+        this.mapControls.drag = dragButton;
+        this.mapControls.drag.style.display = 'none';
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(this.mapControls.drag);
+    }
+
+    createAddMarkerControl() {
+        const addMarkerButton = document.createElement('button');
+        addMarkerButton.type = 'button';
+        addMarkerButton.title = 'Add a new marker.';
+        addMarkerButton.className = 'gl-map__button gl-map__add-marker';
+        addMarkerButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="23" viewBox="0 0 20 23"><path fill="currentColor" fill-rule="nonzero" d="M10 .374c5.523 0 10 4.477 10 10 0 7.508-5.6 12.49-10 12.49S0 18.155 0 10.374c0-5.523 4.477-10 10-10Zm0 3.475A6.526 6.526 0 1 0 10 16.9 6.526 6.526 0 0 0 10 3.85Zm0 2.562c.314 0 .574.23.618.532l.007.093-.001 2.624h2.626a.625.625 0 0 1 .092 1.244l-.092.007-2.626-.001.001 2.626a.625.625 0 0 1-1.243.092l-.007-.092-.001-2.626H6.75a.625.625 0 0 1-.092-1.243l.092-.006 2.624-.001.001-2.624c0-.346.28-.625.625-.625Z"/></svg>';
+        this.mapControls.addMarker = addMarkerButton;
+        this.mapControls.addMarker.style.display = 'none';
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(this.mapControls.addMarker);
+    }
+
+    createRemoveMarkerControl() {
+        const removeMarkerButton = document.createElement('button');
+        removeMarkerButton.type = 'button';
+        removeMarkerButton.title = 'Add a new marker.';
+        removeMarkerButton.className = 'gl-map__button gl-map__remove-marker';
+        removeMarkerButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 20 24"><path fill="currentColor" fill-rule="nonzero" d="M10 .677c5.523 0 10 4.477 10 10 0 7.508-5.6 12.49-10 12.49s-10-4.71-10-12.49c0-5.523 4.477-10 10-10Zm0 3.474a6.526 6.526 0 1 0 0 13.051 6.526 6.526 0 0 0 0-13.051Zm3.25 5.812a.625.625 0 0 1 .092 1.243l-.092.007h-6.5a.625.625 0 0 1-.092-1.243l.092-.007h6.5Z"/></svg>';
+        this.mapControls.removeMarker = removeMarkerButton;
+        this.mapControls.removeMarker.style.display = 'none';
+        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(this.mapControls.removeMarker);
+    }
+
+    createLegendControl() {
+        this.mapControls.legend = this.#legendElem;
+        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this.mapControls.legend);
+    }
+
     recenterMap() {
-        const imageBounds = this.imageLayer.getBounds();
-        const bounds = new google.maps.LatLngBounds();
-
-        bounds.extend(imageBounds.getNorthEast());
-        bounds.extend(imageBounds.getSouthWest());
-        this.map.fitBounds(bounds);
-    }
-
-    /**
-     * Toggles the legend visibility via CSS by changing the
-     * `aria-expanded` attribute value
-     */
-    toggleLegend() {
-        if (this.legendToggleElem.getAttribute('aria-expanded') === 'true') {
-            this.legendToggleElem.setAttribute('aria-expanded', false);
-        } else {
-            this.legendToggleElem.setAttribute('aria-expanded', true);
+        console.log('recentering');
+        if (this.#imageLayer) {
+            this.#imageLayer.recenterMap();
         }
     }
 
-    /**
-     * Generates the legend container elements for a supplied
-     * GlGoogleLegend element
-     *
-     * @todo This should be its own imported custom element
-     */
-    generateLegend() {
-        const legendElem = document.createElement('div');
-        const legendToggleElem = document.createElement('button');
-        const legendDrawerElem = document.createElement('div');
-        const legendContentElem = document.createElement('div');
-        const legendContentElems = [...this._legendElem.childNodes];
+    restrictPanning() {
+        console.log('restricting');
+        const imageBounds = this.#imageLayer.bounds;
+        const mapBounds = this.map.getBounds();
+        const newMapCenter = this.map.getCenter();
 
-        legendContentElem.className = 'gl-map__legend-content';
-        legendContentElems.forEach((elem) => {
-            legendContentElem.appendChild(elem);
-        });
+        if (!imageBounds.contains(newMapCenter)) {
+            // Find the nearest point within the image bounds
+            const newLat = Math.max(imageBounds.getSouthWest().lat(), Math.min(imageBounds.getNorthEast().lat(), newMapCenter.lat()));
+            const newLng = Math.max(imageBounds.getSouthWest().lng(), Math.min(imageBounds.getNorthEast().lng(), newMapCenter.lng()));
 
-        legendDrawerElem.setAttribute('id', `gl_legend_${this._id}`);
-        legendDrawerElem.className = 'gl-map__legend-drawer';
-        legendDrawerElem.appendChild(legendContentElem);
-
-        legendToggleElem.setAttribute('type', 'button');
-        legendToggleElem.setAttribute('id', `gl_legend_toggle_${this._id}`);
-        legendToggleElem.setAttribute('aria-controls', `gl_legend_${this._id}`);
-        legendToggleElem.setAttribute('aria-expanded', false);
-        legendToggleElem.setAttribute('title', 'Show Map Legend');
-        legendToggleElem.className = 'gl-map__legend-toggle';
-        legendToggleElem.textContent = '•••';
-        this.legendToggleElem = legendToggleElem;
-        this.legendToggleElem.addEventListener('click', this.toggleLegend, false);
-
-        legendElem.style.userSelect = 'none';
-        legendElem.className = 'gl-map__legend';
-        legendElem.appendChild(this.legendToggleElem);
-        legendElem.appendChild(legendDrawerElem);
-
-        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(legendElem);
-    }
-
-    generateMapRotateControl() {
-        this.rotateButtonElem = document.createElement('button');
-
-        this.rotateButtonElem.type = 'button';
-        this.rotateButtonElem.className = 'gl__edit gl__edit-rotate';
-        this.rotateButtonElem.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M19.51613 0h-.40323c-.26721 0-.48387.21665-.48387.48387v4.46077C16.8923 1.98634 13.6784 0 10 0 4.64629 0 .27516 4.20718.0125 9.49569-.00117 9.7706.22077 10 .496 10h.40388c.25617 0 .4696-.19956.48294-.45536C1.61923 5.0087 5.36682 1.37097 10 1.37097c3.34121 0 6.2394 1.89826 7.67294 4.67742h-4.60842c-.26722 0-.48387.21665-.48387.48387v.40322c0 .26722.21665.48387.48387.48387h6.4516c.26723 0 .48388-.21665.48388-.48387V.48388C20 .21664 19.78335 0 19.51613 0Zm-.01214 10h-.40383c-.25613 0-.46964.19956-.48294.45536-.23653 4.55101-3.99843 8.17367-8.61722 8.17367-3.33097 0-6.23677-1.89322-7.67335-4.67742h4.60883c.26722 0 .48387-.21665.48387-.48387v-.40322c0-.26722-.21665-.48387-.48387-.48387H.48388c-.26723 0-.48388.21665-.48388.48387v6.4516C0 19.78336.21665 20 .48387 20H.8871c.26721 0 .48387-.21665.48387-.48387v-4.46077C3.1077 18.01366 6.32165 20 10 20c5.35375 0 9.72484-4.20718 9.9875-9.49569C20.00117 10.2294 19.77923 10 19.504 10Z"/></svg>';
-
-        this.rotateButtonElem.addEventListener('click', this.handleRotateButtonClick, false);
-
-        this.map.controls[google.maps.ControlPosition.CENTER].push(this.rotateButtonElem);
-    }
-
-    generateCenterMapControl() {
-        const centerMapElem = document.createElement('button');
-
-        centerMapElem.type = 'button';
-        centerMapElem.title = 'Center the Map';
-        centerMapElem.className = 'gl-map__center-button';
-
-        centerMapElem.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="M10 0c5.52285 0 10 4.47715 10 10s-4.47715 10-10 10S0 15.52285 0 10 4.47715 0 10 0ZM3.72462 10.63068h-2.4409c.30834 4.32356 3.76204 7.77726 8.0856 8.0856v-2.4409c-2.97945-.29584-5.34886-2.66525-5.6447-5.6447Zm14.99251-.01202-.04376.00775-.07354.00424-2.32445.00007c-.29584 2.97941-2.66525 5.34882-5.6447 5.64466v2.4409c4.32757-.30863 7.78366-3.76844 8.08645-8.09762Zm-8.08627-4.35022-.0002.89139c0 .3483-.28236.63065-.63066.63065-.32342 0-.58998-.24346-.62641-.5571l-.00424-.07355-.00021-.8914c-1.58435.2659-2.8348 1.51636-3.1007 3.1007l1.1959.00022c.3483 0 .63065.28235.63065.63065 0 .32342-.24345.58998-.5571.62641l-.07355.00424-1.1959.00021c.2659 1.58435 1.51635 2.8348 3.1007 3.1007l.0002-1.21748c0-.3483.28236-.63065.63066-.63065.32342 0 .58998.24346.62641.5571l.00424.07355.00021 1.21748c1.58435-.2659 2.8348-1.51635 3.1007-3.1007l-1.38427-.0002c-.3483 0-.63065-.28236-.63065-.63066 0-.32342.24346-.58998.5571-.62641l.07355-.00424 1.38427-.00021c-.2659-1.58435-1.51635-2.8348-3.1007-3.1007Zm-.00018-4.98472v2.4409c2.97945.29584 5.34886 2.66525 5.6447 5.64466l2.32445.00007a.6341.6341 0 0 1 .11726.01088c-.30275-4.32807-3.75884-7.78788-8.0864-8.09651Zm-9.34696 8.0856h2.4409c.29584-2.97945 2.66525-5.34886 5.6447-5.6447v-2.4409c-4.32356.30834-7.77726 3.76204-8.0856 8.0856Z"/></svg>';
-
-        centerMapElem.addEventListener('click', this.recenterMap, false);
-
-        this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(centerMapElem);
-    }
-
-    /**
-     * Generates the detail container elements for marker details
-     */
-    generateDetail() {
-        const detailElem = document.createElement('div');
-        const contentElem = document.createElement('div');
-        const closeElem = document.createElement('button');
-
-        closeElem.setAttribute('type', 'button');
-        closeElem.className = 'gl-map__detail-close';
-        closeElem.innerHTML = '&times;';
-        closeElem.addEventListener('click', this.closeDetail.bind(this), false);
-
-        contentElem.className = 'gl-map__detail-content';
-
-        detailElem.className = 'gl-map__detail';
-        detailElem.appendChild(contentElem);
-        detailElem.appendChild(closeElem);
-
-        this.elem.appendChild(detailElem);
-        this.detailElem = detailElem;
-        this.detailContentElem = contentElem;
-    }
-
-    /**
-     * Loads the detail for a selected marker
-     *
-     * @param {google.maps.Marker} marker
-     */
-    loadDetail(marker) {
-        const markerElem = this.markerElems.find(elem => elem.id === marker.id);
-        const markerElemChildren = markerElem ? [...markerElem.children] : [];
-
-        this.elem.classList.remove('has-detail');
-
-        if (!this.detailElem) {
-            this.generateDetail();
+            // Set the map's center to the nearest point
+            this.map.panTo(new google.maps.LatLng(newLat, newLng));
         }
-
-        while (this.detailContentElem.firstChild) {
-            this.detailContentElem.removeChild(this.detailContentElem.lastChild);
-        }
-
-        markerElemChildren.forEach((child) => {
-            this.detailContentElem.appendChild(child.cloneNode(true));
-        });
-
-        this.loadDetailTimeout = setTimeout(this.showDetail, 200);
     }
 
-    /**
-     * Shows the detail by adding a class name to
-     * GlGoogleMap element
-     */
-    showDetail() {
-        this.elem.classList.add('has-detail');
+    toggleResizeState() {
+        if (!this.#imageLayer) return;
+        this.state = this.state === GlMap.STATES.RESIZING
+            ? GlMap.STATES.DEFAULT
+            : GlMap.STATES.RESIZING;
+    }
+
+    toggleDragState() {
+        if (!this.#imageLayer) return;
+        this.state = this.state === GlMap.STATES.DRAGGING
+            ? GlMap.STATES.DEFAULT
+            : GlMap.STATES.DRAGGING;
+    }
+
+    toggleAddMarkerState() {
+        this.state = this.state === GlMap.STATES.ADDING_MARKER
+            ? GlMap.STATES.DEFAULT
+            : GlMap.STATES.ADDING_MARKER;
+    }
+
+    toggleRemoveMarkerState() {
+        this.state = this.state === GlMap.STATES.REMOVING_MARKER
+            ? GlMap.STATES.DEFAULT
+            : GlMap.STATES.REMOVING_MARKER;
     }
 
     /**
      * Closes the detail
      */
     closeDetail() {
-        this.elem.classList.remove('has-detail');
         this.markers.forEach((marker) => {
             if (marker.isSelected && marker.type !== 'admin') {
                 marker.setIcon({
-                    path: this._markerPath,
+                    path: marker.path,
                     fillColor: marker.color,
                     fillOpacity: 1,
                     strokeWeight: 0,
@@ -653,39 +508,17 @@ export class GlGoogleMap extends HTMLElement {
      * @returns {Object}
      */
     getPixelCoordinate(latLng) {
-        const overlayProjection = this.imageLayer.getProjection();
+        const overlayProjection = this.#imageLayer.getProjection();
         return overlayProjection.fromLatLngToDivPixel(latLng);
-    }
-
-    loadGoogleMapsApi() {
-        const endpoint = 'https://maps.googleapis.com/maps/api/js';
-        const script = document.createElement('script');
-        script.id = `map_script_${this._id}`;
-        script.type = 'text/javascript';
-        script.src = `${endpoint}?key=${this.key}&callback=${this.apiLoadedCBName}&v=weekly`;
-        script.defer = true;
-        script.async = true;
-        window[this.apiLoadedCBName] = this.handleApiLoaded.bind(this);
-        document.head.appendChild(script);
     }
 
     setAdminMode(isAdmin) {
         if (this.map) {
             this.map.isAdmin = isAdmin;
         }
-        if (this.imageLayer) {
-            this.imageLayer.setAdminMode(isAdmin);
+        if (this.#imageLayer) {
+            this.#imageLayer.isAdmin = isAdmin;
         }
-        if (this.rotateButtonElem) {
-            this.rotateButtonElem.style.display = isAdmin ? 'flex' : 'none';
-        }
-
-        this.markers.forEach((marker) => {
-            marker.setDraggable(this.isAdmin);
-            if (marker.type === 'admin') {
-                marker.setVisible(this.isAdmin && this.isImageVisible);
-            }
-        });
     }
 
     /**
@@ -698,7 +531,7 @@ export class GlGoogleMap extends HTMLElement {
      * @param {number=} [offsetY=0]
      */
     panToSelectedMarker(marker, offsetX = 100, offsetY = 0) {
-        const projection = this.imageLayer.getProjection();
+        const projection = this.#imageLayer.getProjection();
         const pixelPosition = projection.fromLatLngToDivPixel(marker.getPosition());
         const newPixelPosition = {
             x: pixelPosition.x + offsetX,
@@ -709,53 +542,224 @@ export class GlGoogleMap extends HTMLElement {
     }
 
     /**
-     * Fires when the component is connected to the DOM
+     * Handles clicks on the map while in the GlMap.STATES.ADDING_MARKER state
+     * @param {google.maps.MapMouseEvent} e - The google maps click event
      */
-    connectedCallback() {
-        this._markerElems = this.querySelectorAll('gl-google-marker');
-    }
+    onAddMarkerClick(e) {
+        const newMarker = document.createElement('gl-marker');
+        newMarker.latitude = e.latLng.lat();
+        newMarker.longitude = e.latLng.lng();
+        newMarker.status = 'model';
+        newMarker.color = '#60b3df';
+        newMarker.path = 'M10 0c5.52285 0 10 4.47715 10 10 0 7.50794-5.59957 12.48988-10 12.48988S0 17.78101 0 10C0 4.47715 4.47715 0 10 0Zm0 3.4743c-3.60404 0-6.5257 2.92166-6.5257 6.5257 0 3.60404 2.92166 6.5257 6.5257 6.5257 3.60404 0 6.5257-2.92166 6.5257-6.5257 0-3.60404-2.92166-6.5257-6.5257-6.5257Zm0 3.0039c1.94504 0 3.5218 1.57676 3.5218 3.5218 0 1.94504-1.57676 3.5218-3.5218 3.5218-1.94504 0-3.5218-1.57676-3.5218-3.5218 0-1.94504 1.57676-3.5218 3.5218-3.5218Z';
 
-    adoptedCallback() {
-        this._markerElems = this.querySelectorAll('gl-google-marker');
+        this.#activeMarker = newMarker;
+
+        this.notifySubscribers('marker-added', {
+            glMarker: this.#activeMarker
+        });
+
+        this.state = GlMap.STATES.ADDING_MARKER;
     }
 
     /**
-     * Handles changes to the component attributes
-     * @param {String} name
-     * @param {String} oldValue
-     * @param {String} newValue
+     * Switches between GlGoogleMap Modes ADMIN and DEFAULT modes.
      */
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'key' && newValue) {
-            this.key = newValue;
-            this.removeAttribute('key');
-            this.loadGoogleMapsApi();
-        }
+    switchModes() {
+        this.state = GlMap.STATES.DEFAULT;
 
-        if (name === 'admin') {
-            this.setAdminMode(this.isAdmin);
-        }
-
-        if (name === 'hide-kml' && this.kmlLayer) {
-            this.kmlLayer.setMap(this.isKmlVisible ? this.map : null);
-        }
-
-        if (name === 'hide-image' && this.imageLayer) {
-            if (this.isImageVisible) {
-                this.placeImages();
-            } else {
-                this.imageLayer.setMap(null);
+        // Cleanup
+        if (this.#previousMode === GlMap.MODES.ADMIN) {
+            this.mapControls.resize.style.display = 'none';
+            this.mapControls.drag.style.display = 'none';
+            this.mapControls.addMarker.style.display = 'none';
+            this.mapControls.removeMarker.style.display = 'none';
+            this.markers.forEach((m) => m.setDraggable(false));
+            this.mapControls.resize.removeEventListener('click', this.toggleResizeState);
+            this.mapControls.drag.removeEventListener('click', this.toggleDragState);
+            this.mapControls.addMarker.removeEventListener('click', this.toggleAddMarkerState);
+            this.mapControls.removeMarker.removeEventListener('click', this.toggleRemoveMarkerState);
+            if (this.map) {
+                this.map.addListener('dragend', this.restrictPanning);
             }
+        }
 
-            this.markers.forEach((marker) => {
-                if (marker.type === 'admin') {
-                    marker.setVisible(this.isAdmin && this.isImageVisible);
-                }
+        // New mode settings
+        if (this.mode === GlMap.MODES.ADMIN) {
+            this.mapControls.resize.style.display = '';
+            this.mapControls.drag.style.display = '';
+            this.mapControls.addMarker.style.display = '';
+            this.mapControls.removeMarker.style.display = '';
+            this.markers.forEach((m) => m.setDraggable(true));
+            this.mapControls.resize.addEventListener('click', this.toggleResizeState, false);
+            this.mapControls.drag.addEventListener('click', this.toggleDragState, false);
+            this.mapControls.addMarker.addEventListener('click', this.toggleAddMarkerState, false);
+            this.mapControls.removeMarker.addEventListener('click', this.toggleRemoveMarkerState, false);
+            if (this.map) {
+                google.maps.event.clearListeners(this.map, 'dragend');
+            }
+        }
+    }
+
+    /**
+     * Switches between GlGoogleMap States
+     */
+    switchStates() {
+        // Cleanup
+        switch (this.#previousState) {
+            case GlMap.STATES.LOADING:
+                break;
+            case GlMap.STATES.RESIZING:
+                this.markers.forEach((m) => m.setVisible(true));
+                this.#imageLayer.state = GlMap.STATES.DEFAULT;
+                this.mapControls.resize.classList.remove('active');
+                break;
+            case GlMap.STATES.DRAGGING:
+                this.markers.forEach((m) => m.setVisible(true));
+                this.#imageLayer.state = GlMap.STATES.DEFAULT;
+                this.mapControls.drag.classList.remove('active');
+                break;
+            case GlMap.STATES.ADDING_MARKER:
+                google.maps.event.clearListeners(this.map, 'click');
+                this.mapControls.addMarker.classList.remove('active');
+                break;
+            case GlMap.STATES.REMOVING_MARKER:
+                this.mapControls.removeMarker.classList.remove('active');
+                break;
+            case GlMap.STATES.CONFIRMING:
+                break;
+            default:
+                break;
+        }
+
+        switch (this.state) {
+            case GlMap.STATES.LOADING:
+                this.pingLoadState(this);
+                break;
+            case GlMap.STATES.RESIZING:
+                this.markers.forEach((m) => m.setVisible(false));
+                this.#imageLayer.state = GlMap.STATES.RESIZING;
+                this.mapControls.resize.classList.add('active');
+                break;
+            case GlMap.STATES.DRAGGING:
+                this.markers.forEach((m) => m.setVisible(false));
+                this.#imageLayer.state = GlMap.STATES.DRAGGING;
+                this.mapControls.drag.classList.add('active');
+                break;
+            case GlMap.STATES.ADDING_MARKER:
+                this.mapControls.addMarker.classList.add('active');
+                this.map.addListener('click', this.onAddMarkerClick);
+                break;
+            case GlMap.STATES.REMOVING_MARKER:
+                this.mapControls.removeMarker.classList.add('active');
+                break;
+            case GlMap.STATES.CONFIRMING:
+                break;
+            default:
+                this.pingLoadState(this);
+                break;
+        }
+        this.notifySubscribers('state', this.state);
+    }
+
+    pingLoadState(component) {
+        let fullyLoaded = true;
+
+        if (this.#imageLayer.state === GlMap.STATES.LOADING) {
+            fullyLoaded = false;
+        }
+
+        if (fullyLoaded) {
+            this.notifySubscribers('load', {
+                state: this.state,
+                progress: 70
+            });
+        }
+
+        if (this.state === GlMap.STATES.LOADING) {
+            fullyLoaded = false;
+        }
+
+        if (fullyLoaded) {
+            this.notifySubscribers('load', {
+                state: this.state,
+                progress: 100
             });
         }
     }
-}
 
-if (!window.customElements.get('gl-google-map')) {
-    window.customElements.define('gl-google-map', GlGoogleMap);
+    subscribe(callback) {
+        this.#subscribers.push(callback);
+    }
+
+    notifySubscribers(...data) {
+        this.#subscribers.forEach((callback) => callback(...data));
+    }
+
+    /**
+     * Gets the current mode of the GlGoogleMap instance.
+     * @returns {string} The current mode
+     */
+    get mode() {
+        return this.#currentMode;
+    }
+
+    /**
+     * Sets the current mode of the GlGoogleMap instance, if the provided mode is valid.
+     * @param {string} newMode - The new mode to set.
+     */
+    set mode(newMode) {
+        if (!newMode || newMode === this.#currentMode) return;
+        if (Object.values(GlMap.MODES).includes(newMode)) {
+            this.#previousMode = this.#currentMode;
+            this.#currentMode = newMode;
+            this.switchModes();
+        } else {
+            console.error(`Invalid mode: ${newMode}`);
+        }
+    }
+
+    /**
+     * Gets the current state of the GlGoogleMap instance
+     * @returns {string} The current state
+     */
+    get state() { return this.#currentState; }
+
+    /**
+     * Sets the current state of the GlGoogleMap instance, if the provided state is valid.
+     * @param {string} newState - The new state to set.
+     */
+    set state(newState) {
+        if (!newState || newState === this.#currentState) return;
+        if (Object.values(GlMap.STATES).includes(newState)) {
+            this.#previousState = this.#currentState;
+            this.#currentState = newState;
+            this.switchStates();
+        } else {
+            console.error(`Invalid state: ${newState}`);
+        }
+    }
+
+    get map() {
+        return this.#map;
+    }
+
+    set map(newMap) {
+        this.#map = newMap instanceof google.maps.Map
+            ? newMap
+            : null;
+    }
+
+    get markers() {
+        return this.#markers;
+    }
+
+    set markers(glMarkers) {
+        this.#glMarkers = [...glMarkers];
+        this.#markers = this.#glMarkers.map((glMarker) => {
+            // If GlMarker has already been mapped, return it
+            if (glMarker.mapMarker) return glMarker.mapMarker;
+            return this.createMarker(glMarker);
+        });
+    }
 }

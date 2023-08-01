@@ -1,0 +1,134 @@
+[
+  {
+    "elementType": "all",
+    "featureType": "landscape",
+    "stylers": [
+      {
+        "color": "#f2f2f2"
+      }
+    ]
+  },
+  {
+    "elementType": "all",
+    "featureType": "poi",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "elementType": "all",
+    "featureType": "road",
+    "stylers": [
+      {
+        "hue": "#ff0000"
+      },
+      {
+        "lightness": "-15"
+      },
+      {
+        "saturation": -100
+      }
+    ]
+  },
+  {
+    "elementType": "all",
+    "featureType": "road.highway",
+    "stylers": [
+      {
+        "visibility": "simplified"
+      },
+      {
+        "weight": "1.78"
+      }
+    ]
+  },
+  {
+    "elementType": "all",
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "elementType": "all",
+    "featureType": "water",
+    "stylers": [
+      {
+        "color": "#0079c1"
+      },
+      {
+        "visibility": "on"
+      }
+    ]
+  },
+  {
+    "elementType": "geometry.fill",
+    "featureType": "road",
+    "stylers": [
+      {
+        "color": "#f8981d"
+      },
+      {
+        "invert_lightness": true
+      },
+      {
+        "weight": "0.5"
+      }
+    ]
+  },
+  {
+    "elementType": "geometry.fill",
+    "featureType": "road.arterial",
+    "stylers": [
+      {
+        "color": "#9d9d9d"
+      },
+      {
+        "saturation": "-100"
+      }
+    ]
+  },
+  {
+    "elementType": "geometry.fill",
+    "featureType": "road.local",
+    "stylers": [
+      {
+        "color": "#a0a0a0"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.icon",
+    "featureType": "road.arterial",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "featureType": "administrative",
+    "stylers": [
+      {
+        "color": "#444444"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "featureType": "administrative",
+    "stylers": [
+      {
+        "color": "#ffffff"
+      },
+      {
+        "weight": "3.00"
+      }
+    ]
+  }
+]

@@ -2,6 +2,7 @@
     "editor.quickSuggestions": null,
     "javascript.validate.enable": false,
     "search.exclude": {
-        "**/dist": true
+        "**/dist": true,
+        "**/docs/components": true
     }
 }
